@@ -1,0 +1,11 @@
+{
+  "documents": [],
+  "chunks": [],
+  "settings": {
+    "embeddingProvider": "local",
+    "embeddingModel": "local-hash-v1",
+    "chunkSize": 1800,
+    "chunkOverlap": 220,
+    "topK": 6
+  }
+}

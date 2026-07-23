@@ -1,65 +1,189 @@
-import Image from "next/image";
+"use client";
+
+import { ChatComposer } from "@/components/chat/ChatComposer";
+import { ChatMessages } from "@/components/chat/ChatMessages";
+import { AuthGate } from "@/components/auth/AuthGate";
+import { DocumentationPanel } from "@/components/docs/DocumentationPanel";
+import { DocumentsPanel } from "@/components/docs/DocumentsPanel";
+import { EmptyChat } from "@/components/chat/EmptyChat";
+import { I18nProvider, useI18n } from "@/components/i18n/I18nProvider";
+import { AppFooter } from "@/components/layout/AppFooter";
+import { Sidebar } from "@/components/layout/Sidebar";
+import { TopBar } from "@/components/layout/TopBar";
+import { SettingsPanel } from "@/components/settings/SettingsPanel";
+import { TokenUsagePanel } from "@/components/usage/TokenUsagePanel";
+import { useChatController } from "@/hooks/useChatController";
 
 export default function Home() {
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
+    <AuthGate>
+      <AuthenticatedHome />
+    </AuthGate>
+  );
+}
+
+function AuthenticatedHome() {
+  const chat = useChatController();
+
+  return (
+    <I18nProvider locale={chat.locale}>
+      <HomeShell chat={chat} />
+    </I18nProvider>
+  );
+}
+
+function HomeShell({ chat }) {
+  const { dir, t } = useI18n();
+
+  const composer = (
+    <ChatComposer
+      canSend={chat.canSend}
+      hasMessages={chat.hasMessages}
+      input={chat.input}
+      inputRef={chat.inputRef}
+      isSending={chat.isSending}
+      provider={chat.provider}
+      webSearchEnabled={chat.webSearchEnabled}
+      onChange={chat.setInput}
+      onSubmit={chat.sendMessage}
+      onToggleWebSearch={() => chat.setWebSearchEnabled((value) => !value)}
+      onToggleVoiceChat={chat.toggleVoiceChat}
+      voiceState={chat.voiceState}
+    />
+  );
+
+  return (
+    <main className="app-shell" dir={dir}>
+      <Sidebar
+        activeChatId={chat.activeChatId}
+        chats={chat.visibleChats}
+        folders={chat.folders}
+        isOpen={chat.sidebarOpen}
+        searchQuery={chat.searchQuery}
+        selectedFolderId={chat.selectedFolderId}
+        selectedWorkspaceId={chat.selectedWorkspaceId}
+        workspaces={chat.workspaces}
+        onChangeSearch={chat.setSearchQuery}
+        onClose={() => chat.setSidebarOpen(false)}
+        onCreateFolder={chat.createFolder}
+        onCreateWorkspace={chat.createWorkspace}
+        onDeleteChat={chat.deleteSavedChat}
+        onMoveChat={chat.moveSavedChat}
+        onNewChat={chat.newChat}
+        onSelectChat={chat.selectChat}
+        onSelectFolder={chat.selectFolder}
+        onSelectWorkspace={chat.selectWorkspace}
+      />
+
+      {chat.sidebarOpen && (
+        <button className="mobile-scrim" onClick={() => chat.setSidebarOpen(false)} aria-label={t("sidebar.collapse")} type="button" />
+      )}
+
+      <section className="chat-stage">
+        <TopBar
+          documentChatEnabled={chat.documentChatEnabled}
+          model={chat.model}
+          sidebarOpen={chat.sidebarOpen}
+          temporaryChat={chat.temporaryChat}
+          onOpenDocuments={() => chat.setDocumentsOpen(true)}
+          onOpenDocs={() => chat.setDocsOpen(true)}
+          onOpenSettings={() => chat.setSettingsOpen(true)}
+          onOpenSidebar={() => chat.setSidebarOpen(true)}
+          onOpenUsage={() => chat.setUsageOpen(true)}
+          onToggleDocumentChat={() => chat.setDocumentChatEnabled((value) => !value)}
+          onToggleTemporaryChat={() => chat.setTemporaryChat((value) => !value)}
         />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.js file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+
+        {chat.documentChatEnabled && (
+          <div className="document-chat-banner">
+            {t("banners.documentChat")}
+          </div>
+        )}
+
+        {chat.temporaryChat && (
+          <div className="temporary-banner">
+            {t("banners.temporaryChat")}
+          </div>
+        )}
+
+        <div className={`chat-body ${chat.hasMessages ? "with-messages" : "empty"}`}>
+          {!chat.hasMessages ? (
+            <EmptyChat composer={composer} model={chat.model} onPickSuggestion={chat.pickSuggestion} />
+          ) : (
+            <>
+              <ChatMessages
+                copiedId={chat.copiedId}
+                messages={chat.messages}
+                model={chat.model}
+                onCopyMessage={chat.copyMessage}
+                scrollRef={chat.scrollRef}
+              />
+              <div className="docked-composer">
+                {composer}
+                <AppFooter />
+              </div>
+            </>
+          )}
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
-    </div>
+      </section>
+
+      {chat.settingsOpen && (
+        <SettingsPanel
+          apiKey={chat.apiKey}
+          baseUrl={chat.baseUrl}
+          currentProvider={chat.currentProvider}
+          folders={chat.folders}
+          guardrails={chat.guardrails}
+          hasMessages={chat.hasMessages}
+          importChatsRef={chat.importChatsRef}
+          model={chat.model}
+          modelCatalog={chat.modelCatalog}
+          modelCatalogError={chat.modelCatalogError}
+          modelCatalogSource={chat.modelCatalogSource}
+          modelCatalogStatus={chat.modelCatalogStatus}
+          provider={chat.provider}
+          realtimeModel={chat.realtimeModel}
+          resolvedRealtimeModel={chat.resolvedRealtimeModel}
+          selectedFolderId={chat.selectedFolderId}
+          selectedWorkspaceId={chat.selectedWorkspaceId}
+          temperature={chat.temperature}
+          temporaryChat={chat.temporaryChat}
+          theme={chat.theme}
+          locale={chat.locale}
+          voiceError={chat.voiceError}
+          voiceState={chat.voiceState}
+          onChangeApiKey={chat.setApiKey}
+          onChangeBaseUrl={chat.setBaseUrl}
+          onChangeModel={chat.setModel}
+          onChangeProvider={chat.changeProvider}
+          onChangeRealtimeModel={chat.setRealtimeModel}
+          onChangeTemperature={chat.setTemperature}
+          onChangeLocale={chat.setLocale}
+          onClearMessages={() => chat.setMessages([])}
+          onClose={() => chat.setSettingsOpen(false)}
+          onExportChat={chat.exportChat}
+          onExportChatLibrary={chat.exportChatLibrary}
+          onImportChatLibrary={chat.importChatLibrary}
+          onMoveChat={chat.moveActiveChat}
+          onSaveChat={() => chat.saveChat()}
+          onToggleGuardrails={() => chat.setGuardrails((value) => !value)}
+          onToggleTemporaryChat={() => chat.setTemporaryChat((value) => !value)}
+          onToggleTheme={() => chat.setTheme(chat.theme === "dark" ? "light" : "dark")}
+          onToggleVoiceChat={chat.toggleVoiceChat}
+        />
+      )}
+
+      {chat.usageOpen && <TokenUsagePanel usage={chat.tokenUsage} onClose={() => chat.setUsageOpen(false)} />}
+      {chat.docsOpen && <DocumentationPanel onClose={() => chat.setDocsOpen(false)} />}
+      {chat.documentsOpen && (
+        <DocumentsPanel
+          apiKey={chat.apiKey}
+          documentChatEnabled={chat.documentChatEnabled}
+          openAIBaseUrl={chat.provider === "openai" ? chat.baseUrl : "https://api.openai.com/v1"}
+          onClose={() => chat.setDocumentsOpen(false)}
+          onToggleDocumentChat={() => chat.setDocumentChatEnabled((value) => !value)}
+        />
+      )}
+    </main>
   );
 }

@@ -1,36 +1,436 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# SB Chat
+
+![Next.js](https://img.shields.io/badge/Next.js-16-black?style=for-the-badge&logo=nextdotjs)
+![React](https://img.shields.io/badge/React-19-149eca?style=for-the-badge&logo=react&logoColor=white)
+![Better Auth](https://img.shields.io/badge/Better_Auth-Sovereign_Auth-111111?style=for-the-badge)
+![SQLite](https://img.shields.io/badge/SQLite-Local_Sessions-003b57?style=for-the-badge&logo=sqlite&logoColor=white)
+![Ollama](https://img.shields.io/badge/Ollama-Local_AI-111111?style=for-the-badge)
+![OpenAI](https://img.shields.io/badge/OpenAI-Compatible-10a37f?style=for-the-badge&logo=openai&logoColor=white)
+![OpenRouter](https://img.shields.io/badge/OpenRouter-Models-7c3aed?style=for-the-badge)
+![Claude](https://img.shields.io/badge/Claude-Anthropic_API-d97757?style=for-the-badge)
+![Grok](https://img.shields.io/badge/Grok-xAI_API-111111?style=for-the-badge)
+![Sarvam AI](https://img.shields.io/badge/Sarvam_AI-Chat_Completions-ff6b35?style=for-the-badge)
+![RAG](https://img.shields.io/badge/RAG-Document_Chat-10a37f?style=for-the-badge)
+![License](https://img.shields.io/badge/License-MIT-f59e0b?style=for-the-badge)
+
+**SB Chat** is a sovereign, Next.js-native AI chat workspace for local models, hosted model APIs, document chat, voice, web search, authenticated users, protected APIs, and local-first persistence.
+
+Built by **[Suhas Bhairav](https://suhasbhairav.com)**.
+
+---
+
+## What It Is
+
+SB Chat is a polished alternative to Open WebUI built as a straightforward JavaScript Next.js app. It is designed for people who want control over their AI stack: local Ollama models, bring-your-own API keys, OpenAI-compatible servers, local JSON data files, local SQLite auth sessions, and no mandatory hosted identity provider.
+
+The product goal is **sovereign AI**: the app can run privately on your machine or server while still supporting OpenAI, Claude, Grok, Sarvam AI, OpenRouter, Ollama, and custom OpenAI-compatible endpoints.
+
+---
+
+## Current Capabilities
+
+### Sovereign Authentication
+
+- Better Auth email/password authentication
+- Local SQLite auth database at `data/sb-chat-auth.sqlite`
+- Uses Node's built-in `node:sqlite` driver, avoiding native `better-sqlite3` rebuild issues
+- Local sessions with HTTP-only cookies
+- Sign in, create account, and sign out UI
+- Default sign-up name set to Suhas Bhairav
+- Protected app APIs for chat, library, models, documents, token usage, and realtime sessions
+- Auth database ignored by git
+- Migration script: `npm run auth:migrate`
+
+### Chat Experience
+
+- ChatGPT-style dark/light interface
+- SB-branded circular chat icon
+- Streaming assistant responses
+- Markdown rendering through `react-markdown` and `remark-gfm`
+- Vertical scrolling for chat history and composer input
+- Temporary chat mode with visible banner and no history persistence
+- Copy assistant messages
+- Import/export individual chats and the full chat library
+- Workspaces and folders
+- Move chats between folders
+- Search across saved chats and message content
+
+### Providers
+
+- Ollama via `http://localhost:11434`
+- OpenAI Chat Completions
+- OpenAI hosted Web Search through the Responses tools flow
+- OpenAI Realtime voice sessions
+- OpenRouter chat completions
+- Claude through Anthropic Messages API
+- Grok through xAI API
+- Sarvam AI chat completions
+- Custom OpenAI-compatible endpoints such as LM Studio, vLLM, llama.cpp, and LiteLLM
+- Server-side `.env` API key fallback
+- Runtime API key entry in Settings
+
+### Model Selection
+
+- Provider-specific model picker
+- OpenAI model catalog support
+- OpenRouter model catalog support
+- Ollama local model discovery from `/api/tags`
+- Claude, Grok, and Sarvam catalog fallbacks
+- Manual model entry for custom endpoints
+- Compatibility handling for models such as `gpt-5-nano` that require default temperature
+
+### Voice Chat
+
+- OpenAI Realtime over WebRTC
+- Server-created ephemeral realtime client secret
+- Automatic realtime model resolution
+- Browser microphone streaming
+- Spoken assistant replies
+- User transcript inserted into chat
+
+### Web Search
+
+- Web Search toggle inside the chat composer plus menu
+- OpenAI-only hosted search flow
+- Search stays below the composer control and uses an opaque dropdown surface
+- Streaming answer integration with normal chat messages
+
+### Guardrails
+
+- Comprehensive guardrails switch
+- Server-side request screening
+- Safer system behavior toggle
+- Detection for prompt extraction, secret exposure, and high-risk cyber requests
+- Raw model mode remains available when guardrails are disabled
+
+### Document Chat and RAG
+
+- Documents page for upload, list, search, download, delete, and reindex
+- Uploads: PDF, TXT, Markdown, JSON, LOG, CSV, XLS, XLSX, DOCX
+- Local hashed embeddings for private/offline indexing
+- OpenAI embeddings with `text-embedding-3-small`
+- Configurable chunk size, overlap, and Top K
+- `Enable Document Chat` top-bar toggle
+- Document-grounded system prompt that refuses unsupported answers
+- Source labels appended to answers
+
+### Token Usage
+
+- JSON usage ledger at `data/token-usage.json`
+- Input tokens
+- Output tokens
+- Total tokens
+- Requests by provider, model, and day
+- Recent usage events
+- Temporary chat usage is tracked even when chat history is not saved
+
+### Internationalization
+
+SB Chat intentionally exposes only languages with complete curated UI coverage:
+
+- English
+- German
+- Spanish
+- Simplified Chinese
+- Hindi
+- Kannada
+
+Locale preference is stored in browser settings. User-generated data, model output, chat titles, folder names, and document names are intentionally not translated.
+
+---
+
+## Tech Stack
+
+| Layer | Technology |
+| --- | --- |
+| Framework | Next.js 16 App Router |
+| UI | React 19 |
+| Styling | Tailwind CSS 4 + custom product CSS tokens |
+| Icons | Lucide React |
+| Auth | Better Auth |
+| Auth DB | Local SQLite through Node `node:sqlite` |
+| Chat Storage | Local JSON files |
+| Markdown | `react-markdown` + `remark-gfm` |
+| Documents | `mammoth`, `xlsx`, local file processing |
+| Voice | OpenAI Realtime WebRTC |
+| Providers | Ollama, OpenAI, Claude, Grok, Sarvam AI, OpenRouter, OpenAI-compatible APIs |
+
+---
+
+## Project Structure
+
+```text
+sb-chat/
+  app/
+    api/
+      auth/[...all]/       # Better Auth route
+      chat/                # Streaming chat endpoint
+      documents/           # RAG document library API
+      library/             # JSON chat library API
+      models/              # Provider model catalogs
+      realtime/session/    # OpenAI Realtime ephemeral sessions
+      token-usage/         # Token usage summary API
+    globals.css            # Product UI system
+    layout.js
+    page.js                # Auth gate + chat shell composition
+
+  components/
+    auth/                  # Better Auth sign-in/sign-up gate
+    brand/                 # SB brand mark
+    chat/                  # Composer, messages, empty state
+    docs/                  # In-app docs and document manager
+    i18n/                  # Runtime localization provider
+    layout/                # Sidebar, top bar, footer
+    settings/              # Settings drawer
+    usage/                 # Token usage drawer
+
+  hooks/
+    useChatController.js   # Chat state and orchestration
+    useRealtimeVoice.js    # WebRTC voice lifecycle
+
+  lib/
+    auth.js                # Better Auth server config
+    auth-client.js         # Better Auth React client
+    auth-session.js        # Server session guard helpers
+    chat-request.js        # Request validation and normalization
+    chat-store.js          # JSON chat persistence
+    guardrails.js          # Guardrail screening and system prompts
+    i18n.js                # Locale registry and message catalogs
+    i18n-full-overrides.js # Complete curated language catalogs
+    model-catalog.js       # Model discovery and fallbacks
+    model-clients.js       # Provider streaming clients
+    rag-*.js               # RAG storage, processing, embeddings
+    token-usage-store.js   # Usage ledger and summaries
+
+  data/
+    chat-store.json
+    document-store.json
+    token-usage.json
+    sb-chat-auth.sqlite    # Local auth DB, gitignored
+
+  scripts/
+    migrate-auth.mjs       # Better Auth SQLite migration
+```
+
+For deeper module notes, see [ARCHITECTURE.md](./ARCHITECTURE.md).
+
+---
 
 ## Getting Started
 
-First, run the development server:
+### 1. Install dependencies
+
+```bash
+npm install
+```
+
+### 2. Configure environment variables
+
+Create `.env` in the project root:
+
+```bash
+BETTER_AUTH_SECRET=replace_with_a_long_random_secret
+BETTER_AUTH_URL=http://localhost:3000
+BETTER_AUTH_DB_PATH=data/sb-chat-auth.sqlite
+
+OPENAI_API_KEY=your_openai_api_key
+OPENROUTER_API_KEY=your_openrouter_api_key
+ANTHROPIC_API_KEY=your_anthropic_api_key
+XAI_API_KEY=your_xai_api_key
+SARVAM_API_KEY=your_sarvam_api_key
+```
+
+Notes:
+
+- `BETTER_AUTH_SECRET` is required for production-quality sessions.
+- `BETTER_AUTH_URL` should match the public URL of your deployment.
+- `BETTER_AUTH_DB_PATH` defaults to `data/sb-chat-auth.sqlite`.
+- Provider API keys can also be entered at runtime inside Settings.
+- Server-side `.env` values are used when the Settings key field is empty.
+- Restart Next.js after editing `.env`.
+
+### 3. Create or update auth tables
+
+```bash
+npm run auth:migrate
+```
+
+This creates the Better Auth tables:
+
+```text
+user
+session
+account
+verification
+```
+
+### 4. Run the app
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open:
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+```text
+http://localhost:3000
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Create a local account, then configure your provider/model settings.
 
-## Learn More
+---
 
-To learn more about Next.js, take a look at the following resources:
+## Provider Notes
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### Ollama
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```bash
+ollama pull llama3.1
+ollama serve
+```
 
-## Deploy on Vercel
+Settings:
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- Provider: `Ollama`
+- Base URL: `http://localhost:11434`
+- Model: any installed Ollama model
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### OpenAI
+
+```bash
+OPENAI_API_KEY=...
+```
+
+OpenAI supports chat, hosted web search, embeddings, and realtime voice. SB Chat automatically avoids sending unsupported temperature values to models that only allow the default.
+
+### OpenRouter
+
+```bash
+OPENROUTER_API_KEY=...
+```
+
+Use OpenRouter for routed access across model families through an OpenAI-compatible API.
+
+### Claude
+
+```bash
+ANTHROPIC_API_KEY=...
+```
+
+Claude uses Anthropic's Messages API with streaming and provider usage when available.
+
+### Grok
+
+```bash
+XAI_API_KEY=...
+```
+
+Grok uses xAI's API path with streaming support.
+
+### Sarvam AI
+
+```bash
+SARVAM_API_KEY=...
+```
+
+Sarvam AI uses chat completions and is included as a first-class provider.
+
+### Custom OpenAI-Compatible Servers
+
+Examples:
+
+- LM Studio
+- vLLM
+- llama.cpp server
+- LiteLLM
+- OpenAI-compatible internal gateways
+
+Set the provider to custom/OpenAI-compatible, enter your base URL, and use the model ID expected by that server.
+
+---
+
+## Document Chat
+
+Open the Documents icon in the top bar to manage the RAG library.
+
+Supported uploads:
+
+- PDF
+- TXT, Markdown, JSON, LOG
+- CSV
+- XLS, XLSX
+- DOCX
+
+PDF extraction uses local tooling. On macOS, install Poppler if PDF extraction needs it:
+
+```bash
+brew install poppler
+```
+
+Embedding modes:
+
+- `Local embeddings`: deterministic local hashed vectors, no API key required.
+- `OpenAI embeddings`: uses `text-embedding-3-small`.
+
+When Document Chat is enabled, SB Chat retrieves relevant chunks, injects them into the model request, and instructs the model to answer only from retrieved context.
+
+---
+
+## Data and Privacy
+
+SB Chat uses local files by default:
+
+```text
+data/chat-store.json
+data/document-store.json
+data/token-usage.json
+data/sb-chat-auth.sqlite
+```
+
+The auth SQLite file is ignored by git. The API key typed into Settings lives in React state and is not persisted to local storage. Temporary chats are not written to `data/chat-store.json`.
+
+---
+
+## Scripts
+
+```bash
+npm run dev           # Start local development
+npm run build         # Build production app
+npm run start         # Start production server
+npm run lint          # Run ESLint
+npm run auth:migrate  # Create/update Better Auth SQLite schema
+```
+
+---
+
+## Production Notes
+
+Before exposing SB Chat outside a trusted local network:
+
+- Rotate any API key that has ever been logged or committed
+- Set a strong `BETTER_AUTH_SECRET`
+- Set `BETTER_AUTH_URL` to the deployed origin
+- Add HTTPS
+- Add rate limits
+- Consider per-user chat/document/token stores
+- Encrypt provider API keys if you decide to persist them
+- Add audit logs for auth, guardrails, imports, exports, and document actions
+- Consider Postgres or another durable database for multi-user deployments
+
+---
+
+## Creator
+
+Built by **[Suhas Bhairav](https://suhasbhairav.com)**.
+
+Part of the broader AI tooling work by Suhas Bhairav and Metric Coders.
+
+---
+
+## License
+
+MIT License.
+
+Copyright (c) 2026 [Suhas Bhairav](https://suhasbhairav.com).
+
+See [LICENSE](./LICENSE).
