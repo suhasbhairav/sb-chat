@@ -40,6 +40,11 @@ export function DocumentationPanel({ onClose }) {
       title: "Document Chat and RAG",
       copy: "Upload documents, index with local or OpenAI embeddings, retrieve chunks per message, and cite document sources.",
     },
+    {
+      icon: Waypoints,
+      title: "Agent Builder",
+      copy: "Design reusable multi-agent workflows, attach documents to Agent 1, run agents in sequence, and send the final output back to chat.",
+    },
     { icon: Mic2, title: t("docs.cardVoiceTitle"), copy: t("docs.cardVoiceCopy") },
     { icon: ShieldCheck, title: t("docs.cardGuardrailsTitle"), copy: t("docs.cardGuardrailsCopy") },
     { icon: FolderKanban, title: t("docs.cardFoldersTitle"), copy: t("docs.cardFoldersCopy") },
@@ -66,6 +71,7 @@ export function DocumentationPanel({ onClose }) {
     t("docs.workflow4"),
     t("docs.workflow5"),
     t("docs.workflow6"),
+    "Open Agent Builder to save repeatable multi-agent workflows that use the same model and settings as chat.",
   ];
   const providers = [
     ["Ollama", t("providers.ollama.docs")],
@@ -123,6 +129,10 @@ export function DocumentationPanel({ onClose }) {
             <div>
               <strong>JSON</strong>
               <span>{t("docs.localPersistence")}</span>
+            </div>
+            <div>
+              <strong>Agents</strong>
+              <span>Saved workflow builder</span>
             </div>
           </section>
 
@@ -245,6 +255,54 @@ await requireServerSession();`}</code>
             </div>
           </section>
 
+          <section className="docs-split">
+            <div className="docs-copy-block">
+              <span>Agent Builder</span>
+              <h2>Turn one-off prompts into saved, repeatable AI workflows.</h2>
+              <p>
+                The Agent Builder is a dedicated workspace for chaining agents together. Each agent has its own instruction,
+                receives the previous agent output, and runs with the same provider, model, temperature, API key, and
+                guardrail settings already selected in chat.
+              </p>
+              <ul>
+                {[
+                  "Workflow library with saved cards for create, edit, update, and delete",
+                  "Add draft agents or insert reusable saved agents into a workflow",
+                  "Attach documents to Agent 1 so extracted file content starts the chain",
+                  "Right-side visualizer shows the connected sequence and scrollable run trace",
+                  "Final agent output is posted back into the chat window",
+                ].map((item) => (
+                  <li key={item}>
+                    <CheckCircle2 size={16} />
+                    {item}
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div className="docs-code-card">
+              <div className="code-dots" aria-hidden="true">
+                <span />
+                <span />
+                <span />
+              </div>
+              <pre>
+                <code>{`const workflow = [
+  "Agent 1: extract facts from input + docs",
+  "Agent 2: reason over constraints",
+  "Agent 3: produce final answer"
+];
+
+for (const agent of workflow) {
+  output = await runModel({
+    model: chatSettings.model,
+    prompt: agent,
+    input: output
+  });
+}`}</code>
+              </pre>
+            </div>
+          </section>
+
           <section className="docs-band">
             <div>
               <BookOpen size={21} />
@@ -257,6 +315,7 @@ await requireServerSession();`}</code>
               <span><Search size={15} /> {t("docs.featureSearch")}</span>
               <span><FileText size={15} /> {t("docs.featureExport")}</span>
               <span><FileText size={15} /> Document Chat</span>
+              <span><Waypoints size={15} /> Agent Builder</span>
               <span><Boxes size={15} /> {t("docs.featureMove")}</span>
               <span><Languages size={15} /> i18n</span>
               <span><Moon size={15} /> {t("docs.featureDark")}</span>

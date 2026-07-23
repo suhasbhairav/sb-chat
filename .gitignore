@@ -37,6 +37,7 @@ yarn-error.log*
 /data/sb-chat-auth.sqlite
 /data/sb-chat-auth.sqlite-*
 /data/memory-store.json
+/data/agent-store.json
 
 # vercel
 .vercel

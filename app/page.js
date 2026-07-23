@@ -8,6 +8,7 @@ import { DocumentsPanel } from "@/components/docs/DocumentsPanel";
 import { EmptyChat } from "@/components/chat/EmptyChat";
 import { I18nProvider, useI18n } from "@/components/i18n/I18nProvider";
 import { AppFooter } from "@/components/layout/AppFooter";
+import { AgentWorkflowBuilder } from "@/components/agents/AgentWorkflowBuilder";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { TopBar } from "@/components/layout/TopBar";
 import { SettingsPanel } from "@/components/settings/SettingsPanel";
@@ -86,6 +87,7 @@ function HomeShell({ chat }) {
           sidebarOpen={chat.sidebarOpen}
           temporaryChat={chat.temporaryChat}
           onOpenDocuments={() => chat.setDocumentsOpen(true)}
+          onOpenAgents={() => chat.setAgentBuilderOpen(true)}
           onOpenDocs={() => chat.setDocsOpen(true)}
           onOpenSettings={() => chat.setSettingsOpen(true)}
           onOpenSidebar={() => chat.setSidebarOpen(true)}
@@ -94,38 +96,53 @@ function HomeShell({ chat }) {
           onToggleTemporaryChat={() => chat.setTemporaryChat((value) => !value)}
         />
 
-        {chat.documentChatEnabled && (
-          <div className="document-chat-banner">
-            {t("banners.documentChat")}
-          </div>
-        )}
-
-        {chat.temporaryChat && (
-          <div className="temporary-banner">
-            {t("banners.temporaryChat")}
-          </div>
-        )}
-
-        <div className={`chat-body ${chat.hasMessages ? "with-messages" : "empty"}`}>
-          {!chat.hasMessages ? (
-            <EmptyChat composer={composer} model={chat.model} onPickSuggestion={chat.pickSuggestion} />
-          ) : (
-            <>
-              <ChatMessages
-                copiedId={chat.copiedId}
-                messages={chat.messages}
-                model={chat.model}
-                onCopyMessage={chat.copyMessage}
-                onRememberMessage={chat.rememberMessage}
-                scrollRef={chat.scrollRef}
-              />
-              <div className="docked-composer">
-                {composer}
-                <AppFooter />
+        {chat.agentBuilderOpen ? (
+          <AgentWorkflowBuilder
+            apiKey={chat.apiKey}
+            baseUrl={chat.baseUrl}
+            guardrails={chat.guardrails}
+            model={chat.model}
+            provider={chat.provider}
+            temperature={chat.temperature}
+            onClose={() => chat.setAgentBuilderOpen(false)}
+            onWorkflowComplete={chat.completeAgentWorkflow}
+          />
+        ) : (
+          <>
+            {chat.documentChatEnabled && (
+              <div className="document-chat-banner">
+                {t("banners.documentChat")}
               </div>
-            </>
-          )}
-        </div>
+            )}
+
+            {chat.temporaryChat && (
+              <div className="temporary-banner">
+                {t("banners.temporaryChat")}
+              </div>
+            )}
+
+            <div className={`chat-body ${chat.hasMessages ? "with-messages" : "empty"}`}>
+              {!chat.hasMessages ? (
+                <EmptyChat composer={composer} model={chat.model} onPickSuggestion={chat.pickSuggestion} />
+              ) : (
+                <>
+                  <ChatMessages
+                    copiedId={chat.copiedId}
+                    messages={chat.messages}
+                    model={chat.model}
+                    onCopyMessage={chat.copyMessage}
+                    onRememberMessage={chat.rememberMessage}
+                    scrollRef={chat.scrollRef}
+                  />
+                  <div className="docked-composer">
+                    {composer}
+                    <AppFooter />
+                  </div>
+                </>
+              )}
+              </div>
+          </>
+        )}
       </section>
 
       {chat.settingsOpen && (
@@ -164,7 +181,7 @@ function HomeShell({ chat }) {
           onChangeRealtimeModel={chat.setRealtimeModel}
           onChangeTemperature={chat.setTemperature}
           onChangeLocale={chat.setLocale}
-          onClearMessages={() => chat.setMessages([])}
+          onClearMessages={chat.clearMessages}
           onClose={() => chat.setSettingsOpen(false)}
           onExportChat={chat.exportChat}
           onExportChatLibrary={chat.exportChatLibrary}

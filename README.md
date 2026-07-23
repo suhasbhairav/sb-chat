@@ -124,6 +124,19 @@ The product goal is **sovereign AI**: the app can run privately on your machine 
 - Document-grounded system prompt that refuses unsupported answers
 - Source labels appended to answers
 
+### Agent Builder
+
+- Dedicated Agent Builder screen opened from the top bar
+- Workflow library with saved workflow cards
+- Create, update, save, and delete multi-agent workflows
+- Add draft agents or insert reusable saved agents into a workflow
+- Sequential agent execution where each agent receives the previous agent output
+- Uses the same provider, model, API key, temperature, and guardrail settings as chat
+- Agent 1 can receive attached documents; files are extracted and included in its context
+- Right-side flow visualizer and scrollable run trace
+- Final workflow output is sent back into the chat window
+- Local JSON persistence for agent and workflow definitions
+
 ### Token Usage
 
 - JSON usage ledger at `data/token-usage.json`
@@ -165,65 +178,6 @@ Locale preference is stored in browser settings. User-generated data, model outp
 | Vector DB | Local JSON vectors, optional ChromaDB through `chromadb` |
 | Voice | OpenAI Realtime WebRTC |
 | Providers | Ollama, OpenAI, Claude, Grok, Sarvam AI, OpenRouter, OpenAI-compatible APIs |
-
----
-
-## Project Structure
-
-```text
-sb-chat/
-  app/
-    api/
-      auth/[...all]/       # Better Auth route
-      chat/                # Streaming chat endpoint
-      documents/           # RAG document library API
-      library/             # JSON chat library API
-      models/              # Provider model catalogs
-      realtime/session/    # OpenAI Realtime ephemeral sessions
-      token-usage/         # Token usage summary API
-    globals.css            # Product UI system
-    layout.js
-    page.js                # Auth gate + chat shell composition
-
-  components/
-    auth/                  # Better Auth sign-in/sign-up gate
-    brand/                 # SB brand mark
-    chat/                  # Composer, messages, empty state
-    docs/                  # In-app docs and document manager
-    i18n/                  # Runtime localization provider
-    layout/                # Sidebar, top bar, footer
-    settings/              # Settings drawer
-    usage/                 # Token usage drawer
-
-  hooks/
-    useChatController.js   # Chat state and orchestration
-    useRealtimeVoice.js    # WebRTC voice lifecycle
-
-  lib/
-    auth.js                # Better Auth server config
-    auth-client.js         # Better Auth React client
-    auth-session.js        # Server session guard helpers
-    chat-request.js        # Request validation and normalization
-    chat-store.js          # JSON chat persistence
-    guardrails.js          # Guardrail screening and system prompts
-    i18n.js                # Locale registry and message catalogs
-    i18n-full-overrides.js # Complete curated language catalogs
-    model-catalog.js       # Model discovery and fallbacks
-    model-clients.js       # Provider streaming clients
-    rag-*.js               # RAG storage, processing, embeddings
-    token-usage-store.js   # Usage ledger and summaries
-
-  data/
-    chat-store.json
-    document-store.json
-    token-usage.json
-    sb-chat-auth.sqlite    # Local auth DB, gitignored
-
-  scripts/
-    migrate-auth.mjs       # Better Auth SQLite migration
-```
-
-For deeper module notes, see [ARCHITECTURE.md](./ARCHITECTURE.md).
 
 ---
 
@@ -453,12 +407,13 @@ SB Chat uses local files by default:
 ```text
 data/chat-store.json
 data/document-store.json
+data/agent-store.json
 data/memory-store.json
 data/token-usage.json
 data/sb-chat-auth.sqlite
 ```
 
-The auth SQLite file and memory store are ignored by git. The API key typed into Settings lives in React state and is not persisted to local storage. Temporary chats are not written to `data/chat-store.json`.
+The auth SQLite file, memory store, and agent workflow store are ignored by git. The API key typed into Settings lives in React state and is not persisted to local storage. Temporary chats are not written to `data/chat-store.json`.
 
 ---
 

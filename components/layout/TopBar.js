@@ -1,4 +1,4 @@
-import { BarChart3, BookOpen, ChevronDown, FileText, Menu, PanelLeft, Plus, Settings2 } from "lucide-react";
+import { BarChart3, BookOpen, ChevronDown, FileText, Menu, PanelLeft, Plus, Settings2, Workflow } from "lucide-react";
 import { useI18n } from "@/components/i18n/I18nProvider";
 
 export function TopBar({
@@ -11,6 +11,7 @@ export function TopBar({
   onOpenSidebar,
   onOpenUsage,
   onOpenDocs,
+  onOpenAgents,
   onToggleTemporaryChat,
   onToggleDocumentChat,
 }) {
@@ -52,6 +53,16 @@ export function TopBar({
         >
           <FileText size={16} />
           <span>{documentChatEnabled ? t("topbar.documentChatOn") : t("topbar.documentChatOff")}</span>
+        </button>
+        <button
+          aria-label={t("topbar.agentBuilder")}
+          className="top-icon"
+          data-tooltip={t("topbar.agentBuilder")}
+          onClick={onOpenAgents}
+          title={t("topbar.agentBuilder")}
+          type="button"
+        >
+          <Workflow size={19} />
         </button>
         <button
           aria-label={t("topbar.openDocuments")}

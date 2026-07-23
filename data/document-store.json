@@ -4,7 +4,7 @@
   "settings": {
     "embeddingProvider": "local",
     "embeddingModel": "local-hash-v1",
-    "vectorStoreProvider": "chroma",
+    "vectorStoreProvider": "json",
     "chromaUrl": "http://localhost:8000",
     "chromaCollection": "sb_chat_documents",
     "chunkSize": 1800,

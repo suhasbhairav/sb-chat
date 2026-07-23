@@ -130,6 +130,7 @@ export function useChatController() {
   const [usageOpen, setUsageOpen] = useState(false);
   const [docsOpen, setDocsOpen] = useState(false);
   const [documentsOpen, setDocumentsOpen] = useState(false);
+  const [agentBuilderOpen, setAgentBuilderOpen] = useState(false);
   const [tokenUsage, setTokenUsage] = useState(null);
   const [copiedId, setCopiedId] = useState(null);
   const [workspaces, setWorkspaces] = useState([]);
@@ -322,6 +323,26 @@ export function useChatController() {
     return data;
   }
 
+  async function completeAgentWorkflow(result) {
+    const trace = result.trace || [];
+    const output = result.output || "The workflow completed without a final output.";
+    const traceSummary = trace.length
+      ? trace.map((step, index) => `${index + 1}. ${step.name}`).join("\n")
+      : "No agent trace returned.";
+    const nextMessages = messages.concat({
+      id: makeId(),
+      role: "assistant",
+      content: `## Agent workflow result\n\n${output}\n\n**Workflow trace**\n${traceSummary}`,
+    });
+
+    setMessages(nextMessages);
+    setAgentBuilderOpen(false);
+    if (!temporaryChat) {
+      await saveChat(nextMessages).catch(() => {});
+    }
+    await refreshTokenUsage().catch(() => {});
+  }
+
   async function refreshMemories() {
     try {
       const nextMemories = await loadMemoryStore();
@@ -361,6 +382,20 @@ export function useChatController() {
     replaceStore(result.store);
     setActiveChatId(result.chat.id);
     return result.chat;
+  }
+
+  async function clearMessages() {
+    if (isSending) return;
+
+    setMessages([]);
+    setInput("");
+
+    if (!temporaryChat && activeChatId) {
+      const chat = currentChatPayload([], { id: activeChatId });
+      const result = await libraryAction("upsertChat", { chat });
+      replaceStore(result.store);
+      setActiveChatId(result.chat.id);
+    }
   }
 
   function changeProvider(nextProvider) {
@@ -740,6 +775,7 @@ export function useChatController() {
 
   return {
     activeChatId,
+    agentBuilderOpen,
     apiKey,
     baseUrl,
     canSend,
@@ -785,9 +821,11 @@ export function useChatController() {
     workspaces,
     changeProvider,
     addMemory,
+    completeAgentWorkflow,
     copyMessage,
     createFolder,
     createWorkspace,
+    clearMessages,
     deleteSavedChat,
     deleteMemory,
     exportChat,
@@ -806,6 +844,7 @@ export function useChatController() {
     selectWorkspace,
     sendMessage,
     setApiKey,
+    setAgentBuilderOpen,
     setBaseUrl,
     setDocumentChatEnabled,
     setDocumentsOpen,
