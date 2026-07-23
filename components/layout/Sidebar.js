@@ -30,7 +30,7 @@ export function Sidebar({
     <aside className={`sidebar ${isOpen ? "is-open" : ""}`}>
       <div className="sidebar-top">
         <BrandMark />
-        <div className="brand-name">SB Chat</div>
+        <div className="brand-name">SB AI Chat</div>
         <button className="nav-icon ml-auto" onClick={onClose} title={t("sidebar.collapse")} type="button">
           <PanelLeft size={18} />
         </button>

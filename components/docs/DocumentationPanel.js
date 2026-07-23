@@ -202,7 +202,7 @@ await streamModel({
               <span>Sovereign foundation</span>
               <h2>Accounts, sessions, and local data stay under your control.</h2>
               <p>
-                SB Chat uses Better Auth with a local SQLite database for email/password accounts and session cookies. Chat,
+                SB AI Chat uses Better Auth with a local SQLite database for email/password accounts and session cookies. Chat,
                 document, model, token usage, and realtime APIs require an authenticated session before touching local data
                 or provider credentials.
               </p>
@@ -228,7 +228,7 @@ await streamModel({
               </div>
               <pre>
                 <code>{`export const auth = betterAuth({
-  appName: "SB Chat",
+  appName: "SB AI Chat",
   database: new DatabaseSync(
     "data/sb-chat-auth.sqlite"
   ),

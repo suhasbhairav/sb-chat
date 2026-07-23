@@ -1,6 +1,6 @@
-# SB Chat Architecture
+# SB AI Chat Architecture
 
-SB Chat is structured around product boundaries instead of framework files alone.
+SB AI Chat is structured around product boundaries instead of framework files alone.
 
 ## App
 
@@ -61,7 +61,7 @@ Add new model providers by extending `lib/providers.js` and `lib/model-clients.j
 
 ## Auth
 
-SB Chat uses Better Auth because the product goal is sovereign AI: local accounts, local sessions, and self-hostable identity without requiring Google, GitHub, or any hosted identity provider.
+SB AI Chat uses Better Auth because the product goal is sovereign AI: local accounts, local sessions, and self-hostable identity without requiring Google, GitHub, or any hosted identity provider.
 
 - Email/password auth is enabled.
 - Sessions are stored in local SQLite.

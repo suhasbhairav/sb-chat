@@ -1,11 +1,11 @@
-<h1 align="center">SB Chat - The Sovereign AI Chat</h1>
+<h1 align="center">SB AI Chat - The Sovereign AI Chat</h1>
 
 <p align="center">
   Created by <a href="https://suhasbhairav.com"><strong>Suhas Bhairav</strong></a>
 </p>
 
 <p align="center">
-  <img src="public/homepage.png" alt="SB Chat homepage" width="100%" />
+  <img src="public/homepage.png" alt="SB AI Chat homepage" width="100%" />
 </p>
 
 ![Next.js](https://img.shields.io/badge/Next.js-16-black?style=for-the-badge&logo=nextdotjs)
@@ -21,7 +21,7 @@
 ![RAG](https://img.shields.io/badge/RAG-Document_Chat-10a37f?style=for-the-badge)
 ![License](https://img.shields.io/badge/License-MIT-f59e0b?style=for-the-badge)
 
-**SB Chat** is a sovereign, Next.js-native AI chat workspace for local models, hosted model APIs, document chat, voice, web search, authenticated users, protected APIs, and local-first persistence.
+**SB AI Chat** is a sovereign, Next.js-native AI chat workspace for local models, hosted model APIs, document chat, voice, web search, authenticated users, protected APIs, and local-first persistence.
 
 Built by **[Suhas Bhairav](https://suhasbhairav.com)**.
 
@@ -29,7 +29,7 @@ Built by **[Suhas Bhairav](https://suhasbhairav.com)**.
 
 ## What It Is
 
-SB Chat is a polished alternative to Open WebUI built as a straightforward JavaScript Next.js app. It is designed for people who want control over their AI stack: local Ollama models, bring-your-own API keys, OpenAI-compatible servers, local JSON data files, local SQLite auth sessions, and no mandatory hosted identity provider.
+SB AI Chat is a polished alternative to Open WebUI built as a straightforward JavaScript Next.js app. It is designed for people who want control over their AI stack: local Ollama models, bring-your-own API keys, OpenAI-compatible servers, local JSON data files, local SQLite auth sessions, and no mandatory hosted identity provider.
 
 The product goal is **sovereign AI**: the app can run privately on your machine or server while still supporting OpenAI, Claude, Grok, Sarvam AI, OpenRouter, Ollama, and custom OpenAI-compatible endpoints.
 
@@ -149,7 +149,7 @@ The product goal is **sovereign AI**: the app can run privately on your machine 
 
 ### Internationalization
 
-SB Chat intentionally exposes only languages with complete curated UI coverage:
+SB AI Chat intentionally exposes only languages with complete curated UI coverage:
 
 - English
 - German
@@ -189,7 +189,7 @@ Locale preference is stored in browser settings. User-generated data, model outp
 npm install
 ```
 
-SB Chat uses the `chromadb` TypeScript client for optional ChromaDB vector storage. Do not install `@chroma-core/default-embed`; SB Chat creates embeddings itself and sends precomputed vectors to Chroma. The default embed package currently breaks Next.js/Turbopack builds in this app.
+SB AI Chat uses the `chromadb` TypeScript client for optional ChromaDB vector storage. Do not install `@chroma-core/default-embed`; SB AI Chat creates embeddings itself and sends precomputed vectors to Chroma. The default embed package currently breaks Next.js/Turbopack builds in this app.
 
 ### 2. Configure environment variables
 
@@ -272,11 +272,11 @@ Settings:
 OPENAI_API_KEY=...
 ```
 
-SB Chat automatically avoids sending unsupported temperature values to models that only allow the default.
+SB AI Chat automatically avoids sending unsupported temperature values to models that only allow the default.
 
 ### OpenRouter
 
-[OpenRouter](https://openrouter.ai) provides routed access to many model families. SB Chat can use the [OpenRouter model directory](https://openrouter.ai/models) and OpenAI-compatible chat API.
+[OpenRouter](https://openrouter.ai) provides routed access to many model families. SB AI Chat can use the [OpenRouter model directory](https://openrouter.ai/models) and OpenAI-compatible chat API.
 
 ```bash
 OPENROUTER_API_KEY=...
@@ -354,7 +354,7 @@ Embedding modes:
 Vector storage modes:
 
 - `Local JSON vectors`: stores chunk vectors in `data/document-store.json`. This is the default and needs no extra service.
-- `ChromaDB`: stores chunk vectors in a running Chroma server while SB Chat keeps document metadata locally.
+- `ChromaDB`: stores chunk vectors in a running Chroma server while SB AI Chat keeps document metadata locally.
 
 To use ChromaDB locally, start Chroma before uploading or reindexing documents:
 
@@ -394,15 +394,15 @@ or:
 yarn add @chroma-core/default-embed
 ```
 
-SB Chat already computes embeddings through its configured embedding mode and queries Chroma with precomputed vectors.
+SB AI Chat already computes embeddings through its configured embedding mode and queries Chroma with precomputed vectors.
 
-When Document Chat is enabled, SB Chat retrieves relevant chunks, injects them into the model request, and instructs the model to answer only from retrieved context.
+When Document Chat is enabled, SB AI Chat retrieves relevant chunks, injects them into the model request, and instructs the model to answer only from retrieved context.
 
 ---
 
 ## Data and Privacy
 
-SB Chat uses local files by default:
+SB AI Chat uses local files by default:
 
 ```text
 data/chat-store.json
@@ -431,7 +431,7 @@ npm run auth:migrate  # Create/update Better Auth SQLite schema
 
 ## Production Notes
 
-Before exposing SB Chat outside a trusted local network:
+Before exposing SB AI Chat outside a trusted local network:
 
 - Rotate any API key that has ever been logged or committed
 - Set a strong `BETTER_AUTH_SECRET`

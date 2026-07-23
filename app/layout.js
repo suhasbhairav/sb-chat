@@ -12,7 +12,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata = {
-  title: "SB Chat",
+  title: "SB AI Chat",
   description: "A Next.js chat interface for Ollama, OpenRouter, OpenAI, and OpenAI-compatible models.",
 };
 
