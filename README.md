@@ -65,15 +65,15 @@ The product goal is **sovereign AI**: the app can run privately on your machine 
 
 ### Providers
 
-- Ollama via `http://localhost:11434`
-- OpenAI Chat Completions
-- OpenAI hosted Web Search through the Responses tools flow
-- OpenAI Realtime voice sessions
-- OpenRouter chat completions
-- Claude through Anthropic Messages API
-- Grok through xAI API
-- Sarvam AI chat completions
-- Custom OpenAI-compatible endpoints such as LM Studio, vLLM, llama.cpp, and LiteLLM
+- [Ollama](https://ollama.com) via `http://localhost:11434`
+- [OpenAI](https://platform.openai.com/docs) Chat Completions
+- [OpenAI Web Search](https://platform.openai.com/docs/guides/tools-web-search) through the Responses tools flow
+- [OpenAI Realtime](https://platform.openai.com/docs/guides/realtime) voice sessions
+- [OpenRouter](https://openrouter.ai/models) chat completions
+- [Claude](https://docs.anthropic.com) through Anthropic Messages API
+- [Grok](https://docs.x.ai) through xAI API
+- [Sarvam AI](https://docs.sarvam.ai/api-reference/chat/chat-completions) chat completions
+- Custom OpenAI-compatible endpoints such as [LM Studio](https://lmstudio.ai), [vLLM](https://docs.vllm.ai), [llama.cpp](https://github.com/ggml-org/llama.cpp), and [LiteLLM](https://docs.litellm.ai)
 - Server-side `.env` API key fallback
 - Runtime API key entry in Settings
 
@@ -292,6 +292,8 @@ Create a local account, then configure your provider/model settings.
 
 ### Ollama
 
+[Ollama](https://ollama.com) runs local models on your machine.
+
 ```bash
 ollama pull llama3.1
 ollama serve
@@ -305,52 +307,62 @@ Settings:
 
 ### OpenAI
 
+[OpenAI Platform](https://platform.openai.com/docs) powers chat, hosted [web search](https://platform.openai.com/docs/guides/tools-web-search), [embeddings](https://platform.openai.com/docs/guides/embeddings), and [realtime voice](https://platform.openai.com/docs/guides/realtime). You can review model availability and costs on the [OpenAI pricing page](https://platform.openai.com/docs/pricing).
+
 ```bash
 OPENAI_API_KEY=...
 ```
 
-OpenAI supports chat, hosted web search, embeddings, and realtime voice. SB Chat automatically avoids sending unsupported temperature values to models that only allow the default.
+SB Chat automatically avoids sending unsupported temperature values to models that only allow the default.
 
 ### OpenRouter
+
+[OpenRouter](https://openrouter.ai) provides routed access to many model families. SB Chat can use the [OpenRouter model directory](https://openrouter.ai/models) and OpenAI-compatible chat API.
 
 ```bash
 OPENROUTER_API_KEY=...
 ```
 
-Use OpenRouter for routed access across model families through an OpenAI-compatible API.
+Use the OpenAI-compatible API shape with your OpenRouter key.
 
 ### Claude
+
+[Claude](https://www.anthropic.com/claude) is available through the [Anthropic API docs](https://docs.anthropic.com) and Messages API.
 
 ```bash
 ANTHROPIC_API_KEY=...
 ```
 
-Claude uses Anthropic's Messages API with streaming and provider usage when available.
+Streaming and provider usage are supported when available.
 
 ### Grok
+
+[Grok](https://x.ai) is available through the [xAI API docs](https://docs.x.ai).
 
 ```bash
 XAI_API_KEY=...
 ```
 
-Grok uses xAI's API path with streaming support.
+Streaming responses are supported.
 
 ### Sarvam AI
+
+[Sarvam AI](https://www.sarvam.ai) is supported through its [chat completions API](https://docs.sarvam.ai/api-reference/chat/chat-completions).
 
 ```bash
 SARVAM_API_KEY=...
 ```
 
-Sarvam AI uses chat completions and is included as a first-class provider.
+Sarvam AI is included as a first-class provider.
 
 ### Custom OpenAI-Compatible Servers
 
 Examples:
 
-- LM Studio
-- vLLM
-- llama.cpp server
-- LiteLLM
+- [LM Studio](https://lmstudio.ai)
+- [vLLM](https://docs.vllm.ai)
+- [llama.cpp server](https://github.com/ggml-org/llama.cpp)
+- [LiteLLM](https://docs.litellm.ai)
 - OpenAI-compatible internal gateways
 
 Set the provider to custom/OpenAI-compatible, enter your base URL, and use the model ID expected by that server.
