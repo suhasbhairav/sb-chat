@@ -1,4 +1,12 @@
-# SB Chat
+<h1 align="center">SB Chat - The Sovereign AI Chat</h1>
+
+<p align="center">
+  Created by <a href="https://suhasbhairav.com"><strong>Suhas Bhairav</strong></a>
+</p>
+
+<p align="center">
+  <img src="public/homepage.png" alt="SB Chat homepage" width="100%" />
+</p>
 
 ![Next.js](https://img.shields.io/badge/Next.js-16-black?style=for-the-badge&logo=nextdotjs)
 ![React](https://img.shields.io/badge/React-19-149eca?style=for-the-badge&logo=react&logoColor=white)
