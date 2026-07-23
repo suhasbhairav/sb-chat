@@ -46,6 +46,7 @@ export function SettingsPanel({
   onExportChatLibrary,
   onImportChatLibrary,
   onMoveChat,
+  onResetTokenUsage,
   onSaveChat,
   onToggleGuardrails,
   onToggleMemory,
@@ -124,6 +125,17 @@ export function SettingsPanel({
       await onDeleteMemory(memoryId);
     } catch (error) {
       window.alert(error.message || t("settings.memoryDeleteError"));
+    }
+  }
+
+  async function handleResetTokenUsage() {
+    if (!window.confirm(t("settings.resetTokenUsageConfirm"))) return;
+
+    try {
+      await onResetTokenUsage();
+      window.alert(t("settings.resetTokenUsageDone"));
+    } catch (error) {
+      window.alert(error.message || t("settings.resetTokenUsageError"));
     }
   }
 
@@ -407,6 +419,18 @@ export function SettingsPanel({
 
             <button className="secondary-button" disabled={!hasMessages || temporaryChat} onClick={onSaveChat} type="button">
               {t("settings.saveCurrentChat")}
+            </button>
+          </section>
+
+          <section className="settings-card">
+            <div className="setting-title">
+              <h3>{t("settings.tokenUsage")}</h3>
+              <p>{t("settings.tokenUsageCopy")}</p>
+            </div>
+
+            <button className="secondary-button danger" onClick={handleResetTokenUsage} type="button">
+              <Trash2 size={16} />
+              {t("settings.resetTokenUsage")}
             </button>
           </section>
 

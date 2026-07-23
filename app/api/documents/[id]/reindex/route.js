@@ -1,6 +1,7 @@
 import { json, resolveServerApiKey } from "@/lib/chat-request";
 import { requireServerSession } from "@/lib/auth-session";
 import { createEmbeddings } from "@/lib/rag-embeddings";
+import { normalizeChromaCollectionName, normalizeChromaUrl, upsertChromaChunks } from "@/lib/rag-chroma";
 import { chunkDocumentText, extractDocumentText } from "@/lib/rag-processing";
 import { getDocumentFilePath, readDocumentStore, summarizeDocuments, writeDocumentStore } from "@/lib/rag-store";
 
@@ -20,10 +21,14 @@ export async function POST(request, { params }) {
       return json({ error: "Document not found." }, 404);
     }
 
+    const vectorStoreProvider = payload.vectorStoreProvider || store.settings.vectorStoreProvider;
     const settings = {
       ...store.settings,
       embeddingProvider: payload.embeddingProvider || store.settings.embeddingProvider,
       embeddingModel: payload.embeddingModel || store.settings.embeddingModel,
+      vectorStoreProvider: vectorStoreProvider === "chroma" ? "chroma" : "json",
+      chromaUrl: normalizeChromaUrl(payload.chromaUrl || store.settings.chromaUrl),
+      chromaCollection: normalizeChromaCollectionName(payload.chromaCollection || store.settings.chromaCollection),
     };
     const filePath = getDocumentFilePath(document);
     const text = await extractDocumentText(filePath, document.name);
@@ -51,6 +56,9 @@ export async function POST(request, { params }) {
       embeddingModel: settings.embeddingModel,
       createdAt,
     }));
+    if (settings.vectorStoreProvider === "chroma") {
+      await upsertChromaChunks(indexedChunks, settings);
+    }
     const nextDocument = {
       ...document,
       status: "ready",
@@ -59,13 +67,19 @@ export async function POST(request, { params }) {
       chunkCount: indexedChunks.length,
       embeddingProvider: settings.embeddingProvider,
       embeddingModel: settings.embeddingModel,
+      vectorStoreProvider: settings.vectorStoreProvider,
+      chromaUrl: settings.vectorStoreProvider === "chroma" ? settings.chromaUrl : null,
+      chromaCollection: settings.vectorStoreProvider === "chroma" ? settings.chromaCollection : null,
       reindexedAt: createdAt,
     };
     const nextStore = {
       ...store,
       settings,
       documents: store.documents.map((item) => (item.id === document.id ? nextDocument : item)),
-      chunks: [...indexedChunks, ...store.chunks.filter((chunk) => chunk.documentId !== document.id)],
+      chunks: [
+        ...(settings.vectorStoreProvider === "json" ? indexedChunks : indexedChunks.map(({ embedding, ...chunk }) => chunk)),
+        ...store.chunks.filter((chunk) => chunk.documentId !== document.id),
+      ],
     };
 
     await writeDocumentStore(nextStore);

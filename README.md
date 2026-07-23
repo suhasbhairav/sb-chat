@@ -117,6 +117,8 @@ The product goal is **sovereign AI**: the app can run privately on your machine 
 - Uploads: PDF, TXT, Markdown, JSON, LOG, CSV, XLS, XLSX, DOCX
 - Local hashed embeddings for private/offline indexing
 - OpenAI embeddings with `text-embedding-3-small`
+- Local JSON vector storage by default
+- Optional ChromaDB vector storage with configurable URL and collection
 - Configurable chunk size, overlap, and Top K
 - `Enable Document Chat` top-bar toggle
 - Document-grounded system prompt that refuses unsupported answers
@@ -160,6 +162,7 @@ Locale preference is stored in browser settings. User-generated data, model outp
 | Chat Storage | Local JSON files |
 | Markdown | `react-markdown` + `remark-gfm` |
 | Documents | `mammoth`, `xlsx`, local file processing |
+| Vector DB | Local JSON vectors, optional ChromaDB through `chromadb` |
 | Voice | OpenAI Realtime WebRTC |
 | Providers | Ollama, OpenAI, Claude, Grok, Sarvam AI, OpenRouter, OpenAI-compatible APIs |
 
@@ -231,6 +234,8 @@ For deeper module notes, see [ARCHITECTURE.md](./ARCHITECTURE.md).
 ```bash
 npm install
 ```
+
+SB Chat uses the `chromadb` TypeScript client for optional ChromaDB vector storage. Do not install `@chroma-core/default-embed`; SB Chat creates embeddings itself and sends precomputed vectors to Chroma. The default embed package currently breaks Next.js/Turbopack builds in this app.
 
 ### 2. Configure environment variables
 
@@ -392,6 +397,51 @@ Embedding modes:
 - `Local embeddings`: deterministic local hashed vectors, no API key required.
 - `OpenAI embeddings`: uses `text-embedding-3-small`.
 
+Vector storage modes:
+
+- `Local JSON vectors`: stores chunk vectors in `data/document-store.json`. This is the default and needs no extra service.
+- `ChromaDB`: stores chunk vectors in a running Chroma server while SB Chat keeps document metadata locally.
+
+To use ChromaDB locally, start Chroma before uploading or reindexing documents:
+
+```bash
+npx chroma run --path ./data/chroma
+```
+
+If you use Yarn:
+
+```bash
+yarn chroma run --path ./data/chroma
+```
+
+Then open **Documents -> Vector storage** and set:
+
+```text
+Vector store: ChromaDB
+Chroma URL: http://localhost:8000
+Chroma collection: sb_chat_documents
+```
+
+Install only the Chroma client package:
+
+```bash
+npm install chromadb
+```
+
+Do not run:
+
+```bash
+npm install @chroma-core/default-embed
+```
+
+or:
+
+```bash
+yarn add @chroma-core/default-embed
+```
+
+SB Chat already computes embeddings through its configured embedding mode and queries Chroma with precomputed vectors.
+
 When Document Chat is enabled, SB Chat retrieves relevant chunks, injects them into the model request, and instructs the model to answer only from retrieved context.
 
 ---
@@ -403,11 +453,12 @@ SB Chat uses local files by default:
 ```text
 data/chat-store.json
 data/document-store.json
+data/memory-store.json
 data/token-usage.json
 data/sb-chat-auth.sqlite
 ```
 
-The auth SQLite file is ignored by git. The API key typed into Settings lives in React state and is not persisted to local storage. Temporary chats are not written to `data/chat-store.json`.
+The auth SQLite file and memory store are ignored by git. The API key typed into Settings lives in React state and is not persisted to local storage. Temporary chats are not written to `data/chat-store.json`.
 
 ---
 

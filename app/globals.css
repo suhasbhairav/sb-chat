@@ -2137,6 +2137,10 @@ button:disabled {
   margin-bottom: 2px;
 }
 
+.rag-subtitle {
+  margin-top: 10px;
+}
+
 .field-label {
   display: block;
   color: var(--muted);

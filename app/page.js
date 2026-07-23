@@ -170,6 +170,7 @@ function HomeShell({ chat }) {
           onExportChatLibrary={chat.exportChatLibrary}
           onImportChatLibrary={chat.importChatLibrary}
           onMoveChat={chat.moveActiveChat}
+          onResetTokenUsage={chat.resetTokenUsage}
           onSaveChat={() => chat.saveChat()}
           onToggleGuardrails={() => chat.setGuardrails((value) => !value)}
           onToggleMemory={() => chat.setMemoryEnabled((value) => !value)}

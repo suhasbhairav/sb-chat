@@ -1,6 +1,6 @@
 import { json } from "@/lib/chat-request";
 import { requireServerSession } from "@/lib/auth-session";
-import { readTokenUsageStore, summarizeTokenUsage } from "@/lib/token-usage-store";
+import { readTokenUsageStore, resetTokenUsageStore, summarizeTokenUsage } from "@/lib/token-usage-store";
 
 export async function GET() {
   const { response } = await requireServerSession();
@@ -11,4 +11,12 @@ export async function GET() {
     ...store,
     summary: summarizeTokenUsage(store.events),
   });
+}
+
+export async function DELETE() {
+  const { response } = await requireServerSession();
+  if (response) return response;
+
+  const store = await resetTokenUsageStore();
+  return json(store);
 }

@@ -308,6 +308,20 @@ export function useChatController() {
     }
   }
 
+  async function resetTokenUsage() {
+    const response = await fetch("/api/token-usage", {
+      method: "DELETE",
+    });
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.error || "Could not reset token usage.");
+    }
+
+    setTokenUsage(data);
+    return data;
+  }
+
   async function refreshMemories() {
     try {
       const nextMemories = await loadMemoryStore();
@@ -785,6 +799,7 @@ export function useChatController() {
     pickSuggestion,
     rememberMessage,
     refreshMemories,
+    resetTokenUsage,
     saveChat,
     selectChat,
     selectFolder,

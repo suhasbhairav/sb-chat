@@ -34,6 +34,36 @@
   ],
   "chats": [
     {
+      "id": "1784832971719-571dc541a01c78",
+      "workspaceId": "workspace-1784806210171-81024ae3ddf17",
+      "folderId": null,
+      "title": "What does the scorecard say",
+      "messages": [
+        {
+          "role": "user",
+          "content": "What does the scorecard say",
+          "id": "1784832971719-571dc541a01c78-0-user-What does the scorecard "
+        },
+        {
+          "role": "user",
+          "content": "What does the scorecard say",
+          "id": "1784832971719-571dc541a01c78-1-user-What does the scorecard "
+        },
+        {
+          "role": "assistant",
+          "content": "The scorecard framework outlined in the documents assesses AI workflow readiness across several dimensions and provides a structured plan for implementation. Key aspects include:\n\n1. **Readiness Dimensions**:  \n   - **Process clarity**: Defined steps, owners, and data flows [D1].  \n   - **Data readiness**: Reliable data sources with governance [D1].  \n   - **Team adoption**: Leadership support and frontline readiness [D1].  \n   - **Tool access**: Secure access to AI tools [D1].  \n   - **Risk level**: Regulatory, privacy, and operational risks [D1].  \n   - **Human approval needs**: Defined and timely approvals [D1].  \n   - **ROI potential**: Credible path to measurable value [D1].  \n\n2. **Scoring Mechanism**:  \n   - Use a **0-5 scale** for each criterion, aggregate scores to identify maturity gaps, and prioritize top 2 gaps to address [D5].  \n   - Publish scorecards regularly to leadership for transparency [D5].  \n\n3. **90-Day Implementation Plan**:  \n   - **Week 1-2**: Complete data inventory and governance baseline [D2].  \n   - **Week 2-4**: Select 1-2 pilot processes and assign owners [D2].  \n   - **Month 1-2**: Run 2-3 experiments and document outcomes [D2].  \n   - **Month 2-3**: Implement an automated workflow for one process [D2].  \n   - **Month 3**: Deploy a small AI agent with guardrails [D2].  \n   - Establish dashboards for ROI and compliance monitoring [D2].  \n\n4. **Maturity Stages**:  \n   - **Not Ready**: Map processes, establish data governance, and set baseline metrics [D5].  \n   - **Experimenting**: Run controlled experiments with clear success criteria [D5].  \n   - **Workflow Ready**: Deploy end-to-end automation and implement monitoring [D5].  \n   - **Agent Ready**: Pilot a single AI agent with escalation and audit trails [D5].  \n\nThe scorecard emphasizes aligning AI adoption with strategic goals, starting small, and iterating based on feedback and metrics [D1, D2, D5].\n\n**Document sources**\n- [D1] ai-workflow-readiness-scorecard.pdf, chunk 3\n- [D2] ai-workflow-readiness-scorecard.pdf, chunk 5\n- [D3] ai-workflow-readiness-scorecard.pdf, chunk 2\n- [D4] ai-workflow-readiness-scorecard.pdf, chunk 1\n- [D5] ai-workflow-readiness-scorecard.pdf, chunk 4",
+          "id": "1784832971719-571dc541a01c78-2-assistant-The scorecard framework "
+        }
+      ],
+      "provider": "ollama",
+      "model": "qwen3:8b",
+      "baseUrl": "http://localhost:11434",
+      "guardrails": true,
+      "temperature": 0.7,
+      "createdAt": "2026-07-23T18:56:11.787Z",
+      "updatedAt": "2026-07-23T18:56:42.039Z"
+    },
+    {
       "id": "1784831749502-64ae92c3cd609",
       "workspaceId": "workspace-1784806210171-81024ae3ddf17",
       "folderId": null,

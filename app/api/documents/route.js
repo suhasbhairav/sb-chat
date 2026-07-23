@@ -2,15 +2,20 @@ import { json, resolveServerApiKey } from "@/lib/chat-request";
 import { requireServerSession } from "@/lib/auth-session";
 import { makeId } from "@/lib/chat-utils";
 import { createEmbeddings } from "@/lib/rag-embeddings";
+import { normalizeChromaCollectionName, normalizeChromaUrl, upsertChromaChunks } from "@/lib/rag-chroma";
 import { chunkDocumentText, extractDocumentText } from "@/lib/rag-processing";
 import { readDocumentStore, saveUploadedDocumentFile, summarizeDocuments, writeDocumentStore } from "@/lib/rag-store";
 
 export const runtime = "nodejs";
 
 function normalizeSettings(settings = {}) {
+  const embeddingProvider = settings.embeddingProvider === "openai" ? "openai" : "local";
   return {
-    embeddingProvider: settings.embeddingProvider === "openai" ? "openai" : "local",
-    embeddingModel: settings.embeddingProvider === "openai" ? settings.embeddingModel || "text-embedding-3-small" : "local-hash-v1",
+    embeddingProvider,
+    embeddingModel: embeddingProvider === "openai" ? settings.embeddingModel || "text-embedding-3-small" : "local-hash-v1",
+    vectorStoreProvider: settings.vectorStoreProvider === "chroma" ? "chroma" : "json",
+    chromaUrl: normalizeChromaUrl(settings.chromaUrl),
+    chromaCollection: normalizeChromaCollectionName(settings.chromaCollection),
     chunkSize: Math.min(6000, Math.max(600, Number(settings.chunkSize || 1800))),
     chunkOverlap: Math.min(1200, Math.max(0, Number(settings.chunkOverlap || 220))),
     topK: Math.min(12, Math.max(1, Number(settings.topK || 6))),
@@ -53,6 +58,9 @@ export async function POST(request) {
       chunkSize: formData.get("chunkSize"),
       chunkOverlap: formData.get("chunkOverlap"),
       topK: formData.get("topK"),
+      vectorStoreProvider: formData.get("vectorStoreProvider"),
+      chromaUrl: formData.get("chromaUrl"),
+      chromaCollection: formData.get("chromaCollection"),
       openAIBaseUrl: formData.get("openAIBaseUrl"),
     });
     const apiKey = String(formData.get("apiKey") || "") || resolveServerApiKey("openai", "");
@@ -78,6 +86,9 @@ export async function POST(request) {
         chunkCount: 0,
         embeddingProvider: settings.embeddingProvider,
         embeddingModel: settings.embeddingModel,
+        vectorStoreProvider: settings.vectorStoreProvider,
+        chromaUrl: settings.vectorStoreProvider === "chroma" ? settings.chromaUrl : null,
+        chromaCollection: settings.vectorStoreProvider === "chroma" ? settings.chromaCollection : null,
         createdAt,
       };
 
@@ -105,18 +116,25 @@ export async function POST(request) {
           embeddingModel: settings.embeddingModel,
           createdAt,
         }));
+        if (settings.vectorStoreProvider === "chroma") {
+          await upsertChromaChunks(indexedChunks, settings);
+        }
         const document = {
           ...baseDocument,
           status: "ready",
           textLength: text.length,
           chunkCount: indexedChunks.length,
+          vectorStoreProvider: settings.vectorStoreProvider,
         };
 
         store = {
           ...store,
           settings,
           documents: [document, ...store.documents.filter((item) => item.id !== id)],
-          chunks: [...indexedChunks, ...store.chunks.filter((chunk) => chunk.documentId !== id)],
+          chunks: [
+            ...(settings.vectorStoreProvider === "json" ? indexedChunks : indexedChunks.map(({ embedding, ...chunk }) => chunk)),
+            ...store.chunks.filter((chunk) => chunk.documentId !== id),
+          ],
         };
         uploaded.push(document);
       } catch (error) {

@@ -7,6 +7,9 @@ import { useI18n } from "@/components/i18n/I18nProvider";
 const DEFAULT_DOCUMENT_SETTINGS = {
   embeddingProvider: "local",
   embeddingModel: "local-hash-v1",
+  vectorStoreProvider: "json",
+  chromaUrl: "http://localhost:8000",
+  chromaCollection: "sb_chat_documents",
   chunkSize: 1800,
   chunkOverlap: 220,
   topK: 6,
@@ -205,6 +208,43 @@ export function DocumentsPanel({ apiKey, documentChatEnabled, openAIBaseUrl, onC
               value={settings.embeddingModel}
             />
 
+            <div className="setting-title rag-subtitle">
+              <h3>{t("documents.vectorStorage")}</h3>
+              <p>{t("documents.vectorStorageCopy")}</p>
+            </div>
+
+            <label className="field-label" htmlFor="vectorStoreProvider">{t("documents.vectorStore")}</label>
+            <select
+              id="vectorStoreProvider"
+              className="field select-field"
+              onChange={(event) => saveSettings({ ...settings, vectorStoreProvider: event.target.value })}
+              value={settings.vectorStoreProvider || "json"}
+            >
+              <option value="json">{t("documents.jsonVectorStore")}</option>
+              <option value="chroma">{t("documents.chromaVectorStore")}</option>
+            </select>
+
+            <label className="field-label" htmlFor="chromaUrl">{t("documents.chromaUrl")}</label>
+            <input
+              id="chromaUrl"
+              className="field"
+              onChange={(event) => saveSettings({ ...settings, chromaUrl: event.target.value })}
+              placeholder="http://localhost:8000"
+              value={settings.chromaUrl || ""}
+            />
+
+            <label className="field-label" htmlFor="chromaCollection">{t("documents.chromaCollection")}</label>
+            <input
+              id="chromaCollection"
+              className="field"
+              onChange={(event) => saveSettings({ ...settings, chromaCollection: event.target.value })}
+              placeholder="sb_chat_documents"
+              value={settings.chromaCollection || ""}
+            />
+            {(settings.vectorStoreProvider || "json") !== "chroma" && (
+              <p className="settings-hint">{t("documents.chromaInactiveHint")}</p>
+            )}
+
             <div className="rag-setting-grid">
               <label>
                 <span>{t("documents.chunkSize")}</span>
@@ -270,6 +310,7 @@ export function DocumentsPanel({ apiKey, documentChatEnabled, openAIBaseUrl, onC
                         <strong>{document.name}</strong>
                         <span>
                           {formatBytes(document.size, locale)} · {document.chunkCount || 0} {t("documents.chunks")} · {document.embeddingProvider}
+                          {" "}· {document.vectorStoreProvider || settings.vectorStoreProvider || "json"}
                           {document.status === "failed" ? ` · ${document.error}` : ""}
                         </span>
                       </div>
