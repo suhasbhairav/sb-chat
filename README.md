@@ -443,7 +443,7 @@ Before exposing SB Chat outside a trusted local network:
 
 Built by **[Suhas Bhairav](https://suhasbhairav.com)**.
 
-Part of the broader AI tooling work by Suhas Bhairav and Metric Coders.
+Part of the broader AI tooling work by Suhas Bhairav.
 
 ---
 
