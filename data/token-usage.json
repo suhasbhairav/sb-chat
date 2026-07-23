@@ -1,12 +1,68 @@
 {
   "version": 1,
   "totals": {
-    "inputTokens": 8715,
-    "outputTokens": 18600,
-    "totalTokens": 27315,
-    "requests": 18
+    "inputTokens": 10007,
+    "outputTokens": 20504,
+    "totalTokens": 30511,
+    "requests": 22
   },
   "events": [
+    {
+      "id": "usage-1784831760474-0af7abf093784",
+      "chatId": "1784831749502-64ae92c3cd609",
+      "workspaceId": "workspace-1784806210171-81024ae3ddf17",
+      "folderId": null,
+      "provider": "ollama",
+      "model": "qwen3:8b",
+      "inputTokens": 420,
+      "outputTokens": 632,
+      "totalTokens": 1052,
+      "source": "ollama",
+      "temporary": false,
+      "createdAt": "2026-07-23T18:36:00.474Z"
+    },
+    {
+      "id": "usage-1784831733802-d18e7836d9d26",
+      "chatId": "1784831716255-acdefcf75eea18",
+      "workspaceId": "workspace-1784806210171-81024ae3ddf17",
+      "folderId": null,
+      "provider": "ollama",
+      "model": "qwen3:8b",
+      "inputTokens": 419,
+      "outputTokens": 517,
+      "totalTokens": 936,
+      "source": "ollama",
+      "temporary": false,
+      "createdAt": "2026-07-23T18:35:33.802Z"
+    },
+    {
+      "id": "usage-1784831722147-aae030a87505c8",
+      "chatId": "1784831716255-acdefcf75eea18",
+      "workspaceId": "workspace-1784806210171-81024ae3ddf17",
+      "folderId": null,
+      "provider": "ollama",
+      "model": "qwen3:8b",
+      "inputTokens": 302,
+      "outputTokens": 330,
+      "totalTokens": 632,
+      "source": "ollama",
+      "temporary": false,
+      "createdAt": "2026-07-23T18:35:22.147Z"
+    },
+    {
+      "id": "usage-1784831691547-9ed809ce934b5",
+      "chatId": "1784831680745-f248693e790268",
+      "workspaceId": "workspace-1784806210171-81024ae3ddf17",
+      "folderId": null,
+      "provider": "ollama",
+      "model": "qwen3:8b",
+      "inputTokens": 151,
+      "outputTokens": 425,
+      "totalTokens": 576,
+      "source": "ollama",
+      "temporary": false,
+      "createdAt": "2026-07-23T18:34:51.547Z"
+    },
     {
       "id": "usage-1784819377348-948a8ab7e6d6e",
       "chatId": null,

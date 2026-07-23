@@ -26,6 +26,17 @@ async function libraryAction(action, payload = {}) {
   return data;
 }
 
+async function loadMemoryStore() {
+  const response = await fetch("/api/memory");
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.error || "Could not load memory.");
+  }
+
+  return data.memories || [];
+}
+
 async function readChatStream(response, { onDone, onError, onToken }) {
   if (!response.body) {
     const data = await response.json();
@@ -103,6 +114,9 @@ export function useChatController() {
   const [temporaryChat, setTemporaryChat] = useState(false);
   const [webSearchEnabled, setWebSearchEnabled] = useState(false);
   const [documentChatEnabled, setDocumentChatEnabled] = useState(false);
+  const [memoryEnabled, setMemoryEnabled] = useState(true);
+  const [memories, setMemories] = useState([]);
+  const [memoryError, setMemoryError] = useState("");
   const [realtimeModel, setRealtimeModel] = useState(AUTO_REALTIME_MODEL);
   const [modelCatalog, setModelCatalog] = useState([]);
   const [modelCatalogStatus, setModelCatalogStatus] = useState("idle");
@@ -188,6 +202,7 @@ export function useChatController() {
           setLocale(SUPPORTED_LOCALES.includes(parsed.locale) ? parsed.locale : DEFAULT_LOCALE);
           setWebSearchEnabled(Boolean(parsed.webSearchEnabled));
           setDocumentChatEnabled(Boolean(parsed.documentChatEnabled));
+          setMemoryEnabled(parsed.memoryEnabled !== false);
           setRealtimeModel(parsed.realtimeModel ?? AUTO_REALTIME_MODEL);
         } catch {
           localStorage.removeItem(SETTINGS_KEY);
@@ -203,6 +218,7 @@ export function useChatController() {
       setChats(store.chats || []);
       setSelectedWorkspaceId(store.workspaces?.[0]?.id || null);
       await refreshTokenUsage();
+      await refreshMemories();
     }
 
     load().catch((error) => {
@@ -232,10 +248,11 @@ export function useChatController() {
         locale,
         webSearchEnabled,
         documentChatEnabled,
+        memoryEnabled,
         realtimeModel,
       }),
     );
-  }, [provider, baseUrl, model, temperature, guardrails, theme, locale, webSearchEnabled, documentChatEnabled, realtimeModel]);
+  }, [provider, baseUrl, model, temperature, guardrails, theme, locale, webSearchEnabled, documentChatEnabled, memoryEnabled, realtimeModel]);
 
   useEffect(() => {
     let ignore = false;
@@ -288,6 +305,16 @@ export function useChatController() {
 
     if (response.ok) {
       setTokenUsage(data);
+    }
+  }
+
+  async function refreshMemories() {
+    try {
+      const nextMemories = await loadMemoryStore();
+      setMemories(nextMemories);
+      setMemoryError("");
+    } catch (error) {
+      setMemoryError(error.message || "Could not load memory.");
     }
   }
 
@@ -484,6 +511,7 @@ export function useChatController() {
           guardrails,
           webSearch: webSearchEnabled && provider === "openai",
           documentChat: documentChatEnabled,
+          memoryEnabled,
           messages: sanitizeMessages(nextMessages),
           temporary: temporaryChat,
           workspaceId: selectedWorkspaceId,
@@ -554,6 +582,87 @@ export function useChatController() {
     await navigator.clipboard.writeText(message.content);
     setCopiedId(message.id);
     setTimeout(() => setCopiedId(null), 1300);
+  }
+
+  async function rememberMessage(message) {
+    if (!message?.content?.trim()) return;
+
+    try {
+      const response = await fetch("/api/memory", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          content: message.content,
+          sourceChatId: activeChatId,
+        }),
+      });
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || "Could not save memory.");
+      }
+
+      setMemories(data.memories || []);
+      setMemoryError("");
+    } catch (error) {
+      setMemoryError(error.message || "Could not save memory.");
+      throw error;
+    }
+  }
+
+  async function addMemory(content) {
+    const response = await fetch("/api/memory", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ content }),
+    });
+    const data = await response.json();
+
+    if (!response.ok) {
+      const error = data.error || "Could not save memory.";
+      setMemoryError(error);
+      throw new Error(error);
+    }
+
+    setMemories(data.memories || []);
+    setMemoryError("");
+    return data.memory;
+  }
+
+  async function updateMemory(memoryId, content) {
+    const response = await fetch("/api/memory", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id: memoryId, content }),
+    });
+    const data = await response.json();
+
+    if (!response.ok) {
+      const error = data.error || "Could not update memory.";
+      setMemoryError(error);
+      throw new Error(error);
+    }
+
+    setMemories(data.memories || []);
+    setMemoryError("");
+    return data.memory;
+  }
+
+  async function deleteMemory(memoryId) {
+    const response = await fetch(`/api/memory?id=${encodeURIComponent(memoryId)}`, {
+      method: "DELETE",
+    });
+    const data = await response.json();
+
+    if (!response.ok) {
+      const error = data.error || "Could not delete memory.";
+      setMemoryError(error);
+      throw new Error(error);
+    }
+
+    setMemories(data.memories || []);
+    setMemoryError("");
+    return data.memory;
   }
 
   function exportChat() {
@@ -634,6 +743,9 @@ export function useChatController() {
     importChatsRef,
     isSending,
     locale,
+    memories,
+    memoryEnabled,
+    memoryError,
     messages,
     model,
     modelCatalog,
@@ -658,10 +770,12 @@ export function useChatController() {
     webSearchEnabled,
     workspaces,
     changeProvider,
+    addMemory,
     copyMessage,
     createFolder,
     createWorkspace,
     deleteSavedChat,
+    deleteMemory,
     exportChat,
     exportChatLibrary,
     importChatLibrary,
@@ -669,6 +783,8 @@ export function useChatController() {
     moveSavedChat,
     newChat,
     pickSuggestion,
+    rememberMessage,
+    refreshMemories,
     saveChat,
     selectChat,
     selectFolder,
@@ -682,6 +798,7 @@ export function useChatController() {
     setGuardrails,
     setInput,
     setLocale,
+    setMemoryEnabled,
     setMessages,
     setModel: changeModel,
     setRealtimeModel,
@@ -693,6 +810,7 @@ export function useChatController() {
     setTheme,
     setUsageOpen,
     setWebSearchEnabled,
+    updateMemory,
     toggleVoiceChat: realtime.toggleVoiceChat,
     voiceError: realtime.voiceError,
     voiceState: realtime.voiceState,

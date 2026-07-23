@@ -4,6 +4,7 @@ import { json, prepareChatRequest, validateChatPayload } from "@/lib/chat-reques
 import { appendDocumentSources, retrieveDocumentContext } from "@/lib/rag-embeddings";
 import { recordTokenUsage } from "@/lib/token-usage-store";
 import { requireServerSession } from "@/lib/auth-session";
+import { formatMemoriesForPrompt, listMemories } from "@/lib/memory-store";
 
 function encodeEvent(event) {
   return new TextEncoder().encode(`${JSON.stringify(event)}\n`);
@@ -24,7 +25,7 @@ function ndjsonHeaders() {
 
 export async function POST(request) {
   try {
-    const { response } = await requireServerSession();
+    const { session, response } = await requireServerSession();
     if (response) return response;
 
     const payload = await request.json();
@@ -42,6 +43,24 @@ export async function POST(request) {
 
     let documentSources = [];
     let modelRequest = chatRequest;
+    const memoryEnabled = payload.memoryEnabled !== false;
+    const activeMemories = memoryEnabled ? await listMemories(session.user.id) : [];
+    const memoryContext = formatMemoriesForPrompt(activeMemories);
+
+    if (memoryContext) {
+      modelRequest = {
+        ...modelRequest,
+        messages: [
+          {
+            role: "system",
+            content:
+              "Persistent memory is enabled. Use these saved facts and preferences as lightweight user context when relevant. Do not mention memory unless it helps the answer.\n\nSaved memory:\n\n" +
+              memoryContext,
+          },
+          ...modelRequest.messages,
+        ],
+      };
+    }
 
     if (chatRequest.documentChat) {
       const latestUserMessage = [...payload.messages].reverse().find((message) => message.role === "user")?.content || "";
@@ -67,7 +86,7 @@ export async function POST(request) {
       }
 
       modelRequest = {
-        ...chatRequest,
+        ...modelRequest,
         messages: [
           {
             role: "system",
@@ -75,7 +94,7 @@ export async function POST(request) {
               "Document Chat is enabled. Answer only from the retrieved document context below. Cite document chunks with labels like [D1]. If the answer is not supported by the retrieved context, say: \"I could not find that in the indexed documents.\" Do not use outside knowledge.\n\nRetrieved document context:\n\n" +
               retrieval.context,
           },
-          ...chatRequest.messages,
+          ...modelRequest.messages,
         ],
       };
     }

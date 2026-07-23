@@ -116,6 +116,7 @@ function HomeShell({ chat }) {
                 messages={chat.messages}
                 model={chat.model}
                 onCopyMessage={chat.copyMessage}
+                onRememberMessage={chat.rememberMessage}
                 scrollRef={chat.scrollRef}
               />
               <div className="docked-composer">
@@ -136,6 +137,9 @@ function HomeShell({ chat }) {
           guardrails={chat.guardrails}
           hasMessages={chat.hasMessages}
           importChatsRef={chat.importChatsRef}
+          memories={chat.memories}
+          memoryEnabled={chat.memoryEnabled}
+          memoryError={chat.memoryError}
           model={chat.model}
           modelCatalog={chat.modelCatalog}
           modelCatalogError={chat.modelCatalogError}
@@ -152,6 +156,7 @@ function HomeShell({ chat }) {
           locale={chat.locale}
           voiceError={chat.voiceError}
           voiceState={chat.voiceState}
+          onAddMemory={chat.addMemory}
           onChangeApiKey={chat.setApiKey}
           onChangeBaseUrl={chat.setBaseUrl}
           onChangeModel={chat.setModel}
@@ -167,9 +172,12 @@ function HomeShell({ chat }) {
           onMoveChat={chat.moveActiveChat}
           onSaveChat={() => chat.saveChat()}
           onToggleGuardrails={() => chat.setGuardrails((value) => !value)}
+          onToggleMemory={() => chat.setMemoryEnabled((value) => !value)}
           onToggleTemporaryChat={() => chat.setTemporaryChat((value) => !value)}
           onToggleTheme={() => chat.setTheme(chat.theme === "dark" ? "light" : "dark")}
           onToggleVoiceChat={chat.toggleVoiceChat}
+          onUpdateMemory={chat.updateMemory}
+          onDeleteMemory={chat.deleteMemory}
         />
       )}
 

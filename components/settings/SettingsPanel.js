@@ -1,4 +1,5 @@
-import { Download, KeyRound, Mic, Moon, RefreshCw, ShieldCheck, ShieldOff, Sun, Trash2, Upload, X } from "lucide-react";
+import { useState } from "react";
+import { Brain, Download, KeyRound, Mic, Moon, Plus, RefreshCw, ShieldCheck, ShieldOff, Sun, Trash2, Upload, X } from "lucide-react";
 import { useI18n } from "@/components/i18n/I18nProvider";
 import { LOCALE_OPTIONS } from "@/lib/i18n";
 import { PROVIDERS } from "@/lib/providers";
@@ -12,6 +13,9 @@ export function SettingsPanel({
   hasMessages,
   importChatsRef,
   locale,
+  memories,
+  memoryEnabled,
+  memoryError,
   model,
   modelCatalog,
   modelCatalogError,
@@ -31,6 +35,7 @@ export function SettingsPanel({
   onChangeApiKey,
   onChangeBaseUrl,
   onChangeLocale,
+  onAddMemory,
   onChangeModel,
   onChangeProvider,
   onChangeRealtimeModel,
@@ -43,11 +48,17 @@ export function SettingsPanel({
   onMoveChat,
   onSaveChat,
   onToggleGuardrails,
+  onToggleMemory,
   onToggleTemporaryChat,
   onToggleTheme,
   onToggleVoiceChat,
+  onUpdateMemory,
+  onDeleteMemory,
 }) {
   const { t } = useI18n();
+  const [newMemory, setNewMemory] = useState("");
+  const [editingMemoryId, setEditingMemoryId] = useState(null);
+  const [editingMemoryContent, setEditingMemoryContent] = useState("");
   const workspaceFolders = folders.filter((folder) => folder.workspaceId === selectedWorkspaceId);
   const realtimeModels = modelCatalog.filter((item) => item.id.includes("realtime"));
   const selectableRealtimeModels = realtimeModels.length
@@ -76,6 +87,43 @@ export function SettingsPanel({
     } catch (error) {
       event.target.value = "";
       window.alert(error.message || t("settings.importError"));
+    }
+  }
+
+  async function handleAddMemory(event) {
+    event.preventDefault();
+    if (!newMemory.trim()) return;
+
+    try {
+      await onAddMemory(newMemory);
+      setNewMemory("");
+    } catch (error) {
+      window.alert(error.message || t("settings.memorySaveError"));
+    }
+  }
+
+  function startEditingMemory(memory) {
+    setEditingMemoryId(memory.id);
+    setEditingMemoryContent(memory.content);
+  }
+
+  async function saveEditingMemory() {
+    if (!editingMemoryId || !editingMemoryContent.trim()) return;
+
+    try {
+      await onUpdateMemory(editingMemoryId, editingMemoryContent);
+      setEditingMemoryId(null);
+      setEditingMemoryContent("");
+    } catch (error) {
+      window.alert(error.message || t("settings.memorySaveError"));
+    }
+  }
+
+  async function handleDeleteMemory(memoryId) {
+    try {
+      await onDeleteMemory(memoryId);
+    } catch (error) {
+      window.alert(error.message || t("settings.memoryDeleteError"));
     }
   }
 
@@ -214,6 +262,17 @@ export function SettingsPanel({
               <span className={`toggle ${temporaryChat ? "on" : ""}`} aria-hidden="true" />
             </button>
 
+            <button className="setting-toggle" onClick={onToggleMemory} type="button">
+              <span className={memoryEnabled ? "toggle-icon on" : "toggle-icon"}>
+                <Brain size={19} />
+              </span>
+              <span>
+                <strong>{t("settings.memory")}</strong>
+                <small>{memoryEnabled ? t("settings.memoryOn") : t("settings.memoryOff")}</small>
+              </span>
+              <span className={`toggle ${memoryEnabled ? "on" : ""}`} aria-hidden="true" />
+            </button>
+
             <button className="setting-toggle" onClick={onToggleTheme} type="button">
               <span className="toggle-icon">{theme === "dark" ? <Moon size={19} /> : <Sun size={19} />}</span>
               <span>
@@ -222,6 +281,72 @@ export function SettingsPanel({
               </span>
               <span className={`toggle ${theme === "dark" ? "on" : ""}`} aria-hidden="true" />
             </button>
+          </section>
+
+          <section className="settings-card">
+            <div className="setting-title">
+              <h3>{t("settings.memory")}</h3>
+              <p>{t("settings.memoryCopy")}</p>
+            </div>
+
+            <form className="memory-form" onSubmit={handleAddMemory}>
+              <label className="field-label" htmlFor="memory">
+                {t("settings.addMemory")}
+              </label>
+              <textarea
+                id="memory"
+                className="field memory-field"
+                onChange={(event) => setNewMemory(event.target.value)}
+                placeholder={t("settings.memoryPlaceholder")}
+                value={newMemory}
+              />
+              <button className="secondary-button" disabled={!newMemory.trim()} type="submit">
+                <Plus size={16} />
+                {t("settings.remember")}
+              </button>
+            </form>
+
+            <div className="memory-list">
+              {memories?.length ? (
+                memories.map((memory) => (
+                  <div className="memory-item" key={memory.id}>
+                    {editingMemoryId === memory.id ? (
+                      <>
+                        <textarea
+                          className="field memory-field"
+                          onChange={(event) => setEditingMemoryContent(event.target.value)}
+                          value={editingMemoryContent}
+                        />
+                        <div className="memory-actions">
+                          <button className="secondary-button" onClick={saveEditingMemory} type="button">
+                            {t("common.save")}
+                          </button>
+                          <button className="secondary-button" onClick={() => setEditingMemoryId(null)} type="button">
+                            {t("common.cancel")}
+                          </button>
+                        </div>
+                      </>
+                    ) : (
+                      <>
+                        <p>{memory.content}</p>
+                        <div className="memory-actions">
+                          <button className="secondary-button" onClick={() => startEditingMemory(memory)} type="button">
+                            {t("settings.editMemory")}
+                          </button>
+                          <button className="secondary-button danger" onClick={() => handleDeleteMemory(memory.id)} type="button">
+                            <Trash2 size={15} />
+                            {t("settings.deleteMemory")}
+                          </button>
+                        </div>
+                      </>
+                    )}
+                  </div>
+                ))
+              ) : (
+                <p className="settings-hint">{t("settings.noMemories")}</p>
+              )}
+            </div>
+            {memoryError && <p className="settings-error">{memoryError}</p>}
           </section>
 
           <section className="settings-card">

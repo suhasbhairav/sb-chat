@@ -34,6 +34,91 @@
   ],
   "chats": [
     {
+      "id": "1784831749502-64ae92c3cd609",
+      "workspaceId": "workspace-1784806210171-81024ae3ddf17",
+      "folderId": null,
+      "title": "Can you give some strategies for m",
+      "messages": [
+        {
+          "role": "user",
+          "content": "Can you give some strategies for my exam",
+          "id": "1784831749502-64ae92c3cd609-0-user-Can you give some strate"
+        },
+        {
+          "role": "assistant",
+          "content": "Here are effective strategies for exam success, tailored to your SAT focus and vocabulary goals:  \n\n1. **Targeted Vocabulary Practice**:  \n   - Use **flashcards with example sentences** to connect words to real contexts. Prioritize high-frequency SAT words (e.g., *confer*, *precipitate*).  \n   - Practice **synonym/antonym questions** to master word nuances. For example, if \"ostentatious\" is paired with \"showy,\" analyze why other options don’t fit.  \n\n2. **Context Clue Mastery**:  \n   - Train yourself to deduce meanings from surrounding text. For example, in *“The politician’s ______ speech was met with boos,”* infer *“condescending”* fits better than *“eloquent”* based on the negative reaction.  \n\n3. **Time Management**:  \n   - Allocate 1–2 minutes per SAT vocabulary question. Skip tough ones and return later to avoid burnout.  \n\n4. **Active Reading**:  \n   - For Reading Comprehension, underline key phrases and summarize paragraphs. This builds familiarity with complex texts.  \n\n5. **Simulate Real Conditions**:  \n   - Take full-length practice tests weekly to build stamina and identify patterns in question types.  \n\n6. **Review Mistakes**:  \n   - Keep a journal of errors (e.g., confusing *“augment”* and *“amplify”*) and revisit them weekly.  \n\nFor other exams (ACT, GRE, etc.), adjust focus: prioritize math/grammar for ACT, or analytical writing for GRE. Let me know your specific exam, and I’ll refine the plan! 📚✨",
+          "id": "1784831749502-64ae92c3cd609-1-assistant-Here are effective strat"
+        }
+      ],
+      "provider": "ollama",
+      "model": "qwen3:8b",
+      "baseUrl": "http://localhost:11434",
+      "guardrails": true,
+      "temperature": 0.7,
+      "createdAt": "2026-07-23T18:36:00.489Z",
+      "updatedAt": "2026-07-23T18:36:00.489Z"
+    },
+    {
+      "id": "1784831716255-acdefcf75eea18",
+      "workspaceId": "workspace-1784806210171-81024ae3ddf17",
+      "folderId": null,
+      "title": "studying details",
+      "messages": [
+        {
+          "role": "user",
+          "content": "studying details",
+          "id": "1784831716255-acdefcf75eea18-0-user-studying details"
+        },
+        {
+          "role": "assistant",
+          "content": "To create a tailored study plan, could you share:  \n1. **Exam type** (e.g., SAT, GRE, etc.)?  \n2. **Your current vocabulary level** (beginner/intermediate/advanced)?  \n3. **Preferred study method** (flashcards, practice questions, word lists, etc.)?  \n4. **Specific challenges** (e.g., context clues, parts of speech, idioms)?  \n\nThis will help me design the most effective strategy for you! 📚✨",
+          "id": "1784831716255-acdefcf75eea18-1-assistant-To create a tailored stu"
+        },
+        {
+          "role": "user",
+          "content": "SAT",
+          "id": "1784831716255-acdefcf75eea18-2-user-SAT"
+        },
+        {
+          "role": "assistant",
+          "content": "Great! You're preparing for the SAT. To refine your vocabulary strategy, could you share:  \n2. **Your current vocabulary level** (e.g., comfortable with advanced words, struggling with synonyms/antonyms)?  \n3. **Preferred study method** (e.g., flashcards with example sentences, practice questions, or word lists)?  \n4. **Specific challenges** (e.g., understanding context clues, mastering parts of speech, or tackling idioms)?  \n\nThis will help me create a targeted plan for SAT vocabulary success! 📚✨",
+          "id": "1784831716255-acdefcf75eea18-3-assistant-Great! You're preparing "
+        }
+      ],
+      "provider": "ollama",
+      "model": "qwen3:8b",
+      "baseUrl": "http://localhost:11434",
+      "guardrails": true,
+      "temperature": 0.7,
+      "createdAt": "2026-07-23T18:35:22.161Z",
+      "updatedAt": "2026-07-23T18:35:33.816Z"
+    },
+    {
+      "id": "1784831680745-f248693e790268",
+      "workspaceId": "workspace-1784806210171-81024ae3ddf17",
+      "folderId": null,
+      "title": "Help me study vocabulary for a col",
+      "messages": [
+        {
+          "role": "user",
+          "content": "Help me study vocabulary for a college entrance exam.",
+          "id": "1784831680745-f248693e790268-0-user-Help me study vocabulary"
+        },
+        {
+          "role": "assistant",
+          "content": "To help you effectively, I'll need a few details:  \n1. **Exam type** (e.g., SAT, ACT, GRE, TOEFL, or another)?  \n2. **Current vocabulary level** (beginner, intermediate, advanced)?  \n3. **Preferred study method** (flashcards, practice questions, word lists, etc.)?  \n4. **Specific areas of struggle** (e.g., context clues, parts of speech, idioms)?  \n\nOnce I have this info, I can tailor a study plan with vocabulary lists, practice exercises, or tips for your exam! 📚✨",
+          "id": "1784831680745-f248693e790268-1-assistant-To help you effectively,"
+        }
+      ],
+      "provider": "ollama",
+      "model": "qwen3:8b",
+      "baseUrl": "http://localhost:11434",
+      "guardrails": true,
+      "temperature": 0.7,
+      "createdAt": "2026-07-23T18:34:51.564Z",
+      "updatedAt": "2026-07-23T18:34:51.564Z"
+    },
+    {
       "id": "1784819002469-c3b32ba66d22a",
       "workspaceId": "workspace-1784806210171-81024ae3ddf17",
       "folderId": null,

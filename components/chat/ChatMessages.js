@@ -1,10 +1,22 @@
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
-import { Bot, Check, Copy, RefreshCw, User, X } from "lucide-react";
+import { useState } from "react";
+import { Bot, Brain, Check, Copy, RefreshCw, User, X } from "lucide-react";
 import { useI18n } from "@/components/i18n/I18nProvider";
 
-export function ChatMessages({ copiedId, messages, model, onCopyMessage, scrollRef }) {
+export function ChatMessages({ copiedId, messages, model, onCopyMessage, onRememberMessage, scrollRef }) {
   const { t } = useI18n();
+  const [rememberedId, setRememberedId] = useState(null);
+
+  async function remember(message) {
+    try {
+      await onRememberMessage(message);
+      setRememberedId(message.id);
+      setTimeout(() => setRememberedId(null), 1300);
+    } catch (error) {
+      window.alert(error.message || t("settings.memorySaveError"));
+    }
+  }
 
   return (
     <div className="messages-wrap">
@@ -17,9 +29,14 @@ export function ChatMessages({ copiedId, messages, model, onCopyMessage, scrollR
             <div className="message-meta">
               <span>{message.role === "user" ? t("common.you") : message.role === "error" ? t("common.error") : model}</span>
               {message.content && message.role !== "error" && (
-                <button className="copy-button" onClick={() => onCopyMessage(message)} title={t("common.copy")} type="button">
-                  {copiedId === message.id ? <Check size={14} /> : <Copy size={14} />}
-                </button>
+                <div className="message-actions">
+                  <button className="copy-button" onClick={() => remember(message)} title={t("settings.remember")} type="button">
+                    {rememberedId === message.id ? <Check size={14} /> : <Brain size={14} />}
+                  </button>
+                  <button className="copy-button" onClick={() => onCopyMessage(message)} title={t("common.copy")} type="button">
+                    {copiedId === message.id ? <Check size={14} /> : <Copy size={14} />}
+                  </button>
+                </div>
               )}
             </div>
             <div className="markdown-body">
