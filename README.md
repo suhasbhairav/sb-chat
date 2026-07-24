@@ -120,6 +120,7 @@ The product goal is **sovereign AI**: the app can run privately on your machine 
 - OpenAI embeddings with `text-embedding-3-small`
 - Local JSON vector storage by default
 - Optional ChromaDB vector storage with configurable URL and collection
+- Optional Pinecone vector storage with configurable index, namespace, cloud, and region
 - Configurable chunk size, overlap, and Top K
 - `Enable Document Chat` top-bar toggle
 - Document-grounded system prompt that refuses unsupported answers
@@ -188,7 +189,7 @@ Locale preference is stored in browser settings. User-generated data, model outp
 | Chat Storage | Local JSON files |
 | Markdown | `react-markdown` + `remark-gfm` |
 | Documents | `mammoth`, `xlsx`, local file processing |
-| Vector DB | Local JSON vectors, optional ChromaDB through `chromadb` |
+| Vector DB | Local JSON vectors, optional ChromaDB through `chromadb`, optional Pinecone through `@pinecone-database/pinecone` |
 | Skills | Local JSON skill store + prompt injection |
 | Voice | OpenAI Realtime WebRTC |
 | Providers | Ollama, OpenAI, Claude, Grok, Sarvam AI, OpenRouter, OpenAI-compatible APIs |
@@ -203,7 +204,7 @@ Locale preference is stored in browser settings. User-generated data, model outp
 npm install
 ```
 
-Batuk uses the `chromadb` TypeScript client for optional ChromaDB vector storage. Do not install `@chroma-core/default-embed`; Batuk creates embeddings itself and sends precomputed vectors to Chroma. The default embed package currently breaks Next.js/Turbopack builds in this app.
+Batuk uses the `chromadb` TypeScript client for optional ChromaDB vector storage and `@pinecone-database/pinecone` for optional Pinecone vector storage. Do not install `@chroma-core/default-embed`; Batuk creates embeddings itself and sends precomputed vectors to Chroma or Pinecone. The default embed package currently breaks Next.js/Turbopack builds in this app.
 
 ### 2. Configure environment variables
 
@@ -218,6 +219,11 @@ OPENAI_API_KEY=your_openai_api_key
 OPENROUTER_API_KEY=your_openrouter_api_key
 ANTHROPIC_API_KEY=your_anthropic_api_key
 XAI_API_KEY=your_xai_api_key
+PINECONE_API_KEY=your_pinecone_api_key
+PINECONE_INDEX=sb-chat-documents
+PINECONE_NAMESPACE=documents
+PINECONE_CLOUD=aws
+PINECONE_REGION=us-east-1
 SARVAM_API_KEY=your_sarvam_api_key
 ```
 
@@ -369,6 +375,7 @@ Vector storage modes:
 
 - `Local JSON vectors`: stores chunk vectors in `data/document-store.json`. This is the default and needs no extra service.
 - `ChromaDB`: stores chunk vectors in a running Chroma server while Batuk keeps document metadata locally.
+- `Pinecone`: stores chunk vectors in Pinecone while Batuk keeps document metadata and uploaded originals locally.
 
 To use ChromaDB locally, start Chroma before uploading or reindexing documents:
 
@@ -409,6 +416,35 @@ yarn add @chroma-core/default-embed
 ```
 
 Batuk already computes embeddings through its configured embedding mode and queries Chroma with precomputed vectors.
+
+To use Pinecone, add a Pinecone API key in `.env` or in the Documents panel:
+
+```bash
+PINECONE_API_KEY=your_pinecone_api_key
+PINECONE_INDEX=sb-chat-documents
+PINECONE_NAMESPACE=documents
+PINECONE_CLOUD=aws
+PINECONE_REGION=us-east-1
+```
+
+Then open **Documents -> Vector storage** and set:
+
+```text
+Vector store: Pinecone
+Pinecone index: sb-chat-documents
+Pinecone namespace: documents
+Cloud: aws
+Region: us-east-1
+```
+
+Batuk creates the Pinecone index automatically if it does not exist. Pinecone indexes are dimension-specific, so local embeddings use `384` dimensions and OpenAI `text-embedding-3-small` uses `1536` dimensions. If the selected Pinecone index already exists with a different dimension, Batuk automatically creates and stores a sibling index such as `sb-chat-documents-1536d` for the new embedding dimension.
+
+The Documents page keeps the same management behavior for every vector store:
+
+- Upload creates local document metadata, extracts text, chunks content, embeds chunks, and stores vectors.
+- Reindex rebuilds vectors using the current embedding and vector store settings.
+- Delete removes the local uploaded file, local metadata, local chunk records, and remote vectors when applicable.
+- Download serves the original uploaded file from local storage, regardless of whether vectors live in JSON, ChromaDB, or Pinecone.
 
 When Document Chat is enabled, Batuk retrieves relevant chunks, injects them into the model request, and instructs the model to answer only from retrieved context.
 

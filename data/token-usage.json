@@ -1,12 +1,26 @@
 {
   "version": 1,
   "totals": {
-    "inputTokens": 8070,
-    "outputTokens": 6955,
-    "totalTokens": 15025,
-    "requests": 11
+    "inputTokens": 9741,
+    "outputTokens": 7541,
+    "totalTokens": 17282,
+    "requests": 12
   },
   "events": [
+    {
+      "id": "usage-1784926283846-8dad5b49489de",
+      "chatId": "1784926234321-ec40386fb1d21",
+      "workspaceId": "workspace-1784806210171-81024ae3ddf17",
+      "folderId": null,
+      "provider": "ollama",
+      "model": "qwen3:8b",
+      "inputTokens": 1671,
+      "outputTokens": 586,
+      "totalTokens": 2257,
+      "source": "ollama",
+      "temporary": false,
+      "createdAt": "2026-07-24T20:51:23.847Z"
+    },
     {
       "id": "usage-1784893061204-e595145de44ca",
       "chatId": "1784893045030-da3abcbc65a858",

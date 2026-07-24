@@ -1,6 +1,7 @@
 import { json } from "@/lib/chat-request";
 import { requireServerSession } from "@/lib/auth-session";
 import { deleteChromaDocument } from "@/lib/rag-chroma";
+import { deletePineconeDocument } from "@/lib/rag-pinecone";
 import { deleteDocument, readDocumentStore, summarizeDocuments } from "@/lib/rag-store";
 
 export const runtime = "nodejs";
@@ -18,6 +19,13 @@ export async function DELETE(_request, { params }) {
       ...currentStore.settings,
       chromaUrl: document?.chromaUrl || currentStore.settings.chromaUrl,
       chromaCollection: document?.chromaCollection || currentStore.settings.chromaCollection,
+    }).catch(() => {});
+  }
+  if (document?.vectorStoreProvider === "pinecone" || currentStore.settings.vectorStoreProvider === "pinecone") {
+    await deletePineconeDocument(id, {
+      ...currentStore.settings,
+      pineconeIndex: document?.pineconeIndex || currentStore.settings.pineconeIndex,
+      pineconeNamespace: document?.pineconeNamespace || currentStore.settings.pineconeNamespace,
     }).catch(() => {});
   }
 

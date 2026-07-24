@@ -1,18 +1,50 @@
 import { json, resolveServerApiKey } from "@/lib/chat-request";
 import { requireServerSession } from "@/lib/auth-session";
 import { createEmbeddings } from "@/lib/rag-embeddings";
-import { normalizeChromaCollectionName, normalizeChromaUrl, upsertChromaChunks } from "@/lib/rag-chroma";
+import { deleteChromaDocument, normalizeChromaCollectionName, normalizeChromaUrl, upsertChromaChunks } from "@/lib/rag-chroma";
+import {
+  deletePineconeDocument,
+  normalizePineconeCloud,
+  normalizePineconeIndexName,
+  normalizePineconeNamespace,
+  normalizePineconeRegion,
+  upsertPineconeChunks,
+} from "@/lib/rag-pinecone";
 import { chunkDocumentText, extractDocumentText } from "@/lib/rag-processing";
 import { getDocumentFilePath, readDocumentStore, summarizeDocuments, writeDocumentStore } from "@/lib/rag-store";
 
 export const runtime = "nodejs";
 
+async function markDocumentReindexFailed(documentId, error) {
+  const store = await readDocumentStore();
+  const message = error.message || "Document reindex failed.";
+  const nextStore = {
+    ...store,
+    documents: store.documents.map((item) =>
+      item.id === documentId
+        ? {
+            ...item,
+            status: "failed",
+            error: message,
+            reindexedAt: new Date().toISOString(),
+          }
+        : item,
+    ),
+  };
+
+  await writeDocumentStore(nextStore);
+  return nextStore;
+}
+
 export async function POST(request, { params }) {
+  let documentId = "";
+
   try {
     const { response } = await requireServerSession();
     if (response) return response;
 
     const { id } = await params;
+    documentId = id;
     const payload = await request.json().catch(() => ({}));
     const store = await readDocumentStore();
     const document = store.documents.find((item) => item.id === id);
@@ -21,14 +53,20 @@ export async function POST(request, { params }) {
       return json({ error: "Document not found." }, 404);
     }
 
-    const vectorStoreProvider = payload.vectorStoreProvider || store.settings.vectorStoreProvider;
+    const requestedVectorStoreProvider = payload.vectorStoreProvider || store.settings.vectorStoreProvider;
+    const vectorStoreProvider = ["chroma", "pinecone"].includes(requestedVectorStoreProvider) ? requestedVectorStoreProvider : "json";
     const settings = {
       ...store.settings,
       embeddingProvider: payload.embeddingProvider || store.settings.embeddingProvider,
       embeddingModel: payload.embeddingModel || store.settings.embeddingModel,
-      vectorStoreProvider: vectorStoreProvider === "chroma" ? "chroma" : "json",
+      vectorStoreProvider,
       chromaUrl: normalizeChromaUrl(payload.chromaUrl || store.settings.chromaUrl),
       chromaCollection: normalizeChromaCollectionName(payload.chromaCollection || store.settings.chromaCollection),
+      pineconeApiKey: String(payload.pineconeApiKey || store.settings.pineconeApiKey || ""),
+      pineconeIndex: normalizePineconeIndexName(payload.pineconeIndex || store.settings.pineconeIndex),
+      pineconeNamespace: normalizePineconeNamespace(payload.pineconeNamespace || store.settings.pineconeNamespace),
+      pineconeCloud: normalizePineconeCloud(payload.pineconeCloud || store.settings.pineconeCloud),
+      pineconeRegion: normalizePineconeRegion(payload.pineconeRegion || store.settings.pineconeRegion),
     };
     const filePath = getDocumentFilePath(document);
     const text = await extractDocumentText(filePath, document.name);
@@ -59,25 +97,59 @@ export async function POST(request, { params }) {
     if (settings.vectorStoreProvider === "chroma") {
       await upsertChromaChunks(indexedChunks, settings);
     }
+    let resolvedSettings = settings;
+    if (settings.vectorStoreProvider === "pinecone") {
+      const pineconeTarget = await upsertPineconeChunks(indexedChunks, settings);
+      resolvedSettings = {
+        ...settings,
+        pineconeIndex: pineconeTarget.indexName,
+        pineconeNamespace: pineconeTarget.namespace,
+      };
+    }
+    const oldChromaSettings = {
+      ...store.settings,
+      chromaUrl: document.chromaUrl || store.settings.chromaUrl,
+      chromaCollection: document.chromaCollection || store.settings.chromaCollection,
+    };
+    const oldPineconeSettings = {
+      ...store.settings,
+      pineconeIndex: document.pineconeIndex || store.settings.pineconeIndex,
+      pineconeNamespace: document.pineconeNamespace || store.settings.pineconeNamespace,
+      pineconeApiKey: settings.pineconeApiKey,
+    };
+    const chromaLocationChanged =
+      oldChromaSettings.chromaUrl !== resolvedSettings.chromaUrl || oldChromaSettings.chromaCollection !== resolvedSettings.chromaCollection;
+    const pineconeLocationChanged =
+      oldPineconeSettings.pineconeIndex !== resolvedSettings.pineconeIndex ||
+      oldPineconeSettings.pineconeNamespace !== resolvedSettings.pineconeNamespace;
+
+    if (document.vectorStoreProvider === "chroma" && (resolvedSettings.vectorStoreProvider !== "chroma" || chromaLocationChanged)) {
+      await deleteChromaDocument(document.id, oldChromaSettings).catch(() => {});
+    }
+    if (document.vectorStoreProvider === "pinecone" && (resolvedSettings.vectorStoreProvider !== "pinecone" || pineconeLocationChanged)) {
+      await deletePineconeDocument(document.id, oldPineconeSettings).catch(() => {});
+    }
     const nextDocument = {
       ...document,
       status: "ready",
       error: null,
       textLength: text.length,
       chunkCount: indexedChunks.length,
-      embeddingProvider: settings.embeddingProvider,
-      embeddingModel: settings.embeddingModel,
-      vectorStoreProvider: settings.vectorStoreProvider,
-      chromaUrl: settings.vectorStoreProvider === "chroma" ? settings.chromaUrl : null,
-      chromaCollection: settings.vectorStoreProvider === "chroma" ? settings.chromaCollection : null,
+      embeddingProvider: resolvedSettings.embeddingProvider,
+      embeddingModel: resolvedSettings.embeddingModel,
+      vectorStoreProvider: resolvedSettings.vectorStoreProvider,
+      chromaUrl: resolvedSettings.vectorStoreProvider === "chroma" ? resolvedSettings.chromaUrl : null,
+      chromaCollection: resolvedSettings.vectorStoreProvider === "chroma" ? resolvedSettings.chromaCollection : null,
+      pineconeIndex: resolvedSettings.vectorStoreProvider === "pinecone" ? resolvedSettings.pineconeIndex : null,
+      pineconeNamespace: resolvedSettings.vectorStoreProvider === "pinecone" ? resolvedSettings.pineconeNamespace : null,
       reindexedAt: createdAt,
     };
     const nextStore = {
       ...store,
-      settings,
+      settings: resolvedSettings,
       documents: store.documents.map((item) => (item.id === document.id ? nextDocument : item)),
       chunks: [
-        ...(settings.vectorStoreProvider === "json" ? indexedChunks : indexedChunks.map(({ embedding, ...chunk }) => chunk)),
+        ...(resolvedSettings.vectorStoreProvider === "json" ? indexedChunks : indexedChunks.map(({ embedding, ...chunk }) => chunk)),
         ...store.chunks.filter((chunk) => chunk.documentId !== document.id),
       ],
     };
@@ -85,6 +157,18 @@ export async function POST(request, { params }) {
     await writeDocumentStore(nextStore);
     return json(summarizeDocuments(nextStore));
   } catch (error) {
+    console.error("Document reindex failed", error);
+    if (documentId) {
+      const failedStore = await markDocumentReindexFailed(documentId, error).catch(() => null);
+      return json(
+        {
+          ...(failedStore ? summarizeDocuments(failedStore) : {}),
+          error: error.message || "Document reindex failed.",
+        },
+        500,
+      );
+    }
+
     return json({ error: error.message || "Document reindex failed." }, 500);
   }
 }

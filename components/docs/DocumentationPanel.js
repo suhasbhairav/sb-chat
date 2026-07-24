@@ -38,7 +38,7 @@ export function DocumentationPanel({ onClose }) {
     {
       icon: FileText,
       title: "Document Chat and RAG",
-      copy: "Upload documents, index with local or OpenAI embeddings, retrieve chunks per message, and cite document sources.",
+      copy: "Upload documents, index with local or OpenAI embeddings, store vectors in JSON, ChromaDB, or Pinecone, and cite document sources.",
     },
     {
       icon: Waypoints,
@@ -258,6 +258,51 @@ await requireServerSession();`}</code>
                   <span>{copy}</span>
                 </div>
               ))}
+            </div>
+          </section>
+
+          <section className="docs-split">
+            <div className="docs-copy-block">
+              <span>Document Chat</span>
+              <h2>Use JSON, ChromaDB, or Pinecone for document vectors.</h2>
+              <p>
+                The Documents panel stores uploaded originals locally, then extracts text, chunks content, creates local
+                or OpenAI embeddings, and writes vectors to the selected store. Pinecone can be configured with an API key,
+                index, namespace, cloud, and region while keeping download and delete behavior identical to ChromaDB.
+              </p>
+              <ul>
+                {[
+                  "Pinecone API key can come from PINECONE_API_KEY or the Documents panel",
+                  "Default Pinecone index is sb-chat-documents with namespace documents",
+                  "Local embeddings use 384 dimensions; OpenAI text-embedding-3-small uses 1536",
+                  "If an existing Pinecone index has the wrong dimension, Batuk creates a sibling index such as sb-chat-documents-1536d",
+                  "Delete removes remote vectors when applicable; download always returns the locally stored original file",
+                ].map((item) => (
+                  <li key={item}>
+                    <CheckCircle2 size={16} />
+                    {item}
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div className="docs-code-card">
+              <div className="code-dots" aria-hidden="true">
+                <span />
+                <span />
+                <span />
+              </div>
+              <pre>
+                <code>{`PINECONE_API_KEY=your_pinecone_api_key
+PINECONE_INDEX=sb-chat-documents
+PINECONE_NAMESPACE=documents
+PINECONE_CLOUD=aws
+PINECONE_REGION=us-east-1
+
+Documents -> Vector storage:
+Vector store: Pinecone
+Embedding: OpenAI embeddings
+Index: sb-chat-documents`}</code>
+              </pre>
             </div>
           </section>
 

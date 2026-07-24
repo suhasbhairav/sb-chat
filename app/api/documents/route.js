@@ -3,6 +3,13 @@ import { requireServerSession } from "@/lib/auth-session";
 import { makeId } from "@/lib/chat-utils";
 import { createEmbeddings } from "@/lib/rag-embeddings";
 import { normalizeChromaCollectionName, normalizeChromaUrl, upsertChromaChunks } from "@/lib/rag-chroma";
+import {
+  normalizePineconeCloud,
+  normalizePineconeIndexName,
+  normalizePineconeNamespace,
+  normalizePineconeRegion,
+  upsertPineconeChunks,
+} from "@/lib/rag-pinecone";
 import { chunkDocumentText, extractDocumentText } from "@/lib/rag-processing";
 import { readDocumentStore, saveUploadedDocumentFile, summarizeDocuments, writeDocumentStore } from "@/lib/rag-store";
 
@@ -10,12 +17,18 @@ export const runtime = "nodejs";
 
 function normalizeSettings(settings = {}) {
   const embeddingProvider = settings.embeddingProvider === "openai" ? "openai" : "local";
+  const vectorStoreProvider = ["chroma", "pinecone"].includes(settings.vectorStoreProvider) ? settings.vectorStoreProvider : "json";
   return {
     embeddingProvider,
     embeddingModel: embeddingProvider === "openai" ? settings.embeddingModel || "text-embedding-3-small" : "local-hash-v1",
-    vectorStoreProvider: settings.vectorStoreProvider === "chroma" ? "chroma" : "json",
+    vectorStoreProvider,
     chromaUrl: normalizeChromaUrl(settings.chromaUrl),
     chromaCollection: normalizeChromaCollectionName(settings.chromaCollection),
+    pineconeApiKey: String(settings.pineconeApiKey || ""),
+    pineconeIndex: normalizePineconeIndexName(settings.pineconeIndex),
+    pineconeNamespace: normalizePineconeNamespace(settings.pineconeNamespace),
+    pineconeCloud: normalizePineconeCloud(settings.pineconeCloud),
+    pineconeRegion: normalizePineconeRegion(settings.pineconeRegion),
     chunkSize: Math.min(6000, Math.max(600, Number(settings.chunkSize || 1800))),
     chunkOverlap: Math.min(1200, Math.max(0, Number(settings.chunkOverlap || 220))),
     topK: Math.min(12, Math.max(1, Number(settings.topK || 6))),
@@ -61,6 +74,11 @@ export async function POST(request) {
       vectorStoreProvider: formData.get("vectorStoreProvider"),
       chromaUrl: formData.get("chromaUrl"),
       chromaCollection: formData.get("chromaCollection"),
+      pineconeIndex: formData.get("pineconeIndex"),
+      pineconeNamespace: formData.get("pineconeNamespace"),
+      pineconeCloud: formData.get("pineconeCloud"),
+      pineconeRegion: formData.get("pineconeRegion"),
+      pineconeApiKey: formData.get("pineconeApiKey"),
       openAIBaseUrl: formData.get("openAIBaseUrl"),
     });
     const apiKey = String(formData.get("apiKey") || "") || resolveServerApiKey("openai", "");
@@ -89,6 +107,8 @@ export async function POST(request) {
         vectorStoreProvider: settings.vectorStoreProvider,
         chromaUrl: settings.vectorStoreProvider === "chroma" ? settings.chromaUrl : null,
         chromaCollection: settings.vectorStoreProvider === "chroma" ? settings.chromaCollection : null,
+        pineconeIndex: settings.vectorStoreProvider === "pinecone" ? settings.pineconeIndex : null,
+        pineconeNamespace: settings.vectorStoreProvider === "pinecone" ? settings.pineconeNamespace : null,
         createdAt,
       };
 
@@ -119,17 +139,28 @@ export async function POST(request) {
         if (settings.vectorStoreProvider === "chroma") {
           await upsertChromaChunks(indexedChunks, settings);
         }
+        let resolvedSettings = settings;
+        if (settings.vectorStoreProvider === "pinecone") {
+          const pineconeTarget = await upsertPineconeChunks(indexedChunks, settings);
+          resolvedSettings = {
+            ...settings,
+            pineconeIndex: pineconeTarget.indexName,
+            pineconeNamespace: pineconeTarget.namespace,
+          };
+        }
         const document = {
           ...baseDocument,
           status: "ready",
           textLength: text.length,
           chunkCount: indexedChunks.length,
-          vectorStoreProvider: settings.vectorStoreProvider,
+          vectorStoreProvider: resolvedSettings.vectorStoreProvider,
+          pineconeIndex: resolvedSettings.vectorStoreProvider === "pinecone" ? resolvedSettings.pineconeIndex : null,
+          pineconeNamespace: resolvedSettings.vectorStoreProvider === "pinecone" ? resolvedSettings.pineconeNamespace : null,
         };
 
         store = {
           ...store,
-          settings,
+          settings: resolvedSettings,
           documents: [document, ...store.documents.filter((item) => item.id !== id)],
           chunks: [
             ...(settings.vectorStoreProvider === "json" ? indexedChunks : indexedChunks.map(({ embedding, ...chunk }) => chunk)),

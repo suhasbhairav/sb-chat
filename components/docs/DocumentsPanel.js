@@ -10,6 +10,11 @@ const DEFAULT_DOCUMENT_SETTINGS = {
   vectorStoreProvider: "json",
   chromaUrl: "http://localhost:8000",
   chromaCollection: "sb_chat_documents",
+  pineconeApiKey: "",
+  pineconeIndex: "sb-chat-documents",
+  pineconeNamespace: "documents",
+  pineconeCloud: "aws",
+  pineconeRegion: "us-east-1",
   chunkSize: 1800,
   chunkOverlap: 220,
   topK: 6,
@@ -222,27 +227,86 @@ export function DocumentsPanel({ apiKey, documentChatEnabled, openAIBaseUrl, onC
             >
               <option value="json">{t("documents.jsonVectorStore")}</option>
               <option value="chroma">{t("documents.chromaVectorStore")}</option>
+              <option value="pinecone">{t("documents.pineconeVectorStore")}</option>
             </select>
 
-            <label className="field-label" htmlFor="chromaUrl">{t("documents.chromaUrl")}</label>
-            <input
-              id="chromaUrl"
-              className="field"
-              onChange={(event) => saveSettings({ ...settings, chromaUrl: event.target.value })}
-              placeholder="http://localhost:8000"
-              value={settings.chromaUrl || ""}
-            />
+            {(settings.vectorStoreProvider || "json") === "chroma" && (
+              <>
+                <label className="field-label" htmlFor="chromaUrl">{t("documents.chromaUrl")}</label>
+                <input
+                  id="chromaUrl"
+                  className="field"
+                  onChange={(event) => saveSettings({ ...settings, chromaUrl: event.target.value })}
+                  placeholder="http://localhost:8000"
+                  value={settings.chromaUrl || ""}
+                />
 
-            <label className="field-label" htmlFor="chromaCollection">{t("documents.chromaCollection")}</label>
-            <input
-              id="chromaCollection"
-              className="field"
-              onChange={(event) => saveSettings({ ...settings, chromaCollection: event.target.value })}
-              placeholder="sb_chat_documents"
-              value={settings.chromaCollection || ""}
-            />
-            {(settings.vectorStoreProvider || "json") !== "chroma" && (
-              <p className="settings-hint">{t("documents.chromaInactiveHint")}</p>
+                <label className="field-label" htmlFor="chromaCollection">{t("documents.chromaCollection")}</label>
+                <input
+                  id="chromaCollection"
+                  className="field"
+                  onChange={(event) => saveSettings({ ...settings, chromaCollection: event.target.value })}
+                  placeholder="sb_chat_documents"
+                  value={settings.chromaCollection || ""}
+                />
+              </>
+            )}
+
+            {(settings.vectorStoreProvider || "json") === "pinecone" && (
+              <>
+                <label className="field-label" htmlFor="pineconeApiKey">{t("documents.pineconeApiKey")}</label>
+                <input
+                  id="pineconeApiKey"
+                  className="field"
+                  onChange={(event) => saveSettings({ ...settings, pineconeApiKey: event.target.value })}
+                  placeholder={t("documents.pineconeApiKeyPlaceholder")}
+                  type="password"
+                  value={settings.pineconeApiKey || ""}
+                />
+
+                <label className="field-label" htmlFor="pineconeIndex">{t("documents.pineconeIndex")}</label>
+                <input
+                  id="pineconeIndex"
+                  className="field"
+                  onChange={(event) => saveSettings({ ...settings, pineconeIndex: event.target.value })}
+                  placeholder="sb-chat-documents"
+                  value={settings.pineconeIndex || ""}
+                />
+
+                <label className="field-label" htmlFor="pineconeNamespace">{t("documents.pineconeNamespace")}</label>
+                <input
+                  id="pineconeNamespace"
+                  className="field"
+                  onChange={(event) => saveSettings({ ...settings, pineconeNamespace: event.target.value })}
+                  placeholder="documents"
+                  value={settings.pineconeNamespace || ""}
+                />
+
+                <div className="rag-setting-grid">
+                  <label>
+                    <span>{t("documents.pineconeCloud")}</span>
+                    <input
+                      className="field"
+                      onChange={(event) => saveSettings({ ...settings, pineconeCloud: event.target.value })}
+                      placeholder="aws"
+                      value={settings.pineconeCloud || ""}
+                    />
+                  </label>
+                  <label>
+                    <span>{t("documents.pineconeRegion")}</span>
+                    <input
+                      className="field"
+                      onChange={(event) => saveSettings({ ...settings, pineconeRegion: event.target.value })}
+                      placeholder="us-east-1"
+                      value={settings.pineconeRegion || ""}
+                    />
+                  </label>
+                </div>
+              </>
+            )}
+
+            {(settings.vectorStoreProvider || "json") === "json" && (
+              <p className="settings-hint">{t("documents.localVectorStoreHint")}</p>
             )}
 
             <div className="rag-setting-grid">

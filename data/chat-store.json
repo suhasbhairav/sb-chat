@@ -34,6 +34,76 @@
   ],
   "chats": [
     {
+      "id": "1784926234321-ec40386fb1d21",
+      "workspaceId": "workspace-1784806210171-81024ae3ddf17",
+      "folderId": null,
+      "title": "What's in the document?",
+      "messages": [
+        {
+          "role": "user",
+          "content": "What's in the document?",
+          "id": "1784926234321-ec40386fb1d21-0-user-What's in the document?"
+        },
+        {
+          "role": "assistant",
+          "content": "The document contains guidance on leveraging AI for marketing transformation, divided into key sections and practical checklists:  \n\n1. **Content Operations (D1)**:  \n   - Automate content creation (blogs, social posts, emails) with AI-assisted drafting and templates.  \n   - Use AI for content calendars, publish dates, and human-in-the-loop reviews for accuracy.  \n   - Pilot channels for 2 weeks to measure impact and reviewer effort.  \n\n2. **Campaign Planning (D1)**:  \n   - Translate business goals into AI-driven briefs and multichannel plans with A/B testing hypotheses.  \n   - Automate campaign calendars and enforce brand/compliance guardrails.  \n   - Assign ownership and document decisions for accountability.  \n\n3. **Customer Research & Reporting (D1/D3)**:  \n   - Use AI for sentiment analysis, persona creation, and automated KPI dashboards.  \n   - Flag data gaps and anomalies, and ensure data lineage (CRM, warehouses, etc.).  \n   - Generate narrative-ready summaries for stakeholders.  \n\n4. **Cross-Industry AI Patterns (D2)**:  \n   - Practical implementations for sectors like automotive, finance, cybersecurity, etc.  \n   - Emphasizes security, governance, observability, and failure-mode planning for operational AI systems.  \n\nThe guide is authored by **Suhas Bhairav** and focuses on auditable, repeatable AI workflows with human oversight. [D1], [D2], [D3]\n\n**Document sources**\n- [D1] ai-transformation-guide-for-marketing.pdf, chunk 1\n- [D2] ai-transformation-guide-for-marketing.pdf, chunk 3\n- [D3] ai-transformation-guide-for-marketing.pdf, chunk 2",
+          "id": "1784926234321-ec40386fb1d21-1-assistant-The document contains gu"
+        }
+      ],
+      "provider": "ollama",
+      "model": "qwen3:8b",
+      "baseUrl": "http://localhost:11434",
+      "guardrails": true,
+      "temperature": 0.7,
+      "createdAt": "2026-07-24T20:50:36.752Z",
+      "updatedAt": "2026-07-24T20:51:23.879Z"
+    },
+    {
+      "id": "1784922571646-21bbaeb535a1b",
+      "workspaceId": "workspace-1784806210171-81024ae3ddf17",
+      "folderId": null,
+      "title": "Explain what is in the document ab",
+      "messages": [
+        {
+          "role": "user",
+          "content": "Explain what is in the document about marketing?",
+          "id": "1784922571646-21bbaeb535a1b-0-user-Explain what is in the d"
+        }
+      ],
+      "provider": "ollama",
+      "model": "qwen3:8b",
+      "baseUrl": "http://localhost:11434",
+      "guardrails": true,
+      "temperature": 0.7,
+      "createdAt": "2026-07-24T19:49:32.599Z",
+      "updatedAt": "2026-07-24T19:49:32.599Z"
+    },
+    {
+      "id": "1784919279408-3a288c0d961fe8",
+      "workspaceId": "workspace-1784806210171-81024ae3ddf17",
+      "folderId": null,
+      "title": "How do I transform marketing as pe",
+      "messages": [
+        {
+          "role": "user",
+          "content": "How do I transform marketing as per the document?",
+          "id": "1784919279408-3a288c0d961fe8-0-user-How do I transform marke"
+        },
+        {
+          "role": "assistant",
+          "content": "Document Chat is enabled, but I could not find any indexed document chunks to answer from. Check the Documents page for failed uploads, re-upload the file, or switch Document Chat off for normal AI chat.",
+          "id": "1784919279408-3a288c0d961fe8-1-assistant-Document Chat is enabled"
+        }
+      ],
+      "provider": "ollama",
+      "model": "qwen3:8b",
+      "baseUrl": "http://localhost:11434",
+      "guardrails": true,
+      "temperature": 0.7,
+      "createdAt": "2026-07-24T18:54:40.101Z",
+      "updatedAt": "2026-07-24T18:55:36.972Z"
+    },
+    {
       "id": "1784893045030-da3abcbc65a858",
       "workspaceId": "workspace-1784806210171-81024ae3ddf17",
       "folderId": null,
