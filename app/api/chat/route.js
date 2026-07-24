@@ -5,6 +5,7 @@ import { appendDocumentSources, retrieveDocumentContext } from "@/lib/rag-embedd
 import { recordTokenUsage } from "@/lib/token-usage-store";
 import { requireServerSession } from "@/lib/auth-session";
 import { formatMemoriesForPrompt, listMemories } from "@/lib/memory-store";
+import { formatSkillsForPrompt, listEnabledSkills } from "@/lib/skill-store";
 
 function encodeEvent(event) {
   return new TextEncoder().encode(`${JSON.stringify(event)}\n`);
@@ -43,9 +44,26 @@ export async function POST(request) {
 
     let documentSources = [];
     let modelRequest = chatRequest;
+    const enabledSkills = await listEnabledSkills();
+    const skillsContext = formatSkillsForPrompt(enabledSkills);
     const memoryEnabled = payload.memoryEnabled !== false;
     const activeMemories = memoryEnabled ? await listMemories(session.user.id) : [];
     const memoryContext = formatMemoriesForPrompt(activeMemories);
+
+    if (skillsContext) {
+      modelRequest = {
+        ...modelRequest,
+        messages: [
+          {
+            role: "system",
+            content:
+              "Enabled skills are reusable workflows and instructions. Silently use one or more enabled skills when they are relevant to the user's request. Do not mention a skill unless the user asks or it helps explain your approach.\n\nEnabled skills:\n\n" +
+              skillsContext,
+          },
+          ...modelRequest.messages,
+        ],
+      };
+    }
 
     if (memoryContext) {
       modelRequest = {

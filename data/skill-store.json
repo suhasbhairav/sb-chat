@@ -1,0 +1,27 @@
+{
+  "version": 1,
+  "skills": [
+    {
+      "id": "1784882011826-211973673b76e",
+      "name": "Eight-line rhyming poem",
+      "description": "Use when the user asks for a poem, verse, rhyme, or poetic response.",
+      "instructions": "When the user asks for a poem, write exactly 8 lines. Each line must end with a rhyming word. Do not add a title, explanation, notes, or extra lines unless the user explicitly asks for them. Keep the poem concise and make the end words rhyme clearly.",
+      "examples": "User: Write a poem about rain.\nAssistant:\nRain taps softly on the pane\nDreams awaken in the rain\nSilver streets begin to gleam\nNight dissolves into a dream\n\nRain taps softly on the pane\nDreams awaken in the rain\nSilver streets begin to gleam\nNight dissolves into a dream",
+      "resources": "Checklist: exactly 8  lines; no title by default; each line ends with a rhyming word; avoid prose before or after the poem.",
+      "enabled": true,
+      "createdAt": "2026-07-24T08:33:31.826Z",
+      "updatedAt": "2026-07-24T08:50:06.052Z"
+    },
+    {
+      "id": "1784881993422-739e259f9f0ee8",
+      "name": "Story under 100 words",
+      "description": "Use when the user asks for a story, short story, fiction scene, fable, or narrative.",
+      "instructions": "When the user asks for a story, write a complete story in 100 words or fewer. Include a clear beginning, middle, and ending. Do not exceed 100 words under any circumstance. Do not add a title, word count, explanation, or extra commentary unless the user explicitly asks for it.",
+      "examples": "User: Write a story about a lost key.\nAssistant: Mara found the brass key under the library clock, warm as if recently held. It opened no door she tried until midnight, when moonlight outlined a tiny lock in the old atlas. Inside was a map of streets that had vanished years ago. She followed one to a bakery glowing in an empty lot. Her grandfather, younger than memory, waved from the doorway. \"You found your way,\" he said. By dawn, only the key remained, and the smell of bread.",
+      "resources": "",
+      "enabled": true,
+      "createdAt": "2026-07-24T08:33:13.422Z",
+      "updatedAt": "2026-07-24T08:50:06.052Z"
+    }
+  ]
+}

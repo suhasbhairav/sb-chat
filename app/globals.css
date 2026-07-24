@@ -952,6 +952,121 @@ button:disabled {
   box-shadow: var(--shadow);
 }
 
+.composer-shell {
+  display: grid;
+  gap: 10px;
+  width: min(850px, 100%);
+}
+
+.composer-shell .chat-composer {
+  width: 100%;
+}
+
+.message-queue {
+  display: grid;
+  gap: 8px;
+  border: 1px solid var(--composer-border);
+  border-radius: 16px;
+  background: color-mix(in srgb, var(--composer) 90%, var(--hover));
+  padding: 10px;
+  box-shadow: 0 16px 36px rgb(0 0 0 / 0.08);
+}
+
+.message-queue-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding-inline: 2px;
+}
+
+.message-queue-head strong {
+  color: var(--app-text);
+  font-size: 12px;
+  font-weight: 850;
+}
+
+.message-queue-head span {
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 780;
+}
+
+.message-queue-list {
+  display: grid;
+  gap: 7px;
+  max-height: 190px;
+  overflow-y: auto;
+}
+
+.queued-message {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--stage);
+  padding: 9px 10px;
+}
+
+.queued-message p {
+  display: -webkit-box;
+  margin: 0;
+  overflow: hidden;
+  color: var(--muted-strong);
+  font-size: 13px;
+  line-height: 1.35;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.queued-message > div:last-child {
+  display: inline-flex;
+  gap: 5px;
+}
+
+.queued-message-copy {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+}
+
+.queued-attachments {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+.queued-attachments span {
+  max-width: 170px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  color: var(--muted);
+  padding: 2px 7px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 11px;
+  font-weight: 760;
+}
+
+.queued-message button {
+  display: grid;
+  width: 28px;
+  height: 28px;
+  place-items: center;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--composer);
+  color: var(--muted-strong);
+}
+
+.queued-message button:hover {
+  background: var(--hover);
+  color: var(--app-text);
+}
+
 .app-footer {
   display: flex;
   width: min(850px, 100%);
@@ -1013,6 +1128,168 @@ button:disabled {
   align-items: center;
   justify-content: space-between;
   padding: 4px 12px 12px;
+}
+
+.composer-attachments,
+.message-attachments {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+
+.composer-attachments {
+  margin: 0 12px 12px;
+}
+
+.attachment-chip,
+.message-attachments span {
+  display: inline-flex;
+  max-width: min(240px, 100%);
+  min-height: 28px;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--composer) 82%, var(--hover));
+  color: var(--muted-strong);
+  padding: 0 9px;
+  font-size: 12px;
+  font-weight: 760;
+}
+
+.attachment-chip {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.attachment-chip.muted {
+  color: var(--muted);
+}
+
+.attachment-chip button {
+  display: grid;
+  width: 18px;
+  height: 18px;
+  flex: 0 0 auto;
+  place-items: center;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: currentColor;
+  padding: 0;
+}
+
+.attachment-chip button:hover {
+  background: var(--hover);
+  color: var(--app-text);
+}
+
+.attachment-error {
+  color: var(--danger);
+  font-size: 12px;
+  font-weight: 760;
+}
+
+.message-attachments {
+  margin-top: 12px;
+}
+
+.chart-artifact {
+  display: grid;
+  gap: 12px;
+  margin-top: 14px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--composer) 78%, var(--stage));
+  padding: 12px;
+}
+
+.chart-artifact-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.chart-artifact-head div {
+  display: grid;
+  gap: 2px;
+}
+
+.chart-artifact-head span {
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 820;
+  text-transform: uppercase;
+}
+
+.chart-artifact-head strong {
+  color: var(--app-text);
+  font-size: 14px;
+  font-weight: 850;
+}
+
+.chart-artifact-head button {
+  display: grid;
+  width: 32px;
+  height: 32px;
+  place-items: center;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--composer);
+  color: var(--muted-strong);
+}
+
+.chart-artifact-head button:hover {
+  background: var(--hover);
+  color: var(--app-text);
+}
+
+.chart-svg {
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+.chart-svg line {
+  stroke: var(--border);
+  stroke-width: 1;
+}
+
+.chart-svg .chart-grid {
+  stroke: color-mix(in srgb, var(--border) 70%, transparent);
+}
+
+.chart-svg text {
+  fill: var(--muted-strong);
+  font-family: inherit;
+}
+
+.chart-axis-text,
+.chart-label {
+  font-size: 11px;
+}
+
+.chart-axis-title,
+.chart-legend text {
+  font-size: 12px;
+  font-weight: 760;
+}
+
+.chart-line {
+  fill: none;
+  stroke: var(--accent);
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 4;
+}
+
+.chart-svg circle {
+  fill: var(--accent);
+  stroke: var(--composer);
+  stroke-width: 2;
 }
 
 .composer-left,
@@ -1245,6 +1522,63 @@ button:disabled {
   display: inline-flex;
   align-items: center;
   gap: 6px;
+}
+
+.danger-copy-button:hover {
+  background: color-mix(in srgb, var(--danger) 12%, var(--hover));
+  color: var(--danger);
+}
+
+.message-edit-box {
+  display: grid;
+  gap: 10px;
+}
+
+.message-edit-box textarea {
+  width: min(520px, 100%);
+  min-height: 96px;
+  resize: vertical;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  outline: 0;
+  background: var(--composer);
+  color: var(--app-text);
+  padding: 11px 12px;
+  font: inherit;
+  line-height: 1.45;
+}
+
+.message-edit-box textarea:focus {
+  border-color: color-mix(in srgb, var(--accent) 60%, var(--border));
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 14%, transparent);
+}
+
+.message-edit-box div {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.message-edit-box button {
+  min-height: 32px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--composer);
+  color: var(--muted-strong);
+  padding: 0 12px;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.message-edit-box button:last-child {
+  border-color: color-mix(in srgb, var(--accent) 55%, var(--border));
+  background: var(--app-text);
+  color: var(--stage);
+}
+
+.message-edit-box button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
 }
 
 .markdown-body {
@@ -3064,6 +3398,105 @@ button:disabled {
   white-space: pre-wrap;
 }
 
+.skills-dashboard-screen {
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--accent) 4%, transparent), transparent 220px),
+    var(--stage);
+}
+
+.skills-dashboard-grid {
+  grid-template-columns: minmax(0, 1fr) minmax(360px, 0.45fr);
+}
+
+.skills-library-head {
+  margin-bottom: 0;
+}
+
+.skills-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.skills-toolbar .hidden-file-input {
+  display: none;
+}
+
+.library-head-actions {
+  display: flex;
+  min-width: min(100%, 520px);
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.agent-search-field,
+.skill-search-field {
+  max-width: 260px;
+}
+
+.skills-card-grid {
+  grid-template-columns: 1fr;
+}
+
+.skill-card {
+  border-radius: 10px;
+}
+
+.skill-card.active {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 14%, transparent);
+}
+
+.skill-card > div {
+  align-items: center;
+}
+
+.skill-toggle {
+  display: inline-flex;
+  min-height: 34px;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--composer) 86%, var(--hover));
+  color: var(--muted-strong);
+  padding: 0 10px;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.skill-toggle.active {
+  border-color: color-mix(in srgb, var(--accent) 55%, var(--border));
+  background: color-mix(in srgb, var(--accent) 12%, var(--composer));
+  color: var(--app-text);
+}
+
+.skill-toggle svg {
+  color: currentColor;
+}
+
+.skill-editor-card {
+  position: sticky;
+  top: 0;
+}
+
+.skill-editor-mode {
+  margin: -2px 0 0;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 760;
+}
+
+.skill-large-textarea {
+  min-height: 360px;
+}
+
+.skill-medium-textarea {
+  min-height: 220px;
+}
+
 .mobile-scrim {
   display: none;
 }
@@ -3340,6 +3773,16 @@ button:disabled {
     flex-direction: column;
   }
 
+  .library-head-actions {
+    display: grid;
+    min-width: 0;
+  }
+
+  .agent-search-field,
+  .skill-search-field {
+    max-width: none;
+  }
+
   .new-workflow-button {
     width: 100%;
   }
@@ -3373,6 +3816,27 @@ button:disabled {
 
   .agent-add-button {
     width: 100%;
+  }
+
+  .skills-dashboard-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .skills-toolbar {
+    display: grid;
+  }
+
+  .skill-card > div {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .skill-toggle {
+    width: 100%;
+  }
+
+  .skill-editor-card {
+    position: static;
   }
 
   .agent-insert-select {

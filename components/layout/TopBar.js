@@ -1,4 +1,4 @@
-import { BarChart3, BookOpen, ChevronDown, FileText, Menu, PanelLeft, Plus, Settings2, Workflow } from "lucide-react";
+import { BarChart3, BookOpen, ChevronDown, FileText, Menu, PanelLeft, Plus, Settings2, Sparkles, Workflow } from "lucide-react";
 import { useI18n } from "@/components/i18n/I18nProvider";
 
 export function TopBar({
@@ -12,6 +12,7 @@ export function TopBar({
   onOpenUsage,
   onOpenDocs,
   onOpenAgents,
+  onOpenSkills,
   onToggleTemporaryChat,
   onToggleDocumentChat,
 }) {
@@ -63,6 +64,16 @@ export function TopBar({
           type="button"
         >
           <Workflow size={19} />
+        </button>
+        <button
+          aria-label={t("topbar.skills")}
+          className="top-icon"
+          data-tooltip={t("topbar.skills")}
+          onClick={onOpenSkills}
+          title={t("topbar.skills")}
+          type="button"
+        >
+          <Sparkles size={19} />
         </button>
         <button
           aria-label={t("topbar.openDocuments")}

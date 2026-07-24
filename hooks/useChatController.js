@@ -9,6 +9,7 @@ import { AUTO_REALTIME_MODEL, resolveRealtimeModel } from "@/lib/voice-models";
 import { DEFAULT_LOCALE, SUPPORTED_LOCALES, translate } from "@/lib/i18n";
 
 const SETTINGS_KEY = "sb-chat-settings";
+const MESSAGE_QUEUES_KEY = "batuk-message-queues";
 const defaults = getDefaultChatSettings();
 
 async function libraryAction(action, payload = {}) {
@@ -123,6 +124,10 @@ export function useChatController() {
   const [modelCatalogError, setModelCatalogError] = useState("");
   const [modelCatalogSource, setModelCatalogSource] = useState("");
   const [messages, setMessages] = useState([]);
+  const [chatAttachments, setChatAttachments] = useState([]);
+  const [attachmentStatus, setAttachmentStatus] = useState("idle");
+  const [attachmentError, setAttachmentError] = useState("");
+  const [queuedMessages, setQueuedMessages] = useState([]);
   const [input, setInput] = useState("");
   const [isSending, setIsSending] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -131,6 +136,7 @@ export function useChatController() {
   const [docsOpen, setDocsOpen] = useState(false);
   const [documentsOpen, setDocumentsOpen] = useState(false);
   const [agentBuilderOpen, setAgentBuilderOpen] = useState(false);
+  const [skillsOpen, setSkillsOpen] = useState(false);
   const [tokenUsage, setTokenUsage] = useState(null);
   const [copiedId, setCopiedId] = useState(null);
   const [workspaces, setWorkspaces] = useState([]);
@@ -142,11 +148,14 @@ export function useChatController() {
   const [searchQuery, setSearchQuery] = useState("");
   const scrollRef = useRef(null);
   const inputRef = useRef(null);
+  const chatAttachmentInputRef = useRef(null);
   const importChatsRef = useRef(null);
+  const queuedMessagesRef = useRef([]);
+  const queueKeyRef = useRef("new");
 
   const currentProvider = useMemo(() => getProviderConfig(provider), [provider]);
   const hasMessages = messages.length > 0;
-  const canSend = input.trim().length > 0 && model.trim().length > 0 && !isSending;
+  const canSend = (input.trim().length > 0 || chatAttachments.length > 0) && model.trim().length > 0;
   const chatTitle = useMemo(() => getChatTitle(messages), [messages]);
   const visibleChats = useMemo(
     () => filterChats(chats, { selectedFolderId, selectedWorkspaceId, searchQuery }),
@@ -294,6 +303,95 @@ export function useChatController() {
     scrollRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
   }, [messages, isSending]);
 
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      const nextQueueKey = activeChatId || `draft:${selectedWorkspaceId || "default"}:${selectedFolderId || "all"}`;
+      queueKeyRef.current = nextQueueKey;
+      const queues = readSessionQueues();
+      const nextQueue = queues[nextQueueKey] || [];
+      queuedMessagesRef.current = nextQueue;
+      setQueuedMessages(nextQueue);
+    }, 0);
+
+    return () => clearTimeout(timeout);
+  }, [activeChatId, selectedFolderId, selectedWorkspaceId]);
+
+  function readSessionQueues() {
+    if (typeof window === "undefined") return {};
+    try {
+      return JSON.parse(sessionStorage.getItem(MESSAGE_QUEUES_KEY) || "{}");
+    } catch {
+      sessionStorage.removeItem(MESSAGE_QUEUES_KEY);
+      return {};
+    }
+  }
+
+  function writeSessionQueue(nextQueue, key = queueKeyRef.current) {
+    if (typeof window === "undefined") return;
+    const queues = readSessionQueues();
+    if (nextQueue.length) {
+      queues[key] = nextQueue;
+    } else {
+      delete queues[key];
+    }
+    sessionStorage.setItem(MESSAGE_QUEUES_KEY, JSON.stringify(queues));
+  }
+
+  function replaceQueuedMessages(nextQueue) {
+    queuedMessagesRef.current = nextQueue;
+    setQueuedMessages(nextQueue);
+    writeSessionQueue(nextQueue);
+  }
+
+  function queueMessage(content, attachments = []) {
+    const trimmed = content.trim();
+    if (!trimmed && !attachments.length) return;
+    replaceQueuedMessages(
+      queuedMessagesRef.current.concat({
+        id: makeId(),
+        content: trimmed || "Please analyze the attached files.",
+        attachments,
+        createdAt: new Date().toISOString(),
+      }),
+    );
+  }
+
+  async function uploadChatAttachments(files) {
+    const nextFiles = Array.from(files || []);
+    if (!nextFiles.length) return;
+
+    const formData = new FormData();
+    nextFiles.forEach((file) => formData.append("files", file));
+    setAttachmentStatus("uploading");
+    setAttachmentError("");
+
+    try {
+      const response = await fetch("/api/chat-attachments", {
+        method: "POST",
+        body: formData,
+      });
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || "Could not upload files.");
+      }
+
+      setChatAttachments((current) => current.concat(data.attachments || []));
+      setAttachmentStatus("ready");
+    } catch (error) {
+      setAttachmentError(error.message || "Could not upload files.");
+      setAttachmentStatus("error");
+    } finally {
+      if (chatAttachmentInputRef.current) {
+        chatAttachmentInputRef.current.value = "";
+      }
+    }
+  }
+
+  function removeChatAttachment(attachmentId) {
+    setChatAttachments((current) => current.filter((attachment) => attachment.id !== attachmentId));
+  }
+
   function replaceStore(store) {
     setWorkspaces(store.workspaces || []);
     setFolders(store.folders || []);
@@ -384,11 +482,22 @@ export function useChatController() {
     return result.chat;
   }
 
+  async function saveChatEvenIfEmpty(nextMessages = messages, overrides = {}) {
+    if (temporaryChat || (!activeChatId && !nextMessages.length)) return null;
+
+    const chat = currentChatPayload(nextMessages, overrides);
+    const result = await libraryAction("upsertChat", { chat });
+    replaceStore(result.store);
+    setActiveChatId(result.chat.id);
+    return result.chat;
+  }
+
   async function clearMessages() {
     if (isSending) return;
 
     setMessages([]);
     setInput("");
+    setChatAttachments([]);
 
     if (!temporaryChat && activeChatId) {
       const chat = currentChatPayload([], { id: activeChatId });
@@ -420,6 +529,7 @@ export function useChatController() {
     setActiveChatId(null);
     setMessages([]);
     setInput("");
+    setChatAttachments([]);
     setTemporaryChat(false);
     setSettingsOpen(false);
     inputRef.current?.focus();
@@ -446,6 +556,7 @@ export function useChatController() {
     setWebSearchEnabled(false);
     setTemporaryChat(false);
     setInput("");
+    setChatAttachments([]);
     setSettingsOpen(false);
     if (window.innerWidth <= 900) {
       setSidebarOpen(false);
@@ -532,18 +643,19 @@ export function useChatController() {
     }
   }
 
-  async function sendMessage(event) {
-    event?.preventDefault();
-    const content = input.trim();
-    if (!content || isSending) return;
+  async function submitMessageContent(content, baseMessages = messages, options = {}) {
+    const attachments = options.attachments || [];
+    const trimmedContent = content.trim() || (attachments.length ? "Please analyze the attached files." : "");
+    if (!trimmedContent || isSending) return null;
 
-    const userMessage = { id: makeId(), role: "user", content };
+    const userMessage = { id: makeId(), role: "user", content: trimmedContent, ...(attachments.length ? { attachments } : {}) };
     const pendingId = makeId();
     const usageChatId = activeChatId || (!temporaryChat ? makeId() : null);
-    const nextMessages = [...messages, userMessage];
+    const nextMessages = [...baseMessages, userMessage];
     setMessages([...nextMessages, { id: pendingId, role: "assistant", content: "", pending: true }]);
-    setInput("");
+    if (!options.keepInput) setInput("");
     setIsSending(true);
+    let queueBaseMessages = nextMessages;
 
     try {
       const response = await fetch("/api/chat", {
@@ -558,10 +670,10 @@ export function useChatController() {
           folderId: selectedFolderId,
           temperature: usesDefaultTemperatureOnly(provider, model) ? 1 : Number(temperature),
           guardrails,
-          webSearch: webSearchEnabled && provider === "openai",
+          webSearch: webSearchEnabled && provider === "openai" && !attachments.length,
           documentChat: documentChatEnabled,
           memoryEnabled,
-          messages: sanitizeMessages(nextMessages),
+          messages: sanitizeMessages(nextMessages, { includeAttachmentData: true }),
           temporary: temporaryChat,
           workspaceId: selectedWorkspaceId,
         }),
@@ -605,6 +717,7 @@ export function useChatController() {
         guardrails: finalEvent?.guardrails,
       });
 
+      queueBaseMessages = completedMessages;
       setMessages(completedMessages);
       if (!temporaryChat) {
         await saveChat(completedMessages, { id: usageChatId });
@@ -616,6 +729,7 @@ export function useChatController() {
         role: "error",
         content: error.message || "Something went wrong.",
       });
+      queueBaseMessages = failedMessages;
       setMessages(failedMessages);
       if (!temporaryChat) {
         await saveChat(nextMessages, { id: usageChatId }).catch(() => {});
@@ -624,6 +738,169 @@ export function useChatController() {
     } finally {
       setIsSending(false);
       inputRef.current?.focus();
+      await processQueuedMessages(queueBaseMessages);
+    }
+
+    return queueBaseMessages;
+  }
+
+  async function processQueuedMessages(baseMessages = messages) {
+    const queue = queuedMessagesRef.current;
+    if (!queue.length) return;
+
+    const combined = queue.map((item) => item.content).join("\n\n");
+    const attachments = queue.flatMap((item) => item.attachments || []);
+    replaceQueuedMessages([]);
+    await submitMessageContent(combined, baseMessages, { attachments, fromQueue: true });
+  }
+
+  async function sendMessage(event) {
+    event?.preventDefault();
+    const content = input.trim();
+    const attachments = chatAttachments;
+    if (!content && !attachments.length) return;
+
+    if (isSending) {
+      queueMessage(content, attachments);
+      setInput("");
+      setChatAttachments([]);
+      inputRef.current?.focus();
+      return;
+    }
+
+    setChatAttachments([]);
+    await submitMessageContent(content, messages, { attachments });
+  }
+
+  function editQueuedMessage(queueId) {
+    const item = queuedMessagesRef.current.find((message) => message.id === queueId);
+    if (!item) return;
+    replaceQueuedMessages(queuedMessagesRef.current.filter((message) => message.id !== queueId));
+    setInput(item.content);
+    setChatAttachments(item.attachments || []);
+    inputRef.current?.focus();
+  }
+
+  function deleteQueuedMessage(queueId) {
+    replaceQueuedMessages(queuedMessagesRef.current.filter((message) => message.id !== queueId));
+  }
+
+  function sendQueuedMessageNext(queueId) {
+    const item = queuedMessagesRef.current.find((message) => message.id === queueId);
+    if (!item) return;
+    const rest = queuedMessagesRef.current.filter((message) => message.id !== queueId);
+    replaceQueuedMessages([item, ...rest]);
+  }
+
+  async function editMessage(messageId, content) {
+    const trimmedContent = content.trim();
+    if (!trimmedContent || isSending) return;
+
+    const messageIndex = messages.findIndex((message) => message.id === messageId);
+    const message = messages[messageIndex];
+    if (messageIndex < 0 || message?.role !== "user") return;
+
+    const updatedUserMessage = {
+      ...message,
+      content: trimmedContent,
+    };
+    const nextMessages = messages.slice(0, messageIndex).concat(updatedUserMessage);
+    const pendingId = makeId();
+    const usageChatId = activeChatId || (!temporaryChat ? makeId() : null);
+    setMessages([...nextMessages, { id: pendingId, role: "assistant", content: "", pending: true }]);
+    setIsSending(true);
+    let queueBaseMessages = nextMessages;
+
+    try {
+      const response = await fetch("/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          provider,
+          baseUrl,
+          model,
+          apiKey,
+          chatId: usageChatId,
+          folderId: selectedFolderId,
+          temperature: usesDefaultTemperatureOnly(provider, model) ? 1 : Number(temperature),
+          guardrails,
+          webSearch: webSearchEnabled && provider === "openai" && !updatedUserMessage.attachments?.length,
+          documentChat: documentChatEnabled,
+          memoryEnabled,
+          messages: sanitizeMessages(nextMessages, { includeAttachmentData: true }),
+          temporary: temporaryChat,
+          workspaceId: selectedWorkspaceId,
+        }),
+      });
+
+      let assistantContent = "";
+      let finalEvent = null;
+      let streamError = null;
+
+      await readChatStream(response, {
+        onToken: (token) => {
+          assistantContent += token;
+          setMessages((current) =>
+            current.map((currentMessage) =>
+              currentMessage.id === pendingId
+                ? {
+                    ...currentMessage,
+                    content: assistantContent,
+                    pending: false,
+                  }
+                : currentMessage,
+            ),
+          );
+        },
+        onDone: (event) => {
+          finalEvent = event;
+        },
+        onError: (error) => {
+          streamError = error;
+        },
+      });
+
+      if (streamError) {
+        throw new Error(streamError);
+      }
+
+      const completedMessages = nextMessages.concat({
+        id: pendingId,
+        role: "assistant",
+        content: finalEvent?.message || assistantContent || "The model returned an empty response.",
+        guardrails: finalEvent?.guardrails,
+      });
+
+      queueBaseMessages = completedMessages;
+      setMessages(completedMessages);
+      if (!temporaryChat) {
+        await saveChat(completedMessages, { id: usageChatId });
+      }
+      await refreshTokenUsage();
+    } catch (error) {
+      const failedMessages = nextMessages.concat({
+        id: pendingId,
+        role: "error",
+        content: error.message || "Something went wrong.",
+      });
+      queueBaseMessages = failedMessages;
+      setMessages(failedMessages);
+      if (!temporaryChat) {
+        await saveChat(nextMessages, { id: usageChatId }).catch(() => {});
+      }
+      await refreshTokenUsage().catch(() => {});
+    } finally {
+      setIsSending(false);
+      inputRef.current?.focus();
+      await processQueuedMessages(queueBaseMessages);
+    }
+  }
+
+  async function deleteMessage(messageId) {
+    const nextMessages = messages.filter((message) => message.id !== messageId);
+    setMessages(nextMessages);
+    if (!temporaryChat) {
+      await saveChatEvenIfEmpty(nextMessages).catch(() => {});
     }
   }
 
@@ -777,8 +1054,12 @@ export function useChatController() {
     activeChatId,
     agentBuilderOpen,
     apiKey,
+    attachmentError,
+    attachmentStatus,
     baseUrl,
     canSend,
+    chatAttachmentInputRef,
+    chatAttachments,
     chatTitle,
     copiedId,
     currentProvider,
@@ -803,6 +1084,7 @@ export function useChatController() {
     modelCatalogSource,
     modelCatalogStatus,
     provider,
+    queuedMessages,
     realtimeModel,
     resolvedRealtimeModel,
     scrollRef,
@@ -811,6 +1093,7 @@ export function useChatController() {
     selectedWorkspaceId,
     settingsOpen,
     sidebarOpen,
+    skillsOpen,
     temperature,
     temporaryChat,
     theme,
@@ -827,10 +1110,14 @@ export function useChatController() {
     createWorkspace,
     clearMessages,
     deleteSavedChat,
+    deleteMessage,
+    deleteQueuedMessage,
     deleteMemory,
     exportChat,
     exportChatLibrary,
     importChatLibrary,
+    editMessage,
+    editQueuedMessage,
     moveActiveChat,
     moveSavedChat,
     newChat,
@@ -843,6 +1130,8 @@ export function useChatController() {
     selectFolder,
     selectWorkspace,
     sendMessage,
+    sendQueuedMessageNext,
+    removeChatAttachment,
     setApiKey,
     setAgentBuilderOpen,
     setBaseUrl,
@@ -859,11 +1148,13 @@ export function useChatController() {
     setSearchQuery,
     setSettingsOpen,
     setSidebarOpen,
+    setSkillsOpen,
     setTemperature,
     setTemporaryChat,
     setTheme,
     setUsageOpen,
     setWebSearchEnabled,
+    uploadChatAttachments,
     updateMemory,
     toggleVoiceChat: realtime.toggleVoiceChat,
     voiceError: realtime.voiceError,

@@ -45,6 +45,11 @@ export function DocumentationPanel({ onClose }) {
       title: "Agent Builder",
       copy: "Design reusable multi-agent workflows, attach documents to Agent 1, run agents in sequence, and send the final output back to chat.",
     },
+    {
+      icon: Sparkles,
+      title: "Skills",
+      copy: "Create reusable instructions with examples and resources, toggle them on or off, and inject enabled skills into chat when relevant.",
+    },
     { icon: Mic2, title: t("docs.cardVoiceTitle"), copy: t("docs.cardVoiceCopy") },
     { icon: ShieldCheck, title: t("docs.cardGuardrailsTitle"), copy: t("docs.cardGuardrailsCopy") },
     { icon: FolderKanban, title: t("docs.cardFoldersTitle"), copy: t("docs.cardFoldersCopy") },
@@ -72,6 +77,7 @@ export function DocumentationPanel({ onClose }) {
     t("docs.workflow5"),
     t("docs.workflow6"),
     "Open Agent Builder to save repeatable multi-agent workflows that use the same model and settings as chat.",
+    "Open Skills to create reusable response rules that Batuk can apply automatically during chat.",
   ];
   const providers = [
     ["Ollama", t("providers.ollama.docs")],
@@ -131,8 +137,8 @@ export function DocumentationPanel({ onClose }) {
               <span>{t("docs.localPersistence")}</span>
             </div>
             <div>
-              <strong>Agents</strong>
-              <span>Saved workflow builder</span>
+              <strong>Skills</strong>
+              <span>Reusable prompt rules</span>
             </div>
           </section>
 
@@ -267,7 +273,9 @@ await requireServerSession();`}</code>
               <ul>
                 {[
                   "Workflow library with saved cards for create, edit, update, and delete",
+                  "Workflow library search filters saved workflow cards by name",
                   "Add draft agents or insert reusable saved agents into a workflow",
+                  "Saved-agent search filters reusable agents before inserting them",
                   "Attach documents to Agent 1 so extracted file content starts the chain",
                   "Right-side visualizer shows the connected sequence and scrollable run trace",
                   "Final agent output is posted back into the chat window",
@@ -303,6 +311,51 @@ for (const agent of workflow) {
             </div>
           </section>
 
+          <section className="docs-split">
+            <div className="docs-code-card">
+              <div className="code-dots" aria-hidden="true">
+                <span />
+                <span />
+                <span />
+              </div>
+              <pre>
+                <code>{`const enabledSkills = await listEnabledSkills();
+
+const skillsPrompt = formatSkillsForPrompt(
+  enabledSkills
+);
+
+messages.unshift({
+  role: "system",
+  content: skillsPrompt
+});`}</code>
+              </pre>
+            </div>
+            <div className="docs-copy-block">
+              <span>Skills</span>
+              <h2>Reusable instructions that travel with every relevant chat.</h2>
+              <p>
+                The Skills dashboard stores named reusable instructions with descriptions, examples, and supporting
+                resources. Skills can be enabled, disabled, searched by name, imported, exported, edited, and deleted.
+                Enabled skills are injected into chat requests as system context and used silently when relevant.
+              </p>
+              <ul>
+                {[
+                  "Create, update, delete, enable, and disable reusable skills",
+                  "Search skills by name inside the dashboard",
+                  "Import and export the skills library as JSON",
+                  "Persist skills locally in data/skill-store.json",
+                  "Enabled skills are prepended to chat requests as reusable workflow instructions",
+                ].map((item) => (
+                  <li key={item}>
+                    <CheckCircle2 size={16} />
+                    {item}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </section>
+
           <section className="docs-band">
             <div>
               <BookOpen size={21} />
@@ -316,6 +369,7 @@ for (const agent of workflow) {
               <span><FileText size={15} /> {t("docs.featureExport")}</span>
               <span><FileText size={15} /> Document Chat</span>
               <span><Waypoints size={15} /> Agent Builder</span>
+              <span><Sparkles size={15} /> Skills</span>
               <span><Boxes size={15} /> {t("docs.featureMove")}</span>
               <span><Languages size={15} /> i18n</span>
               <span><Moon size={15} /> {t("docs.featureDark")}</span>

@@ -21,7 +21,7 @@
 ![RAG](https://img.shields.io/badge/RAG-Document_Chat-10a37f?style=for-the-badge)
 ![License](https://img.shields.io/badge/License-MIT-f59e0b?style=for-the-badge)
 
-**Batuk** is a sovereign, Next.js-native AI chat workspace for local models, hosted model APIs, document chat, voice, web search, authenticated users, protected APIs, and local-first persistence.
+**Batuk** is a sovereign, Next.js-native AI chat workspace for local models, hosted model APIs, reusable skills, agent workflows, document chat, voice, web search, authenticated users, protected APIs, and local-first persistence.
 
 Built by **[Suhas Bhairav](https://suhasbhairav.com)**.
 
@@ -62,6 +62,7 @@ The product goal is **sovereign AI**: the app can run privately on your machine 
 - Workspaces and folders
 - Move chats between folders
 - Search across saved chats and message content
+- Enabled Skills are injected into chat requests as reusable instructions when relevant
 
 ### Providers
 
@@ -127,15 +128,27 @@ The product goal is **sovereign AI**: the app can run privately on your machine 
 ### Agent Builder
 
 - Dedicated Agent Builder screen opened from the top bar
-- Workflow library with saved workflow cards
+- Workflow library with saved workflow cards and name search
 - Create, update, save, and delete multi-agent workflows
 - Add draft agents or insert reusable saved agents into a workflow
+- Search saved agents by name before inserting them into a workflow
 - Sequential agent execution where each agent receives the previous agent output
 - Uses the same provider, model, API key, temperature, and guardrail settings as chat
 - Agent 1 can receive attached documents; files are extracted and included in its context
 - Right-side flow visualizer and scrollable run trace
 - Final workflow output is sent back into the chat window
 - Local JSON persistence for agent and workflow definitions
+
+### Skills
+
+- Dedicated Skills dashboard opened from the top bar
+- Create, update, delete, enable, and disable reusable skills
+- Search skills by name
+- Import and export the full skills library as JSON
+- Skill fields: name, description, instructions, examples, supporting resources, enabled state, timestamps
+- Enabled skills are injected into `/api/chat` as system prompt context
+- Skills are used silently when relevant to the user's request
+- Local JSON persistence at `data/skill-store.json`
 
 ### Token Usage
 
@@ -176,6 +189,7 @@ Locale preference is stored in browser settings. User-generated data, model outp
 | Markdown | `react-markdown` + `remark-gfm` |
 | Documents | `mammoth`, `xlsx`, local file processing |
 | Vector DB | Local JSON vectors, optional ChromaDB through `chromadb` |
+| Skills | Local JSON skill store + prompt injection |
 | Voice | OpenAI Realtime WebRTC |
 | Providers | Ollama, OpenAI, Claude, Grok, Sarvam AI, OpenRouter, OpenAI-compatible APIs |
 
@@ -400,6 +414,33 @@ When Document Chat is enabled, Batuk retrieves relevant chunks, injects them int
 
 ---
 
+## Skills
+
+Open the Skills icon in the top bar to manage reusable chat behaviors.
+
+Each skill contains:
+
+- Name
+- Description
+- Instructions
+- Examples
+- Supporting resources
+- Enabled/disabled state
+
+Enabled skills are loaded from `data/skill-store.json`, formatted as reusable workflows, and prepended to chat requests as system context. The model is instructed to use one or more enabled skills silently when they are relevant.
+
+Use cases:
+
+- Enforce short story or poem formats
+- Keep code reviews consistent
+- Apply house writing style
+- Reuse response checklists
+- Add lightweight domain-specific operating rules
+
+Skills can be imported and exported as JSON from the dashboard.
+
+---
+
 ## Data and Privacy
 
 Batuk uses local files by default:
@@ -408,12 +449,13 @@ Batuk uses local files by default:
 data/chat-store.json
 data/document-store.json
 data/agent-store.json
+data/skill-store.json
 data/memory-store.json
 data/token-usage.json
 data/sb-chat-auth.sqlite
 ```
 
-The auth SQLite file, memory store, and agent workflow store are ignored by git. The API key typed into Settings lives in React state and is not persisted to local storage. Temporary chats are not written to `data/chat-store.json`.
+The auth SQLite file, memory store, skills store, and agent workflow store are ignored by git. The API key typed into Settings lives in React state and is not persisted to local storage. Temporary chats are not written to `data/chat-store.json`.
 
 ---
 

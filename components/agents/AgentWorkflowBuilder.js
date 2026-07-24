@@ -39,6 +39,8 @@ export function AgentWorkflowBuilder({
   const [savedAgents, setSavedAgents] = useState([]);
   const [workflows, setWorkflows] = useState([]);
   const [workflowDraft, setWorkflowDraft] = useState(defaultWorkflow(1));
+  const [workflowSearchQuery, setWorkflowSearchQuery] = useState("");
+  const [savedAgentSearchQuery, setSavedAgentSearchQuery] = useState("");
   const [input, setInput] = useState("");
   const [files, setFiles] = useState([]);
   const [trace, setTrace] = useState([]);
@@ -62,6 +64,16 @@ export function AgentWorkflowBuilder({
     }),
     [agents.length, files.length],
   );
+  const filteredWorkflows = useMemo(() => {
+    const query = workflowSearchQuery.trim().toLowerCase();
+    if (!query) return workflows;
+    return workflows.filter((workflow) => String(workflow.name || "").toLowerCase().includes(query));
+  }, [workflowSearchQuery, workflows]);
+  const filteredSavedAgents = useMemo(() => {
+    const query = savedAgentSearchQuery.trim().toLowerCase();
+    if (!query) return savedAgents;
+    return savedAgents.filter((agent) => String(agent.name || "").toLowerCase().includes(query));
+  }, [savedAgentSearchQuery, savedAgents]);
 
   async function loadDashboard() {
     try {
@@ -269,14 +281,24 @@ export function AgentWorkflowBuilder({
               <h2>{t("agents.workflowLibrary")}</h2>
               <p>{t("agents.workflowLibraryCopy")}</p>
             </div>
-            <button className="new-workflow-button" onClick={createNewWorkflow} type="button">
-              <Plus size={18} />
-              {t("agents.newWorkflow")}
-            </button>
+            <div className="library-head-actions">
+              <input
+                aria-label={t("agents.searchWorkflows")}
+                className="field agent-search-field"
+                onChange={(event) => setWorkflowSearchQuery(event.target.value)}
+                placeholder={t("agents.searchWorkflows")}
+                type="search"
+                value={workflowSearchQuery}
+              />
+              <button className="new-workflow-button" onClick={createNewWorkflow} type="button">
+                <Plus size={18} />
+                {t("agents.newWorkflow")}
+              </button>
+            </div>
           </div>
 
           <div className="workflow-card-grid">
-            {workflows.map((workflow) => (
+            {filteredWorkflows.map((workflow) => (
               <article className="workflow-card" key={workflow.id}>
                 <button onClick={() => openWorkflow(workflow)} type="button">
                   <Workflow size={22} />
@@ -298,6 +320,13 @@ export function AgentWorkflowBuilder({
                 <Workflow size={28} />
                 <strong>{t("agents.noWorkflows")}</strong>
                 <span>{t("agents.noWorkflowsCopy")}</span>
+              </div>
+            )}
+            {workflows.length > 0 && !filteredWorkflows.length && (
+              <div className="empty-documents">
+                <Workflow size={28} />
+                <strong>{t("agents.noSearchResults")}</strong>
+                <span>{t("agents.noSearchResultsCopy")}</span>
               </div>
             )}
           </div>
@@ -372,9 +401,17 @@ export function AgentWorkflowBuilder({
                   <Plus size={17} />
                   {t("agents.addDraftAgent")}
                 </button>
+                <input
+                  aria-label={t("agents.searchSavedAgents")}
+                  className="field agent-insert-select"
+                  onChange={(event) => setSavedAgentSearchQuery(event.target.value)}
+                  placeholder={t("agents.searchSavedAgents")}
+                  type="search"
+                  value={savedAgentSearchQuery}
+                />
                 <select className="field agent-insert-select" onChange={(event) => addSavedAgentToWorkflow(event.target.value)} value="">
                   <option value="">{t("agents.addSavedAgent")}</option>
-                  {savedAgents.map((agent) => (
+                  {filteredSavedAgents.map((agent) => (
                     <option key={agent.id} value={agent.id}>{agent.name}</option>
                   ))}
                 </select>

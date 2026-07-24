@@ -12,6 +12,7 @@ import { AgentWorkflowBuilder } from "@/components/agents/AgentWorkflowBuilder";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { TopBar } from "@/components/layout/TopBar";
 import { SettingsPanel } from "@/components/settings/SettingsPanel";
+import { SkillsDashboard } from "@/components/skills/SkillsDashboard";
 import { TokenUsagePanel } from "@/components/usage/TokenUsagePanel";
 import { useChatController } from "@/hooks/useChatController";
 
@@ -38,15 +39,25 @@ function HomeShell({ chat }) {
 
   const composer = (
     <ChatComposer
+      attachmentError={chat.attachmentError}
+      attachmentInputRef={chat.chatAttachmentInputRef}
+      attachmentStatus={chat.attachmentStatus}
+      attachments={chat.chatAttachments}
       canSend={chat.canSend}
       hasMessages={chat.hasMessages}
       input={chat.input}
       inputRef={chat.inputRef}
       isSending={chat.isSending}
+      queuedMessages={chat.queuedMessages}
       provider={chat.provider}
       webSearchEnabled={chat.webSearchEnabled}
       onChange={chat.setInput}
+      onDeleteQueuedMessage={chat.deleteQueuedMessage}
+      onEditQueuedMessage={chat.editQueuedMessage}
+      onRemoveAttachment={chat.removeChatAttachment}
+      onSendQueuedMessageNext={chat.sendQueuedMessageNext}
       onSubmit={chat.sendMessage}
+      onUploadAttachments={chat.uploadChatAttachments}
       onToggleWebSearch={() => chat.setWebSearchEnabled((value) => !value)}
       onToggleVoiceChat={chat.toggleVoiceChat}
       voiceState={chat.voiceState}
@@ -87,7 +98,14 @@ function HomeShell({ chat }) {
           sidebarOpen={chat.sidebarOpen}
           temporaryChat={chat.temporaryChat}
           onOpenDocuments={() => chat.setDocumentsOpen(true)}
-          onOpenAgents={() => chat.setAgentBuilderOpen(true)}
+          onOpenAgents={() => {
+            chat.setSkillsOpen(false);
+            chat.setAgentBuilderOpen(true);
+          }}
+          onOpenSkills={() => {
+            chat.setAgentBuilderOpen(false);
+            chat.setSkillsOpen(true);
+          }}
           onOpenDocs={() => chat.setDocsOpen(true)}
           onOpenSettings={() => chat.setSettingsOpen(true)}
           onOpenSidebar={() => chat.setSidebarOpen(true)}
@@ -96,7 +114,9 @@ function HomeShell({ chat }) {
           onToggleTemporaryChat={() => chat.setTemporaryChat((value) => !value)}
         />
 
-        {chat.agentBuilderOpen ? (
+        {chat.skillsOpen ? (
+          <SkillsDashboard onClose={() => chat.setSkillsOpen(false)} />
+        ) : chat.agentBuilderOpen ? (
           <AgentWorkflowBuilder
             apiKey={chat.apiKey}
             baseUrl={chat.baseUrl}
@@ -131,6 +151,8 @@ function HomeShell({ chat }) {
                     messages={chat.messages}
                     model={chat.model}
                     onCopyMessage={chat.copyMessage}
+                    onDeleteMessage={chat.deleteMessage}
+                    onEditMessage={chat.editMessage}
                     onRememberMessage={chat.rememberMessage}
                     scrollRef={chat.scrollRef}
                   />
