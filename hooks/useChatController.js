@@ -731,7 +731,7 @@ export function useChatController() {
         JSON.stringify(
           {
             exportedAt: new Date().toISOString(),
-            app: "SB AI Chat",
+            app: "Batuk",
             type: "sb-chat-library",
             store,
           },

@@ -34,6 +34,20 @@
   ],
   "chats": [
     {
+      "id": "1784876089490-2db42af64c088",
+      "workspaceId": "workspace-1784806210171-81024ae3ddf17",
+      "folderId": null,
+      "title": "Untitled chat",
+      "messages": [],
+      "provider": "ollama",
+      "model": "qwen3:8b",
+      "baseUrl": "http://localhost:11434",
+      "guardrails": true,
+      "temperature": 0.7,
+      "createdAt": "2026-07-24T06:55:10.075Z",
+      "updatedAt": "2026-07-24T06:55:25.981Z"
+    },
+    {
       "id": "1784811113767-ee8b56deb84278",
       "workspaceId": "workspace-personal",
       "folderId": null,

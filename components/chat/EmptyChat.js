@@ -15,7 +15,7 @@ export function EmptyChat({ composer, model, onPickSuggestion }) {
     <div className="empty-chat">
       <div className="empty-title">
         <BrandMark large />
-        <h1>{model || "SB AI Chat"}</h1>
+        <h1>{model || "Batuk"}</h1>
       </div>
       {composer}
       <AppFooter />

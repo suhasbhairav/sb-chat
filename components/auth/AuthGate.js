@@ -14,7 +14,7 @@ export function AuthGate({ children }) {
           <div className="auth-brand">
             <span className="auth-mark">SB</span>
             <div>
-              <h1>SB AI Chat</h1>
+              <h1>Batuk</h1>
               <p>Checking your sovereign session...</p>
             </div>
           </div>
@@ -94,10 +94,10 @@ function AuthForm({ onSuccess }) {
   return (
     <main className="auth-screen">
       <section className="auth-hero">
-        <nav className="auth-nav" aria-label="SB AI Chat product">
+        <nav className="auth-nav" aria-label="Batuk product">
           <div className="auth-logo">
             <span className="auth-mark">SB</span>
-            <span>SB AI Chat</span>
+            <span>Batuk</span>
           </div>
           <div className="auth-nav-pills" aria-label="Core capabilities">
             <span>Chat</span>
@@ -119,7 +119,7 @@ function AuthForm({ onSuccess }) {
               in one private workspace.
             </p>
 
-            <div className="auth-capability-line" aria-label="SB AI Chat highlights">
+            <div className="auth-capability-line" aria-label="Batuk highlights">
               {capabilities.map((item) => {
                 const Icon = item.icon;
                 return (
@@ -170,7 +170,7 @@ function AuthForm({ onSuccess }) {
             {error && <p className="auth-error">{error}</p>}
 
             <button className="auth-submit" type="submit" disabled={isSubmitting}>
-              {isSubmitting ? "Please wait..." : isSignUp ? "Create sovereign account" : "Sign in to SB AI Chat"}
+              {isSubmitting ? "Please wait..." : isSignUp ? "Create sovereign account" : "Sign in to Batuk"}
             </button>
           </form>
 
