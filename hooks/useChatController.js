@@ -498,13 +498,16 @@ export function useChatController() {
     setMessages([]);
     setInput("");
     setChatAttachments([]);
+    setAttachmentError("");
+    setAttachmentStatus("idle");
+    replaceQueuedMessages([]);
+    setSettingsOpen(false);
 
-    if (!temporaryChat && activeChatId) {
-      const chat = currentChatPayload([], { id: activeChatId });
-      const result = await libraryAction("upsertChat", { chat });
-      replaceStore(result.store);
-      setActiveChatId(result.chat.id);
+    if (!temporaryChat) {
+      await saveChatEvenIfEmpty([], activeChatId ? { id: activeChatId } : {});
     }
+
+    inputRef.current?.focus();
   }
 
   function changeProvider(nextProvider) {

@@ -1,60 +1,10 @@
 {
-  "documents": [
-    {
-      "id": "1784926252044-72fbcd8978a64",
-      "name": "ai-transformation-guide-for-marketing.pdf",
-      "storedName": "1784926252045-a865d002f9fb08-ai-transformation-guide-for-marketing.pdf",
-      "type": "application/pdf",
-      "size": 143190,
-      "status": "ready",
-      "chunkCount": 3,
-      "embeddingProvider": "openai",
-      "embeddingModel": "text-embedding-3-small",
-      "vectorStoreProvider": "pinecone",
-      "chromaUrl": null,
-      "chromaCollection": null,
-      "pineconeIndex": "sb-chat-documents-1536d",
-      "pineconeNamespace": "documents",
-      "createdAt": "2026-07-24T20:50:52.044Z",
-      "textLength": 3873
-    }
-  ],
-  "chunks": [
-    {
-      "id": "1784926252263-2a13dfe11b5e18",
-      "index": 0,
-      "content": "CONTENT OPERATIONS Business leaders and teams\n\nAutomate Content Ops\n\nDefine repeatable AI-assisted content processes that scale. Separate tasks into\nautomation, human review, and governance.\n\n Key move Pilot one channel for 2 weeks; measure impact and reviewer effort.\n\nPRACTICAL CHECKLIST\n\n Use AI to draft briefs and outlines for blogs, social posts, and emails.\n 01\n\n Set templates and prompts for consistent tone, SEO, and brand guidelines.\n 02\n\n Automate content calendars with AI-suggested publish dates and channels.\n 03\n\n Implement human-in-the-loop reviews for final copy and factual accuracy.\n 04\n\n Capture feedback from editors to refine prompts and outputs.\n 05\n\n Pilot one channel for 2 weeks; measure quality, speed, and reviewer effort.\n 06\n\n Suhas Bhairav AI Resource\n Turn AI into repeatable marketing gains with auditable automation and human-in-the-loop controls.\n\nCreated by Suhas Bhairav suhasbhairav.com 02/05\n\fCAMPAIGN PLANNING Business leaders and teams\n\nAI-Driven Campaign Planning\n\nTranslate business goals into AI-assisted briefs and execution plans. Establish\nguardrails to keep campaigns on-brand and compliant.\n\n Key move Limit AI scope to testable elements; escalate high-risk decisions.\n\nPRACTICAL CHECKLIST\n\n Generate audience segments and personas from CRM and first-party data.\n 01\n\n Create AI-assisted briefs with goals, KPIs, channels, and required assets.\n 02\n\n Propose multichannel plans and A/B test hypotheses with expected lift.\n 03\n\n Auto-create a campaign calendar with drafts, approvals, and asset handoffs.\n 04\n\n Assign ownership to a campaign manager and document decisions.\n 05\n\n Draft multiple ad copy variants and creative prompts for testing.\n 06\n\n Enforce brand and compliance guardrails in prompts and outputs.\n 07",
-      "documentId": "1784926252044-72fbcd8978a64",
-      "documentName": "ai-transformation-guide-for-marketing.pdf",
-      "embeddingProvider": "openai",
-      "embeddingModel": "text-embedding-3-small",
-      "createdAt": "2026-07-24T20:50:52.044Z"
-    },
-    {
-      "id": "1784926252263-18ced335713bc8",
-      "index": 1,
-      "content": "Suhas Bhairav AI Resource\n Turn AI into repeatable marketing gains with auditable automation and human-in-the-loop controls.\n\nCreated by Suhas Bhairav suhasbhairav.com 03/05\n\fCUSTOMER RESEARCH & REPORTING Business leaders and teams\n\nAI-Enhanced Research & Reporting\n\nUse AI to accelerate insights from customers and automated dashboards. Ensure\nhuman review for interpretation and context.\n\n Key move Define data sources and success metrics before starting.\n\nPRACTICAL CHECKLIST\n\n Automate sentiment analysis on surveys, reviews, and social chatter.\n 01\n\n Summarize customer interviews into shareable personas and needs.\n 02\n\n Generate weekly KPI dashboards with automatic data pulls.\n 03\n\n Flag data gaps and anomalies for team review.\n 04\n\n Create narrative-ready executive summaries from analytics outputs.\n 05\n\n Schedule reports to stakeholders with digestible visuals.\n 06\n\n Document data sources, definitions, and update cadence; ensure data lineage (CRM, CMS, AI\n 07\n access, data warehouse, dashboards).\n\n Suhas Bhairav AI Resource\n Turn AI into repeatable marketing gains with auditable automation and human-in-the-loop controls.\n\nCreated by Suhas Bhairav suhasbhairav.com 04/05\n\fABOUT THE CREATOR\n\nSuhas Bhairav\nI build AI systems that combine distributed architecture, retrieval, knowledge graphs,\nsecurity, and practical workflow design. My focus is AI that can be used repeatedly by real\nteams: understandable, reliable, and grounded in the work people already do.\n\nEXPERTISE\n\n Principal systems architecture and applied AI engineering\n\n Production-grade AI systems, agentic workflows, RAG, and knowledge graphs\n\n Full-stack workflow applications across AWS, Google Cloud, Azure, on-premise, and hybrid\n environments",
-      "documentId": "1784926252044-72fbcd8978a64",
-      "documentName": "ai-transformation-guide-for-marketing.pdf",
-      "embeddingProvider": "openai",
-      "embeddingModel": "text-embedding-3-small",
-      "createdAt": "2026-07-24T20:50:52.044Z"
-    },
-    {
-      "id": "1784926252263-31c7d206358f7",
-      "index": 2,
-      "content": "Practical AI implementation patterns for automotive, manufacturing, finance, logistics,\n cybersecurity, sales, and customer operations\n\n Security, governance, observability, approvals, and failure-mode thinking for operational AI\n systems\n\n WEBSITE\n\n suhasbhairav.com\n\n EMAIL\n\n suhasbhairav@gmail.com\n\nCreated as a free educational AI resource for suhasbhairav.com. 05/05",
-      "documentId": "1784926252044-72fbcd8978a64",
-      "documentName": "ai-transformation-guide-for-marketing.pdf",
-      "embeddingProvider": "openai",
-      "embeddingModel": "text-embedding-3-small",
-      "createdAt": "2026-07-24T20:50:52.044Z"
-    }
-  ],
+  "documents": [],
+  "chunks": [],
   "settings": {
     "embeddingProvider": "openai",
     "embeddingModel": "text-embedding-3-small",
-    "vectorStoreProvider": "pinecone",
+    "vectorStoreProvider": "json",
     "chromaUrl": "http://localhost:8000",
     "chromaCollection": "sb_chat_documents",
     "pineconeApiKey": "",

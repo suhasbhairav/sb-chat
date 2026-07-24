@@ -139,6 +139,17 @@ export function SettingsPanel({
     }
   }
 
+  async function handleClearMessages() {
+    if (!hasMessages) return;
+    if (!window.confirm(t("settings.clearMessagesConfirm"))) return;
+
+    try {
+      await onClearMessages();
+    } catch (error) {
+      window.alert(error.message || t("settings.clearMessagesError"));
+    }
+  }
+
   return (
     <div className="settings-layer" role="dialog" aria-modal="true" aria-label={t("topbar.providerSettings")}>
       <button className="settings-backdrop" onClick={onClose} aria-label={t("settings.closeSettings")} type="button" />
@@ -482,7 +493,7 @@ export function SettingsPanel({
               <Download size={16} />
               {t("settings.exportChat")}
             </button>
-            <button className="secondary-button danger" onClick={onClearMessages} type="button">
+            <button className="secondary-button danger" onClick={handleClearMessages} type="button">
               <Trash2 size={16} />
               {t("settings.clearMessages")}
             </button>
