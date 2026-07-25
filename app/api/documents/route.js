@@ -1,5 +1,5 @@
 import { json, resolveServerApiKey } from "@/lib/chat-request";
-import { requireServerSession } from "@/lib/auth-session";
+import { requireServerPermission } from "@/lib/auth-session";
 import { makeId } from "@/lib/chat-utils";
 import { createEmbeddings } from "@/lib/rag-embeddings";
 import { normalizeChromaCollectionName, normalizeChromaUrl, upsertChromaChunks } from "@/lib/rag-chroma";
@@ -12,6 +12,7 @@ import {
 } from "@/lib/rag-pinecone";
 import { chunkDocumentText, extractDocumentText } from "@/lib/rag-processing";
 import { readDocumentStore, saveUploadedDocumentFile, summarizeDocuments, writeDocumentStore } from "@/lib/rag-store";
+import { recordAuditEvent } from "@/lib/compliance-store";
 
 export const runtime = "nodejs";
 
@@ -36,7 +37,7 @@ function normalizeSettings(settings = {}) {
 }
 
 export async function GET() {
-  const { response } = await requireServerSession();
+  const { response } = await requireServerPermission({ document: ["read"] });
   if (response) return response;
 
   const store = await readDocumentStore();
@@ -44,7 +45,7 @@ export async function GET() {
 }
 
 export async function PATCH(request) {
-  const { response } = await requireServerSession();
+  const { session, response } = await requireServerPermission({ document: ["update"] });
   if (response) return response;
 
   const payload = await request.json();
@@ -55,12 +56,24 @@ export async function PATCH(request) {
   };
 
   await writeDocumentStore(nextStore);
+  await recordAuditEvent({
+    category: "document",
+    action: "document.settings.update",
+    outcome: "success",
+    actor: session.user,
+    metadata: {
+      embeddingProvider: nextStore.settings.embeddingProvider,
+      vectorStoreProvider: nextStore.settings.vectorStoreProvider,
+      chromaCollection: nextStore.settings.chromaCollection,
+      pineconeIndex: nextStore.settings.pineconeIndex,
+    },
+  }).catch(() => {});
   return json(summarizeDocuments(nextStore));
 }
 
 export async function POST(request) {
   try {
-    const { response } = await requireServerSession();
+    const { session, response } = await requireServerPermission({ document: ["create"] });
     if (response) return response;
 
     const formData = await request.formData();
@@ -184,6 +197,18 @@ export async function POST(request) {
     }
 
     await writeDocumentStore(store);
+    await recordAuditEvent({
+      category: "document",
+      action: "document.upload",
+      outcome: uploaded.some((document) => document.status === "failed") ? "failure" : "success",
+      actor: session.user,
+      metadata: {
+        count: uploaded.length,
+        names: uploaded.map((document) => document.name),
+        vectorStoreProvider: store.settings.vectorStoreProvider,
+        embeddingProvider: store.settings.embeddingProvider,
+      },
+    }).catch(() => {});
 
     return json({
       ...summarizeDocuments(store),

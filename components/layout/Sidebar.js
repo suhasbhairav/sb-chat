@@ -4,6 +4,7 @@ import { useI18n } from "@/components/i18n/I18nProvider";
 
 export function Sidebar({
   activeChatId,
+  branding,
   chats,
   folders,
   isOpen,
@@ -23,14 +24,19 @@ export function Sidebar({
   onSelectWorkspace,
 }) {
   const { t } = useI18n();
+  const brandEnabled = Boolean(branding?.enabled || branding?.logoUrl);
+  const productName = brandEnabled ? branding.productName : "Batuk";
   const visibleFolders = folders.filter((folder) => folder.workspaceId === selectedWorkspaceId);
   const visibleChats = chats.filter((chat) => chat.workspaceId === selectedWorkspaceId);
 
   return (
     <aside className={`sidebar ${isOpen ? "is-open" : ""}`}>
       <div className="sidebar-top">
-        <BrandMark />
-        <div className="brand-name">Batuk</div>
+        <BrandMark initials={brandEnabled ? branding.logoInitials : "SB"} logoUrl={brandEnabled ? branding.logoUrl : ""} />
+        <div className="brand-name">
+          <span>{productName}</span>
+          {brandEnabled && branding.tagline && <small>{branding.tagline}</small>}
+        </div>
         <button className="nav-icon ml-auto" onClick={onClose} title={t("sidebar.collapse")} type="button">
           <PanelLeft size={18} />
         </button>

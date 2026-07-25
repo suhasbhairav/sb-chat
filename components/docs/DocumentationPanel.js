@@ -2,6 +2,7 @@ import {
   BookOpen,
   Boxes,
   BrainCircuit,
+  Building2,
   CheckCircle2,
   Code2,
   Database,
@@ -18,6 +19,7 @@ import {
   ShieldCheck,
   Sparkles,
   Sun,
+  UsersRound,
   Waypoints,
   X,
   Zap,
@@ -49,6 +51,21 @@ export function DocumentationPanel({ onClose }) {
       icon: Sparkles,
       title: "Skills",
       copy: "Create reusable instructions with examples and resources, toggle them on or off, and inject enabled skills into chat when relevant.",
+    },
+    {
+      icon: Building2,
+      title: "Enterprise administration",
+      copy: "Manage global users, roles, organizations, teams, member invitations, and first-owner bootstrap through Better Auth plugins.",
+    },
+    {
+      icon: KeyRound,
+      title: "Enterprise identity protocols",
+      copy: "Expose Dashboard analytics, OAuth 2.1/OIDC clients, SSO providers, and SCIM provisioning with Better Auth enterprise plugins.",
+    },
+    {
+      icon: ShieldCheck,
+      title: "Compliance evidence",
+      copy: "Track GDPR requests, ISO 27001/SOC 2 controls, audit events, integrity hashes, data inventory, and CSV evidence exports.",
     },
     { icon: Mic2, title: t("docs.cardVoiceTitle"), copy: t("docs.cardVoiceCopy") },
     { icon: ShieldCheck, title: t("docs.cardGuardrailsTitle"), copy: t("docs.cardGuardrailsCopy") },
@@ -125,20 +142,202 @@ export function DocumentationPanel({ onClose }) {
               <span>{t("docs.providerPaths")}</span>
             </div>
             <div>
+              <strong>RAG</strong>
+              <span>JSON, ChromaDB, Pinecone</span>
+            </div>
+            <div>
               <strong>Auth</strong>
-              <span>Better Auth + SQLite</span>
+              <span>Better Auth enterprise</span>
             </div>
             <div>
-              <strong>6</strong>
-              <span>Curated languages</span>
-            </div>
-            <div>
-              <strong>JSON</strong>
-              <span>{t("docs.localPersistence")}</span>
+              <strong>SQL</strong>
+              <span>SQLite, MySQL, PostgreSQL</span>
             </div>
             <div>
               <strong>Skills</strong>
               <span>Reusable prompt rules</span>
+            </div>
+          </section>
+
+          <section className="docs-split">
+            <div className="docs-copy-block">
+              <span>Main purpose</span>
+              <h2>Chat with any model your team is allowed to run.</h2>
+              <p>
+                Batuk is a Sovereign AI chat application for using local models, hosted APIs, and private
+                OpenAI-compatible gateways from one interface. Teams can choose Ollama for local inference, OpenAI for
+                managed models and realtime voice, OpenRouter for routed model access, Claude, Grok, Sarvam AI, or an
+                internal compatible endpoint without changing the chat experience.
+              </p>
+              <ul>
+                {[
+                  "Stream model responses with Markdown, copy actions, history, temporary chat, folders, and workspaces",
+                  "Switch providers and models from the UI while keeping the same chat, RAG, guardrail, skill, and agent workflow controls",
+                  "Use server-side environment configuration for enterprise deployments or runtime Settings for local evaluation",
+                  "Keep default storage local with optional SQL persistence for organization-scoped production installs",
+                ].map((item) => (
+                  <li key={item}>
+                    <CheckCircle2 size={16} />
+                    {item}
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div className="docs-code-card">
+              <div className="code-dots" aria-hidden="true">
+                <span />
+                <span />
+                <span />
+              </div>
+              <pre>
+                <code>{`Providers:
+Ollama -> local/private models
+OpenAI -> chat, web search, embeddings, voice
+OpenRouter -> routed model catalog
+Claude -> Anthropic Messages
+Grok -> xAI models
+Sarvam AI -> Indian language models
+Custom -> LM Studio, vLLM, LiteLLM, gateways`}</code>
+              </pre>
+            </div>
+          </section>
+
+          <section className="docs-split">
+            <div className="docs-copy-block">
+              <span>Enterprise administration</span>
+              <h2>Use Better Auth teams, admins, users, and roles.</h2>
+              <p>
+                Batuk enables Better Auth Admin and Organization plugins with a shared access controller. The Enterprise
+                console can bootstrap the first owner, create organizations, switch active organizations, create teams,
+                invite members, change organization roles, and manage global user roles.
+              </p>
+              <ul>
+                {[
+                  "Global roles: owner, admin, member, viewer, user",
+                  "Organization roles, invitations, teams, and dynamic access control are enabled",
+                  "Admins can create, read, update, ban, unban, reset passwords, and delete users",
+                  "Admins can whitelabel the active organization with an uploaded logo while the Batuk/Suhas Bhairav footer stays locked",
+                  "Better Auth Infrastructure can provide dashboard analytics and audit-log integration when configured",
+                  "OAuth Provider, SSO, and SCIM plugins are mounted for enterprise identity workflows",
+                  "Product APIs check role permissions for documents, chats, agents, skills, memory, usage, models, and voice",
+                ].map((item) => (
+                  <li key={item}>
+                    <CheckCircle2 size={16} />
+                    {item}
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div className="docs-code-card">
+              <div className="code-dots" aria-hidden="true">
+                <span />
+                <span />
+                <span />
+              </div>
+              <pre>
+                <code>{`plugins: [
+  admin({
+    ac: enterpriseAc,
+    roles: enterpriseRoles,
+    adminRoles: ["owner", "admin"]
+  }),
+  organization({
+    ac: enterpriseAc,
+    roles: enterpriseRoles,
+    teams: { enabled: true },
+    dynamicAccessControl: { enabled: true }
+  }),
+  dash({ /* infrastructure config */ }),
+  oauthProvider({ consentPage: "/oauth/consent" }),
+  sso(),
+  scim()
+]`}</code>
+              </pre>
+            </div>
+          </section>
+
+          <section className="docs-section">
+            <div className="docs-section-title">
+              <span>Identity integrations</span>
+              <h2>Dashboard, OAuth/OIDC, SSO, and SCIM are ready for enterprise deployments.</h2>
+            </div>
+            <div className="provider-list">
+              {[
+                ["Dashboard", "Enable Better Auth Infrastructure dashboard activity tracking and audit visibility from deployment configuration."],
+                ["OAuth Provider", "Default mode. Supports OAuth 2.1 flows, client registration, trusted clients, consent, JWT tokens, and OIDC through the openid scope."],
+                ["Legacy OIDC Provider", "Set BETTER_AUTH_PROVIDER_MODE=legacy-oidc only when an older integration needs the deprecated Better Auth OIDC provider."],
+                ["SSO", "Register enterprise OIDC/SAML providers, verify domains, and provision organization membership during sign-in."],
+                ["SCIM", "Let owners and admins generate SCIM tokens so identity providers can provision and manage users."],
+              ].map(([name, copy]) => (
+                <div className="provider-row" key={name}>
+                  <strong>{name}</strong>
+                  <span>{copy}</span>
+                </div>
+              ))}
+            </div>
+          </section>
+
+          <section className="docs-split">
+            <div className="docs-copy-block">
+              <span>Compliance operations</span>
+              <h2>Audit evidence for GDPR, ISO 27001, and SOC 2 readiness.</h2>
+              <p>
+                Batuk writes protected access, admin, privacy, document, and chat-library events to a local audit trail
+                with hash-chain integrity evidence. The dedicated Audit workspace summarizes control coverage, data inventory,
+                GDPR request status, and recent audit activity.
+              </p>
+              <ul>
+                {[
+                  "GDPR export, request, and erasure workflows are available from the Audit workspace",
+                  "ISO 27001 and SOC 2 control evidence is mapped in a local control register",
+                  "Audit CSV export is available at /api/compliance?export=audit",
+                  "Email and IP identifiers are hashed by default in audit events",
+                  "Certification still requires policies, organizational evidence, and auditor review outside the app",
+                ].map((item) => (
+                  <li key={item}>
+                    <CheckCircle2 size={16} />
+                    {item}
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div className="docs-code-card">
+              <div className="code-dots" aria-hidden="true">
+                <span />
+                <span />
+                <span />
+              </div>
+              <pre>
+                <code>{`BATUK_AUDIT_ENABLED=true
+BATUK_AUDIT_RETENTION_DAYS=365
+BATUK_AUDIT_HASH_IDENTIFIERS=true
+BATUK_AUDIT_MAX_EVENTS=10000
+
+Evidence:
+data/compliance-store.json
+/api/compliance?export=audit`}</code>
+              </pre>
+            </div>
+          </section>
+
+          <section className="docs-section">
+            <div className="docs-section-title">
+              <span>Auth database adapters</span>
+              <h2>Run Better Auth on SQLite, MySQL, PostgreSQL, MS SQL, or MongoDB.</h2>
+            </div>
+            <div className="provider-list">
+              {[
+                ["SQLite", "Default local adapter through Node built-in SQLite and BETTER_AUTH_DB_PATH."],
+                ["MySQL", "Set BETTER_AUTH_DATABASE_PROVIDER=mysql and use BETTER_AUTH_DATABASE_URL or BETTER_AUTH_MYSQL_* fields."],
+                ["PostgreSQL", "Set BETTER_AUTH_DATABASE_PROVIDER=postgresql and optionally BETTER_AUTH_POSTGRES_SCHEMA for search_path."],
+                ["MS SQL", "Set BETTER_AUTH_DATABASE_PROVIDER=mssql with BETTER_AUTH_MSSQL_* connection fields."],
+                ["MongoDB", "Set BETTER_AUTH_DATABASE_PROVIDER=mongodb and use MONGODB_URI or BETTER_AUTH_DATABASE_URL; schema migration is skipped."],
+              ].map(([name, copy]) => (
+                <div className="provider-row" key={name}>
+                  <strong>{name}</strong>
+                  <span>{copy}</span>
+                </div>
+              ))}
             </div>
           </section>
 
@@ -272,8 +471,8 @@ await requireServerSession();`}</code>
               </p>
               <ul>
                 {[
-                  "Pinecone API key can come from PINECONE_API_KEY or the Documents panel",
-                  "Default Pinecone index is sb-chat-documents with namespace documents",
+                  "Pinecone can be configured from environment or the Documents panel",
+                  "Default Pinecone index and namespace are configurable per deployment",
                   "Local embeddings use 384 dimensions; OpenAI text-embedding-3-small uses 1536",
                   "If an existing Pinecone index has the wrong dimension, Batuk creates a sibling index such as sb-chat-documents-1536d",
                   "Delete removes remote vectors when applicable; download always returns the locally stored original file",
@@ -292,16 +491,17 @@ await requireServerSession();`}</code>
                 <span />
               </div>
               <pre>
-                <code>{`PINECONE_API_KEY=your_pinecone_api_key
-PINECONE_INDEX=sb-chat-documents
-PINECONE_NAMESPACE=documents
-PINECONE_CLOUD=aws
-PINECONE_REGION=us-east-1
+                <code>{`Documents -> Vector storage
 
-Documents -> Vector storage:
-Vector store: Pinecone
-Embedding: OpenAI embeddings
-Index: sb-chat-documents`}</code>
+Default:
+Local JSON vectors
+
+Optional:
+ChromaDB collection
+Pinecone index + namespace
+
+Operations:
+Upload, reindex, search, download, delete`}</code>
               </pre>
             </div>
           </section>
@@ -409,6 +609,8 @@ messages.unshift({
             <div className="docs-feature-cloud">
               <span><Database size={15} /> {t("docs.featureHistory")}</span>
               <span><LockKeyhole size={15} /> Better Auth</span>
+              <span><Building2 size={15} /> Organizations</span>
+              <span><UsersRound size={15} /> Teams and roles</span>
               <span><KeyRound size={15} /> Protected APIs</span>
               <span><Search size={15} /> {t("docs.featureSearch")}</span>
               <span><FileText size={15} /> {t("docs.featureExport")}</span>
@@ -441,6 +643,7 @@ messages.unshift({
 
           <footer className="docs-footer">
             <div>
+              <strong>Batuk</strong>
               <span>{t("common.createdBy")}</span>
               <a href="https://suhasbhairav.com" rel="noreferrer" target="_blank">
                 {t("common.suhas")}

@@ -1,11 +1,11 @@
 import { createAgent, createWorkflow, deleteAgent, deleteWorkflow, readAgentStore, updateAgent, updateWorkflow } from "@/lib/agent-store";
 import { json } from "@/lib/chat-request";
-import { requireServerSession } from "@/lib/auth-session";
+import { requireServerPermission } from "@/lib/auth-session";
 
 export const runtime = "nodejs";
 
 export async function GET() {
-  const { response } = await requireServerSession();
+  const { response } = await requireServerPermission({ agent: ["read"] });
   if (response) return response;
 
   return json(await readAgentStore());
@@ -13,10 +13,10 @@ export async function GET() {
 
 export async function POST(request) {
   try {
-    const { response } = await requireServerSession();
-    if (response) return response;
-
     const body = await request.json();
+    const permission = body.action?.startsWith("delete") ? { agent: ["delete"] } : body.action?.startsWith("create") ? { agent: ["create"] } : { agent: ["update"] };
+    const { response } = await requireServerPermission(permission);
+    if (response) return response;
 
     if (body.action === "createAgent") {
       return json(await createAgent(body.agent));

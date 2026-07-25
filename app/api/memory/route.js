@@ -1,6 +1,6 @@
 import { archiveMemory, createMemory, listMemories, updateMemory } from "@/lib/memory-store";
 import { json } from "@/lib/chat-request";
-import { requireServerSession } from "@/lib/auth-session";
+import { requireServerPermission } from "@/lib/auth-session";
 
 export const runtime = "nodejs";
 
@@ -10,7 +10,7 @@ function getUserId(session) {
 
 export async function GET() {
   try {
-    const { session, response } = await requireServerSession();
+    const { session, response } = await requireServerPermission({ memory: ["read"] });
     if (response) return response;
 
     const memories = await listMemories(getUserId(session));
@@ -22,7 +22,7 @@ export async function GET() {
 
 export async function POST(request) {
   try {
-    const { session, response } = await requireServerSession();
+    const { session, response } = await requireServerPermission({ memory: ["create"] });
     if (response) return response;
 
     const body = await request.json();
@@ -42,7 +42,7 @@ export async function POST(request) {
 
 export async function PATCH(request) {
   try {
-    const { session, response } = await requireServerSession();
+    const { session, response } = await requireServerPermission({ memory: ["update"] });
     if (response) return response;
 
     const body = await request.json();
@@ -62,7 +62,7 @@ export async function PATCH(request) {
 
 export async function DELETE(request) {
   try {
-    const { session, response } = await requireServerSession();
+    const { session, response } = await requireServerPermission({ memory: ["delete"] });
     if (response) return response;
 
     const { searchParams } = new URL(request.url);

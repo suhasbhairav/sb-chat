@@ -1,11 +1,11 @@
 import { createSkill, deleteSkill, importSkillStore, readSkillStore, updateSkill } from "@/lib/skill-store";
 import { json } from "@/lib/chat-request";
-import { requireServerSession } from "@/lib/auth-session";
+import { requireServerPermission } from "@/lib/auth-session";
 
 export const runtime = "nodejs";
 
 export async function GET() {
-  const { response } = await requireServerSession();
+  const { response } = await requireServerPermission({ skill: ["read"] });
   if (response) return response;
 
   return json(await readSkillStore());
@@ -13,10 +13,10 @@ export async function GET() {
 
 export async function POST(request) {
   try {
-    const { response } = await requireServerSession();
-    if (response) return response;
-
     const body = await request.json();
+    const permission = body.action === "deleteSkill" ? { skill: ["delete"] } : body.action === "createSkill" || body.action === "importStore" ? { skill: ["create"] } : { skill: ["update"] };
+    const { response } = await requireServerPermission(permission);
+    if (response) return response;
 
     if (body.action === "createSkill") {
       return json(await createSkill(body.skill));

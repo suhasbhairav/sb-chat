@@ -1,0 +1,27 @@
+{
+  "version": 1,
+  "organizations": {
+    "bdee5a0e-c9a1-4019-9c32-e31bb11e04e7": {
+      "enabled": false,
+      "productName": "Test Org",
+      "tagline": "Enterprise AI workspace",
+      "logoInitials": "TO",
+      "logoUrl": "/branding/bdee5a0e-c9a1-4019-9c32-e31bb11e04e7-1784970063838.png",
+      "logoName": "openai-image-1784110514035.png",
+      "accentColor": "#10a37f",
+      "showOrgName": true,
+      "footerLocked": "Batuk, created by Suhas Bhairav"
+    },
+    "global": {
+      "enabled": true,
+      "productName": "Batuk",
+      "tagline": "Enterprise AI workspace",
+      "logoInitials": "B",
+      "logoUrl": "",
+      "logoName": "",
+      "accentColor": "#10a37f",
+      "showOrgName": true,
+      "footerLocked": "Batuk, created by Suhas Bhairav"
+    }
+  }
+}

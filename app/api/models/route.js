@@ -1,9 +1,9 @@
 import { json } from "@/lib/chat-request";
-import { requireServerSession } from "@/lib/auth-session";
+import { requireServerPermission } from "@/lib/auth-session";
 import { getClaudeModels, getOllamaModels, getOpenAIModels, getOpenRouterModels, getSarvamModels, getXAIModels } from "@/lib/model-catalog";
 
 export async function GET(request) {
-  const { response } = await requireServerSession();
+  const { response } = await requireServerPermission({ model: ["read"] });
   if (response) return response;
 
   const url = new URL(request.url);

@@ -1,0 +1,79 @@
+services:
+  batuk:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: batuk/sb-chat:enterprise
+    restart: unless-stopped
+    env_file:
+      - ${BATUK_ENV_FILE:-.env.enterprise}
+    ports:
+      - "${BATUK_HTTP_PORT:-3000}:3000"
+    volumes:
+      - batuk_data:/app/data
+      - batuk_branding:/app/public/branding
+    depends_on:
+      postgres:
+        condition: service_healthy
+        required: false
+      mysql:
+        condition: service_healthy
+        required: false
+      chroma:
+        condition: service_started
+        required: false
+
+  postgres:
+    image: postgres:16-bookworm
+    profiles: ["postgres"]
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${BATUK_DATA_POSTGRES_DATABASE:-batuk}
+      POSTGRES_USER: ${BATUK_DATA_POSTGRES_USER:-batuk}
+      POSTGRES_PASSWORD: ${BATUK_DATA_POSTGRES_PASSWORD:-batuk_password}
+    ports:
+      - "${BATUK_POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - batuk_postgres:/var/lib/postgresql/data
+      - ./database/postgresql:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${BATUK_DATA_POSTGRES_USER:-batuk} -d ${BATUK_DATA_POSTGRES_DATABASE:-batuk}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  mysql:
+    image: mysql:8.4
+    profiles: ["mysql"]
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: ${BATUK_DATA_MYSQL_DATABASE:-batuk}
+      MYSQL_USER: ${BATUK_DATA_MYSQL_USER:-batuk}
+      MYSQL_PASSWORD: ${BATUK_DATA_MYSQL_PASSWORD:-batuk_password}
+      MYSQL_ROOT_PASSWORD: ${BATUK_DATA_MYSQL_ROOT_PASSWORD:-batuk_root_password}
+    ports:
+      - "${BATUK_MYSQL_PORT:-3306}:3306"
+    volumes:
+      - batuk_mysql:/var/lib/mysql
+      - ./database/mysql:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -u${BATUK_DATA_MYSQL_USER:-batuk} -p${BATUK_DATA_MYSQL_PASSWORD:-batuk_password} --silent"]
+      interval: 10s
+      timeout: 5s
+      retries: 20
+
+  chroma:
+    image: chromadb/chroma:latest
+    profiles: ["chroma"]
+    restart: unless-stopped
+    ports:
+      - "${BATUK_CHROMA_PORT:-8000}:8000"
+    volumes:
+      - batuk_chroma:/chroma/chroma
+
+volumes:
+  batuk_data:
+  batuk_branding:
+  batuk_postgres:
+  batuk_mysql:
+  batuk_chroma:

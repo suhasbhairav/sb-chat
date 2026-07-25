@@ -3,7 +3,7 @@ import { streamModel } from "@/lib/model-clients";
 import { json, prepareChatRequest, validateChatPayload } from "@/lib/chat-request";
 import { appendDocumentSources, retrieveDocumentContext } from "@/lib/rag-embeddings";
 import { recordTokenUsage } from "@/lib/token-usage-store";
-import { requireServerSession } from "@/lib/auth-session";
+import { requireServerPermission } from "@/lib/auth-session";
 import { formatMemoriesForPrompt, listMemories } from "@/lib/memory-store";
 import { formatSkillsForPrompt, listEnabledSkills } from "@/lib/skill-store";
 
@@ -26,7 +26,7 @@ function ndjsonHeaders() {
 
 export async function POST(request) {
   try {
-    const { session, response } = await requireServerSession();
+    const { session, response } = await requireServerPermission({ model: ["connect"], chat: ["create"] });
     if (response) return response;
 
     const payload = await request.json();
@@ -128,6 +128,7 @@ export async function POST(request) {
 
           if (usage.totalTokens > 0 || usage.inputTokens > 0 || usage.outputTokens > 0) {
             await recordTokenUsage({
+              userId: session.user.id,
               chatId: payload.chatId,
               workspaceId: payload.workspaceId,
               folderId: payload.folderId,

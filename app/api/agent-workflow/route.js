@@ -1,6 +1,6 @@
 import { unlink } from "node:fs/promises";
 import { json, resolveServerApiKey } from "@/lib/chat-request";
-import { requireServerSession } from "@/lib/auth-session";
+import { requireServerPermission } from "@/lib/auth-session";
 import { buildSafeMessages, screenMessages } from "@/lib/guardrails";
 import { normalizeTemperatureForModel } from "@/lib/model-compatibility";
 import { callModel } from "@/lib/model-clients";
@@ -51,7 +51,7 @@ async function extractAttachedDocuments(files) {
 
 export async function POST(request) {
   try {
-    const { response } = await requireServerSession();
+    const { session, response } = await requireServerPermission({ agent: ["run"], model: ["connect"] });
     if (response) return response;
 
     const formData = await request.formData();
@@ -131,6 +131,7 @@ export async function POST(request) {
 
     if (usageTotals.totalTokens > 0 || usageTotals.inputTokens > 0 || usageTotals.outputTokens > 0) {
       await recordTokenUsage({
+        userId: session.user.id,
         provider,
         model,
         source: "agent-workflow",

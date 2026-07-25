@@ -11,6 +11,17 @@ import { DEFAULT_LOCALE, SUPPORTED_LOCALES, translate } from "@/lib/i18n";
 const SETTINGS_KEY = "sb-chat-settings";
 const MESSAGE_QUEUES_KEY = "batuk-message-queues";
 const defaults = getDefaultChatSettings();
+const DEFAULT_BRANDING = {
+  enabled: false,
+  productName: "Batuk",
+  tagline: "Enterprise AI workspace",
+  logoInitials: "SB",
+  logoUrl: "",
+  logoName: "",
+  accentColor: "#10a37f",
+  showOrgName: true,
+  footerLocked: "Batuk, created by Suhas Bhairav",
+};
 
 async function libraryAction(action, payload = {}) {
   const response = await fetch("/api/library", {
@@ -24,6 +35,15 @@ async function libraryAction(action, payload = {}) {
     throw new Error(data.error || "Library action failed.");
   }
 
+  return data;
+}
+
+async function readApiJson(response, fallbackMessage) {
+  const text = await response.text();
+  const data = text ? JSON.parse(text) : {};
+  if (!response.ok) {
+    throw new Error(data.error || fallbackMessage);
+  }
   return data;
 }
 
@@ -116,6 +136,8 @@ export function useChatController() {
   const [webSearchEnabled, setWebSearchEnabled] = useState(false);
   const [documentChatEnabled, setDocumentChatEnabled] = useState(false);
   const [memoryEnabled, setMemoryEnabled] = useState(true);
+  const [branding, setBranding] = useState(DEFAULT_BRANDING);
+  const [brandingOrganization, setBrandingOrganization] = useState({ organizationId: "global", organizationName: "Batuk" });
   const [memories, setMemories] = useState([]);
   const [memoryError, setMemoryError] = useState("");
   const [realtimeModel, setRealtimeModel] = useState(AUTO_REALTIME_MODEL);
@@ -135,6 +157,8 @@ export function useChatController() {
   const [usageOpen, setUsageOpen] = useState(false);
   const [docsOpen, setDocsOpen] = useState(false);
   const [documentsOpen, setDocumentsOpen] = useState(false);
+  const [auditOpen, setAuditOpen] = useState(false);
+  const [enterpriseOpen, setEnterpriseOpen] = useState(false);
   const [agentBuilderOpen, setAgentBuilderOpen] = useState(false);
   const [skillsOpen, setSkillsOpen] = useState(false);
   const [tokenUsage, setTokenUsage] = useState(null);
@@ -227,6 +251,7 @@ export function useChatController() {
       setFolders(store.folders || []);
       setChats(store.chats || []);
       setSelectedWorkspaceId(store.workspaces?.[0]?.id || null);
+      await refreshBranding();
       await refreshTokenUsage();
       await refreshMemories();
     }
@@ -244,6 +269,10 @@ export function useChatController() {
     document.documentElement.classList.toggle("dark", theme === "dark");
     document.documentElement.style.colorScheme = theme;
   }, [theme]);
+
+  useEffect(() => {
+    document.documentElement.style.setProperty("--brand-accent", branding.enabled ? branding.accentColor : "#10a37f");
+  }, [branding]);
 
   useEffect(() => {
     localStorage.setItem(
@@ -335,6 +364,61 @@ export function useChatController() {
       delete queues[key];
     }
     sessionStorage.setItem(MESSAGE_QUEUES_KEY, JSON.stringify(queues));
+  }
+
+  async function refreshBranding() {
+    const response = await fetch("/api/branding");
+    const data = await readApiJson(response, "Could not load branding.");
+    setBranding(data.branding || DEFAULT_BRANDING);
+    setBrandingOrganization({
+      organizationId: data.organizationId || "global",
+      organizationName: data.organizationName || "Batuk",
+    });
+    return data;
+  }
+
+  async function saveBranding(nextBranding) {
+    const response = await fetch("/api/branding", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(nextBranding),
+    });
+    const data = await readApiJson(response, "Could not save branding.");
+    setBranding(data.branding || DEFAULT_BRANDING);
+    setBrandingOrganization({
+      organizationId: data.organizationId || "global",
+      organizationName: data.organizationName || "Batuk",
+    });
+    return data.branding;
+  }
+
+  async function uploadBrandingLogo(file) {
+    const formData = new FormData();
+    formData.append("logo", file);
+    const response = await fetch("/api/branding", {
+      method: "POST",
+      body: formData,
+    });
+    const data = await readApiJson(response, "Could not upload logo.");
+    setBranding(data.branding || DEFAULT_BRANDING);
+    setBrandingOrganization({
+      organizationId: data.organizationId || "global",
+      organizationName: data.organizationName || "Batuk",
+    });
+    return data.branding;
+  }
+
+  async function removeBrandingLogo() {
+    const response = await fetch("/api/branding", {
+      method: "DELETE",
+    });
+    const data = await readApiJson(response, "Could not remove logo.");
+    setBranding(data.branding || DEFAULT_BRANDING);
+    setBrandingOrganization({
+      organizationId: data.organizationId || "global",
+      organizationName: data.organizationName || "Batuk",
+    });
+    return data.branding;
   }
 
   function replaceQueuedMessages(nextQueue) {
@@ -533,9 +617,19 @@ export function useChatController() {
     setMessages([]);
     setInput("");
     setChatAttachments([]);
+    setAttachmentError("");
+    setAttachmentStatus("idle");
+    replaceQueuedMessages([]);
     setTemporaryChat(false);
     setSettingsOpen(false);
-    inputRef.current?.focus();
+    setUsageOpen(false);
+    setDocsOpen(false);
+    setDocumentsOpen(false);
+    setAuditOpen(false);
+    setEnterpriseOpen(false);
+    setAgentBuilderOpen(false);
+    setSkillsOpen(false);
+    window.setTimeout(() => inputRef.current?.focus(), 0);
   }
 
   function pickSuggestion(prompt) {
@@ -561,6 +655,13 @@ export function useChatController() {
     setInput("");
     setChatAttachments([]);
     setSettingsOpen(false);
+    setUsageOpen(false);
+    setDocsOpen(false);
+    setDocumentsOpen(false);
+    setAuditOpen(false);
+    setEnterpriseOpen(false);
+    setAgentBuilderOpen(false);
+    setSkillsOpen(false);
     if (window.innerWidth <= 900) {
       setSidebarOpen(false);
     }
@@ -1060,6 +1161,8 @@ export function useChatController() {
     attachmentError,
     attachmentStatus,
     baseUrl,
+    branding,
+    brandingOrganization,
     canSend,
     chatAttachmentInputRef,
     chatAttachments,
@@ -1068,6 +1171,8 @@ export function useChatController() {
     currentProvider,
     documentChatEnabled,
     documentsOpen,
+    auditOpen,
+    enterpriseOpen,
     docsOpen,
     folders,
     guardrails,
@@ -1128,6 +1233,7 @@ export function useChatController() {
     rememberMessage,
     refreshMemories,
     resetTokenUsage,
+    refreshBranding,
     saveChat,
     selectChat,
     selectFolder,
@@ -1135,11 +1241,16 @@ export function useChatController() {
     sendMessage,
     sendQueuedMessageNext,
     removeChatAttachment,
+    removeBrandingLogo,
     setApiKey,
+    saveBranding,
+    uploadBrandingLogo,
     setAgentBuilderOpen,
+    setAuditOpen,
     setBaseUrl,
     setDocumentChatEnabled,
     setDocumentsOpen,
+    setEnterpriseOpen,
     setDocsOpen,
     setGuardrails,
     setInput,

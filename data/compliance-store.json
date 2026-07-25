@@ -1,0 +1,499 @@
+{
+  "version": 1,
+  "settings": {
+    "auditEnabled": true,
+    "retentionDays": 365,
+    "hashPersonalIdentifiers": true,
+    "exportFormat": "json"
+  },
+  "controls": [
+    {
+      "id": "gdpr-ropa",
+      "framework": "GDPR",
+      "title": "Records of processing activities",
+      "requirement": "Maintain processing-purpose, data-category, recipient, retention, and safeguard evidence.",
+      "status": "implemented",
+      "owner": "Privacy",
+      "evidence": [
+        "Compliance dashboard",
+        "Audit trail",
+        "Data inventory"
+      ]
+    },
+    {
+      "id": "gdpr-dsar",
+      "framework": "GDPR",
+      "title": "Data subject access and erasure",
+      "requirement": "Provide export, request tracking, and erasure workflows for personal data.",
+      "status": "implemented",
+      "owner": "Privacy",
+      "evidence": [
+        "My data export",
+        "Data request register",
+        "Deletion action logs"
+      ]
+    },
+    {
+      "id": "gdpr-security",
+      "framework": "GDPR",
+      "title": "Security of processing",
+      "requirement": "Apply RBAC, authentication, audit logging, and local-first storage controls.",
+      "status": "implemented",
+      "owner": "Security",
+      "evidence": [
+        "Better Auth RBAC",
+        "Audit events",
+        "Protected APIs"
+      ]
+    },
+    {
+      "id": "iso-a5-policy",
+      "framework": "ISO 27001",
+      "title": "Security policies and responsibilities",
+      "requirement": "Document control ownership, operating status, and evidence location.",
+      "status": "implemented",
+      "owner": "Security",
+      "evidence": [
+        "Control register",
+        "Enterprise roles"
+      ]
+    },
+    {
+      "id": "iso-a8-logging",
+      "framework": "ISO 27001",
+      "title": "Logging and monitoring",
+      "requirement": "Log access, admin, document, privacy, and configuration events with integrity hashes.",
+      "status": "implemented",
+      "owner": "Security",
+      "evidence": [
+        "Audit trail",
+        "Hash chain"
+      ]
+    },
+    {
+      "id": "soc2-cc6",
+      "framework": "SOC 2",
+      "title": "Logical access controls",
+      "requirement": "Restrict administrative actions by role and record access changes.",
+      "status": "implemented",
+      "owner": "Security",
+      "evidence": [
+        "Admin/organization plugins",
+        "Role-change audit logs"
+      ]
+    },
+    {
+      "id": "soc2-cc7",
+      "framework": "SOC 2",
+      "title": "System operations monitoring",
+      "requirement": "Capture operational, document, token usage, and failed authorization events for review.",
+      "status": "implemented",
+      "owner": "Operations",
+      "evidence": [
+        "Audit dashboard",
+        "Token usage ledger"
+      ]
+    },
+    {
+      "id": "soc2-privacy",
+      "framework": "SOC 2",
+      "title": "Privacy commitments",
+      "requirement": "Track personal-data requests, processing categories, retention, and disclosure boundaries.",
+      "status": "implemented",
+      "owner": "Privacy",
+      "evidence": [
+        "GDPR request register",
+        "Data inventory"
+      ]
+    }
+  ],
+  "dataInventory": [
+    {
+      "category": "Account identity",
+      "personalData": [
+        "name",
+        "email",
+        "role",
+        "session metadata"
+      ],
+      "purpose": "Authentication, authorization, administration, and account support",
+      "storage": "Better Auth database",
+      "retention": "Until account deletion or configured retention process"
+    },
+    {
+      "category": "Chat content",
+      "personalData": [
+        "chat prompts",
+        "assistant responses",
+        "workspace/folder labels"
+      ],
+      "purpose": "Conversation continuity and user productivity",
+      "storage": "Local JSON chat store",
+      "retention": "User-controlled export/import/delete"
+    },
+    {
+      "category": "Document uploads",
+      "personalData": [
+        "uploaded files",
+        "document names",
+        "derived chunks",
+        "vector identifiers"
+      ],
+      "purpose": "Document chat and retrieval-augmented generation",
+      "storage": "Local files plus JSON, ChromaDB, or Pinecone vectors",
+      "retention": "Until document deletion"
+    },
+    {
+      "category": "Usage and audit evidence",
+      "personalData": [
+        "user id",
+        "email hash",
+        "IP hash",
+        "action metadata",
+        "token usage metadata"
+      ],
+      "purpose": "Security monitoring, audit evidence, abuse investigation, and compliance reporting",
+      "storage": "Local JSON ledgers",
+      "retention": "365 days by default"
+    }
+  ],
+  "dataRequests": [],
+  "auditEvents": [
+    {
+      "id": "audit-1785004091023-765b536dae82dcb8",
+      "createdAt": "2026-07-25T18:28:11.023Z",
+      "category": "admin",
+      "action": "branding.logo.remove",
+      "outcome": "success",
+      "actor": {
+        "id": "3c4816f5-3e7e-4d26-a6ce-e827cc3c856e",
+        "emailHash": "f660ab912ec121d1b1e928a0bb4bc61b15f5ad44d5efdc4e1c92a25e99b8e44a",
+        "role": "owner"
+      },
+      "target": {
+        "type": "organization",
+        "id": "global"
+      },
+      "ipHash": "eff8e7ca506627fe15dda5e0e512fcaad70b6d520f37cc76597fdb4f2d83a1a3",
+      "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36",
+      "metadata": {
+        "footerLocked": true
+      },
+      "previousHash": "828deca0a6179572a6ee07220b471588edb3aef7dde1de46fd9572ecdd0d515a",
+      "integrityHash": "02d649e2e0a6a4ef9404e6a83046ebfaeda8eb7c59e5df133128d1cc58b7704b"
+    },
+    {
+      "id": "audit-1785002404383-55fb9906dd360b82",
+      "createdAt": "2026-07-25T18:00:04.383Z",
+      "category": "data",
+      "action": "chat.upsert",
+      "outcome": "success",
+      "actor": {
+        "id": "3c4816f5-3e7e-4d26-a6ce-e827cc3c856e",
+        "emailHash": "f660ab912ec121d1b1e928a0bb4bc61b15f5ad44d5efdc4e1c92a25e99b8e44a",
+        "role": "owner"
+      },
+      "target": {
+        "type": "chat",
+        "id": "1785002381283-92b768f4716fa8"
+      },
+      "ipHash": null,
+      "userAgent": null,
+      "metadata": {
+        "workspaceId": "workspace-1784806210171-81024ae3ddf17",
+        "folderId": null,
+        "provider": "ollama",
+        "model": "qwen3:8b"
+      },
+      "previousHash": "ca6594cf0835cb822ebdc6be3e1772b17326582502ab546df914d988ae94ad5a",
+      "integrityHash": "828deca0a6179572a6ee07220b471588edb3aef7dde1de46fd9572ecdd0d515a"
+    },
+    {
+      "id": "audit-1785002371437-faf1cca5bf2ac9b1",
+      "createdAt": "2026-07-25T17:59:31.437Z",
+      "category": "admin",
+      "action": "branding.logo.upload",
+      "outcome": "success",
+      "actor": {
+        "id": "3c4816f5-3e7e-4d26-a6ce-e827cc3c856e",
+        "emailHash": "f660ab912ec121d1b1e928a0bb4bc61b15f5ad44d5efdc4e1c92a25e99b8e44a",
+        "role": "owner"
+      },
+      "target": {
+        "type": "organization",
+        "id": "global"
+      },
+      "ipHash": "eff8e7ca506627fe15dda5e0e512fcaad70b6d520f37cc76597fdb4f2d83a1a3",
+      "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36",
+      "metadata": {
+        "logoName": "openai-image-1784110514035.png",
+        "logoUrl": "/branding/global-1785002371434.png",
+        "footerLocked": true
+      },
+      "previousHash": "49f521b01b05bdc690b000d0d6e3c837ce7718bfdce58b25fc4474b388b75db0",
+      "integrityHash": "ca6594cf0835cb822ebdc6be3e1772b17326582502ab546df914d988ae94ad5a"
+    },
+    {
+      "id": "audit-1785001142857-2dff0f84f04b6524",
+      "createdAt": "2026-07-25T17:39:02.857Z",
+      "category": "data",
+      "action": "chat.upsert",
+      "outcome": "success",
+      "actor": {
+        "id": "3c4816f5-3e7e-4d26-a6ce-e827cc3c856e",
+        "emailHash": "f660ab912ec121d1b1e928a0bb4bc61b15f5ad44d5efdc4e1c92a25e99b8e44a",
+        "role": "owner"
+      },
+      "target": {
+        "type": "chat",
+        "id": "1785001129233-c5594d688617b"
+      },
+      "ipHash": null,
+      "userAgent": null,
+      "metadata": {
+        "workspaceId": "workspace-1784806210171-81024ae3ddf17",
+        "folderId": null,
+        "provider": "ollama",
+        "model": "qwen3:8b"
+      },
+      "previousHash": "dbdfce88a24af78f78027262ec9966f0476ca056f909453265f0362ee067240f",
+      "integrityHash": "49f521b01b05bdc690b000d0d6e3c837ce7718bfdce58b25fc4474b388b75db0"
+    },
+    {
+      "id": "audit-1784970063841-bc21014d806abea0",
+      "createdAt": "2026-07-25T09:01:03.841Z",
+      "category": "admin",
+      "action": "branding.logo.upload",
+      "outcome": "success",
+      "actor": {
+        "id": "3c4816f5-3e7e-4d26-a6ce-e827cc3c856e",
+        "emailHash": "f660ab912ec121d1b1e928a0bb4bc61b15f5ad44d5efdc4e1c92a25e99b8e44a",
+        "role": "owner"
+      },
+      "target": {
+        "type": "organization",
+        "id": "bdee5a0e-c9a1-4019-9c32-e31bb11e04e7"
+      },
+      "ipHash": "eff8e7ca506627fe15dda5e0e512fcaad70b6d520f37cc76597fdb4f2d83a1a3",
+      "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36",
+      "metadata": {
+        "logoName": "openai-image-1784110514035.png",
+        "logoUrl": "/branding/bdee5a0e-c9a1-4019-9c32-e31bb11e04e7-1784970063838.png",
+        "footerLocked": true
+      },
+      "previousHash": "3c0b248ee87b38aec059c0e8bb9ee9fffd463295cb004e380800e6f83265a8e0",
+      "integrityHash": "dbdfce88a24af78f78027262ec9966f0476ca056f909453265f0362ee067240f"
+    },
+    {
+      "id": "audit-1784968886653-99005c437ed3989d",
+      "createdAt": "2026-07-25T08:41:26.653Z",
+      "category": "admin",
+      "action": "claimFirstOwner",
+      "outcome": "success",
+      "actor": {
+        "id": "3c4816f5-3e7e-4d26-a6ce-e827cc3c856e",
+        "emailHash": "f660ab912ec121d1b1e928a0bb4bc61b15f5ad44d5efdc4e1c92a25e99b8e44a",
+        "role": "owner"
+      },
+      "target": {
+        "type": "user",
+        "id": "3c4816f5-3e7e-4d26-a6ce-e827cc3c856e"
+      },
+      "ipHash": "eff8e7ca506627fe15dda5e0e512fcaad70b6d520f37cc76597fdb4f2d83a1a3",
+      "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36",
+      "metadata": {},
+      "previousHash": "15706c988143c9de9dcba789baf5a46329558137f3b432046f2973e843b6c90b",
+      "integrityHash": "3c0b248ee87b38aec059c0e8bb9ee9fffd463295cb004e380800e6f83265a8e0"
+    },
+    {
+      "id": "audit-1784968875432-c7f755edb03d2971",
+      "createdAt": "2026-07-25T08:41:15.432Z",
+      "category": "access",
+      "action": "permission.denied",
+      "outcome": "denied",
+      "actor": {
+        "id": "3c4816f5-3e7e-4d26-a6ce-e827cc3c856e",
+        "emailHash": "f660ab912ec121d1b1e928a0bb4bc61b15f5ad44d5efdc4e1c92a25e99b8e44a",
+        "role": "member"
+      },
+      "target": null,
+      "ipHash": "eff8e7ca506627fe15dda5e0e512fcaad70b6d520f37cc76597fdb4f2d83a1a3",
+      "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36",
+      "metadata": {
+        "permissions": {
+          "user": [
+            "list"
+          ]
+        }
+      },
+      "previousHash": "4f6bc3c49f11c8713afbd7f0987cadf87485d7781d2f90811899e634ec0eaadf",
+      "integrityHash": "15706c988143c9de9dcba789baf5a46329558137f3b432046f2973e843b6c90b"
+    },
+    {
+      "id": "audit-1784968875424-86d1dc7ca83ddbde",
+      "createdAt": "2026-07-25T08:41:15.424Z",
+      "category": "access",
+      "action": "permission.denied",
+      "outcome": "denied",
+      "actor": {
+        "id": "3c4816f5-3e7e-4d26-a6ce-e827cc3c856e",
+        "emailHash": "f660ab912ec121d1b1e928a0bb4bc61b15f5ad44d5efdc4e1c92a25e99b8e44a",
+        "role": "member"
+      },
+      "target": null,
+      "ipHash": "eff8e7ca506627fe15dda5e0e512fcaad70b6d520f37cc76597fdb4f2d83a1a3",
+      "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36",
+      "metadata": {
+        "permissions": {
+          "user": [
+            "list"
+          ]
+        }
+      },
+      "previousHash": "45b2bd6237530d3f198fedec638b7f1c4d973d1c34eb0e48c97a0333a3068452",
+      "integrityHash": "4f6bc3c49f11c8713afbd7f0987cadf87485d7781d2f90811899e634ec0eaadf"
+    },
+    {
+      "id": "audit-1784968779566-1a182ad4f1af029d",
+      "createdAt": "2026-07-25T08:39:39.566Z",
+      "category": "access",
+      "action": "permission.denied",
+      "outcome": "denied",
+      "actor": {
+        "id": "3c4816f5-3e7e-4d26-a6ce-e827cc3c856e",
+        "emailHash": "f660ab912ec121d1b1e928a0bb4bc61b15f5ad44d5efdc4e1c92a25e99b8e44a",
+        "role": "member"
+      },
+      "target": null,
+      "ipHash": "eff8e7ca506627fe15dda5e0e512fcaad70b6d520f37cc76597fdb4f2d83a1a3",
+      "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36",
+      "metadata": {
+        "permissions": {
+          "user": [
+            "list"
+          ]
+        }
+      },
+      "previousHash": "6e29f3a0584971c19e6aa39a00f1afe933e672f7a0aca1df3e4b32420806dacf",
+      "integrityHash": "45b2bd6237530d3f198fedec638b7f1c4d973d1c34eb0e48c97a0333a3068452"
+    },
+    {
+      "id": "audit-1784968650119-9f4f3c5c7b99da9f",
+      "createdAt": "2026-07-25T08:37:30.119Z",
+      "category": "access",
+      "action": "permission.denied",
+      "outcome": "denied",
+      "actor": {
+        "id": "3c4816f5-3e7e-4d26-a6ce-e827cc3c856e",
+        "emailHash": "f660ab912ec121d1b1e928a0bb4bc61b15f5ad44d5efdc4e1c92a25e99b8e44a",
+        "role": "member"
+      },
+      "target": null,
+      "ipHash": "eff8e7ca506627fe15dda5e0e512fcaad70b6d520f37cc76597fdb4f2d83a1a3",
+      "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36",
+      "metadata": {
+        "permissions": {
+          "user": [
+            "list"
+          ]
+        }
+      },
+      "previousHash": "e45a911847de928f24fececa3add737e53ac9b9bc02a194bb42bb4fd040246fb",
+      "integrityHash": "6e29f3a0584971c19e6aa39a00f1afe933e672f7a0aca1df3e4b32420806dacf"
+    },
+    {
+      "id": "audit-1784968095125-040a04bda9646e73",
+      "createdAt": "2026-07-25T08:28:15.125Z",
+      "category": "admin",
+      "action": "createTeam",
+      "outcome": "success",
+      "actor": {
+        "id": "3c4816f5-3e7e-4d26-a6ce-e827cc3c856e",
+        "emailHash": "f660ab912ec121d1b1e928a0bb4bc61b15f5ad44d5efdc4e1c92a25e99b8e44a",
+        "role": "member"
+      },
+      "target": {
+        "type": "team",
+        "id": "bdee5a0e-c9a1-4019-9c32-e31bb11e04e7"
+      },
+      "ipHash": "eff8e7ca506627fe15dda5e0e512fcaad70b6d520f37cc76597fdb4f2d83a1a3",
+      "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36",
+      "metadata": {
+        "name": "Finance"
+      },
+      "previousHash": "16a051e1465d0ee31a2ed09c3a9781ad8f5ba9463ae8155b315dae8c93abec69",
+      "integrityHash": "e45a911847de928f24fececa3add737e53ac9b9bc02a194bb42bb4fd040246fb"
+    },
+    {
+      "id": "audit-1784968088616-2ecba8737d3bdcbb",
+      "createdAt": "2026-07-25T08:28:08.616Z",
+      "category": "admin",
+      "action": "createOrganization",
+      "outcome": "success",
+      "actor": {
+        "id": "3c4816f5-3e7e-4d26-a6ce-e827cc3c856e",
+        "emailHash": "f660ab912ec121d1b1e928a0bb4bc61b15f5ad44d5efdc4e1c92a25e99b8e44a",
+        "role": "member"
+      },
+      "target": {
+        "type": "organization",
+        "id": "bdee5a0e-c9a1-4019-9c32-e31bb11e04e7"
+      },
+      "ipHash": "eff8e7ca506627fe15dda5e0e512fcaad70b6d520f37cc76597fdb4f2d83a1a3",
+      "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36",
+      "metadata": {
+        "name": "Test Org"
+      },
+      "previousHash": "343d07669684ea508f38226b4f50e87ccd534bf2614151451ef3df929660f1a2",
+      "integrityHash": "16a051e1465d0ee31a2ed09c3a9781ad8f5ba9463ae8155b315dae8c93abec69"
+    },
+    {
+      "id": "audit-1784967925903-88aded110fa8d9b8",
+      "createdAt": "2026-07-25T08:25:25.903Z",
+      "category": "access",
+      "action": "permission.denied",
+      "outcome": "denied",
+      "actor": {
+        "id": "3c4816f5-3e7e-4d26-a6ce-e827cc3c856e",
+        "emailHash": "f660ab912ec121d1b1e928a0bb4bc61b15f5ad44d5efdc4e1c92a25e99b8e44a",
+        "role": "member"
+      },
+      "target": null,
+      "ipHash": "eff8e7ca506627fe15dda5e0e512fcaad70b6d520f37cc76597fdb4f2d83a1a3",
+      "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36",
+      "metadata": {
+        "permissions": {
+          "user": [
+            "list"
+          ]
+        }
+      },
+      "previousHash": "5b4a446765b68f5e4e29fd3a7ac26c99fa62767703b140359112fe3b6203abf9",
+      "integrityHash": "343d07669684ea508f38226b4f50e87ccd534bf2614151451ef3df929660f1a2"
+    },
+    {
+      "id": "audit-1784967925794-c25370633940fd54",
+      "createdAt": "2026-07-25T08:25:25.794Z",
+      "category": "access",
+      "action": "permission.denied",
+      "outcome": "denied",
+      "actor": {
+        "id": "3c4816f5-3e7e-4d26-a6ce-e827cc3c856e",
+        "emailHash": "f660ab912ec121d1b1e928a0bb4bc61b15f5ad44d5efdc4e1c92a25e99b8e44a",
+        "role": "member"
+      },
+      "target": null,
+      "ipHash": "eff8e7ca506627fe15dda5e0e512fcaad70b6d520f37cc76597fdb4f2d83a1a3",
+      "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36",
+      "metadata": {
+        "permissions": {
+          "user": [
+            "list"
+          ]
+        }
+      },
+      "previousHash": null,
+      "integrityHash": "5b4a446765b68f5e4e29fd3a7ac26c99fa62767703b140359112fe3b6203abf9"
+    }
+  ]
+}

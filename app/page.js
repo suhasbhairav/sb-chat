@@ -6,6 +6,8 @@ import { AuthGate } from "@/components/auth/AuthGate";
 import { DocumentationPanel } from "@/components/docs/DocumentationPanel";
 import { DocumentsPanel } from "@/components/docs/DocumentsPanel";
 import { EmptyChat } from "@/components/chat/EmptyChat";
+import { EnterprisePanel } from "@/components/enterprise/EnterprisePanel";
+import { AuditPanel } from "@/components/audit/AuditPanel";
 import { I18nProvider, useI18n } from "@/components/i18n/I18nProvider";
 import { AppFooter } from "@/components/layout/AppFooter";
 import { AgentWorkflowBuilder } from "@/components/agents/AgentWorkflowBuilder";
@@ -65,9 +67,14 @@ function HomeShell({ chat }) {
   );
 
   return (
-    <main className="app-shell" dir={dir}>
+    <main
+      className={`app-shell ${chat.branding?.enabled ? "is-whitelabeled" : ""}`}
+      dir={dir}
+      style={chat.branding?.enabled ? { "--brand-accent": chat.branding.accentColor } : undefined}
+    >
       <Sidebar
         activeChatId={chat.activeChatId}
+        branding={chat.branding}
         chats={chat.visibleChats}
         folders={chat.folders}
         isOpen={chat.sidebarOpen}
@@ -93,28 +100,62 @@ function HomeShell({ chat }) {
 
       <section className="chat-stage">
         <TopBar
+          branding={chat.branding}
+          brandingOrganization={chat.brandingOrganization}
           documentChatEnabled={chat.documentChatEnabled}
           model={chat.model}
           sidebarOpen={chat.sidebarOpen}
           temporaryChat={chat.temporaryChat}
           onOpenDocuments={() => chat.setDocumentsOpen(true)}
           onOpenAgents={() => {
+            chat.setAuditOpen(false);
             chat.setSkillsOpen(false);
+            chat.setEnterpriseOpen(false);
             chat.setAgentBuilderOpen(true);
           }}
-          onOpenSkills={() => {
+          onOpenAudit={() => {
             chat.setAgentBuilderOpen(false);
+            chat.setEnterpriseOpen(false);
+            chat.setSkillsOpen(false);
+            chat.setAuditOpen(true);
+          }}
+          onOpenEnterprise={() => {
+            chat.setAuditOpen(false);
+            chat.setAgentBuilderOpen(false);
+            chat.setSkillsOpen(false);
+            chat.refreshBranding().catch(() => {});
+            chat.setEnterpriseOpen(true);
+          }}
+          onOpenSkills={() => {
+            chat.setAuditOpen(false);
+            chat.setAgentBuilderOpen(false);
+            chat.setEnterpriseOpen(false);
             chat.setSkillsOpen(true);
           }}
           onOpenDocs={() => chat.setDocsOpen(true)}
-          onOpenSettings={() => chat.setSettingsOpen(true)}
+          onOpenSettings={async () => {
+            await chat.refreshBranding().catch(() => {});
+            chat.setSettingsOpen(true);
+          }}
           onOpenSidebar={() => chat.setSidebarOpen(true)}
           onOpenUsage={() => chat.setUsageOpen(true)}
           onToggleDocumentChat={() => chat.setDocumentChatEnabled((value) => !value)}
           onToggleTemporaryChat={() => chat.setTemporaryChat((value) => !value)}
         />
 
-        {chat.skillsOpen ? (
+        {chat.auditOpen ? (
+          <AuditPanel onClose={() => chat.setAuditOpen(false)} />
+        ) : chat.enterpriseOpen ? (
+          <EnterprisePanel
+            branding={chat.branding}
+            brandingOrganization={chat.brandingOrganization}
+            onClose={() => chat.setEnterpriseOpen(false)}
+            onRefreshBranding={chat.refreshBranding}
+            onSaveBranding={chat.saveBranding}
+            onUploadBrandingLogo={chat.uploadBrandingLogo}
+            onRemoveBrandingLogo={chat.removeBrandingLogo}
+          />
+        ) : chat.skillsOpen ? (
           <SkillsDashboard onClose={() => chat.setSkillsOpen(false)} />
         ) : chat.agentBuilderOpen ? (
           <AgentWorkflowBuilder
@@ -143,7 +184,7 @@ function HomeShell({ chat }) {
 
             <div className={`chat-body ${chat.hasMessages ? "with-messages" : "empty"}`}>
               {!chat.hasMessages ? (
-                <EmptyChat composer={composer} model={chat.model} onPickSuggestion={chat.pickSuggestion} />
+                <EmptyChat branding={chat.branding} composer={composer} model={chat.model} onPickSuggestion={chat.pickSuggestion} />
               ) : (
                 <>
                   <ChatMessages

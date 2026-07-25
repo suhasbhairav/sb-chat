@@ -1,12 +1,13 @@
 import { readFile } from "node:fs/promises";
 import { json } from "@/lib/chat-request";
-import { requireServerSession } from "@/lib/auth-session";
+import { requireServerPermission } from "@/lib/auth-session";
 import { getDocumentFilePath, readDocumentStore } from "@/lib/rag-store";
+import { recordAuditEvent } from "@/lib/compliance-store";
 
 export const runtime = "nodejs";
 
 export async function GET(_request, { params }) {
-  const { response } = await requireServerSession();
+  const { session, response } = await requireServerPermission({ document: ["download"] });
   if (response) return response;
 
   const { id } = await params;
@@ -18,6 +19,18 @@ export async function GET(_request, { params }) {
   }
 
   const file = await readFile(getDocumentFilePath(document));
+  await recordAuditEvent({
+    category: "document",
+    action: "document.download",
+    outcome: "success",
+    actor: session.user,
+    target: { type: "document", id },
+    metadata: {
+      name: document.name,
+      size: document.size,
+      type: document.type,
+    },
+  }).catch(() => {});
 
   return new Response(file, {
     headers: {

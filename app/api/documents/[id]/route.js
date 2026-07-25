@@ -1,13 +1,14 @@
 import { json } from "@/lib/chat-request";
-import { requireServerSession } from "@/lib/auth-session";
+import { requireServerPermission } from "@/lib/auth-session";
 import { deleteChromaDocument } from "@/lib/rag-chroma";
 import { deletePineconeDocument } from "@/lib/rag-pinecone";
 import { deleteDocument, readDocumentStore, summarizeDocuments } from "@/lib/rag-store";
+import { recordAuditEvent } from "@/lib/compliance-store";
 
 export const runtime = "nodejs";
 
 export async function DELETE(_request, { params }) {
-  const { response } = await requireServerSession();
+  const { session, response } = await requireServerPermission({ document: ["delete"] });
   if (response) return response;
 
   const { id } = await params;
@@ -30,5 +31,16 @@ export async function DELETE(_request, { params }) {
   }
 
   const store = await deleteDocument(id);
+  await recordAuditEvent({
+    category: "document",
+    action: "document.delete",
+    outcome: "success",
+    actor: session.user,
+    target: { type: "document", id },
+    metadata: {
+      name: document?.name,
+      vectorStoreProvider: document?.vectorStoreProvider || currentStore.settings.vectorStoreProvider,
+    },
+  }).catch(() => {});
   return json(summarizeDocuments(store));
 }

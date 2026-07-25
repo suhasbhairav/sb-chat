@@ -1,5 +1,5 @@
 import { json } from "@/lib/chat-request";
-import { requireServerSession } from "@/lib/auth-session";
+import { requireServerPermission } from "@/lib/auth-session";
 import { resolveServerApiKey } from "@/lib/chat-request";
 import { DEFAULT_REALTIME_MODEL, DEFAULT_TRANSCRIPTION_MODEL } from "@/lib/voice-models";
 
@@ -7,7 +7,7 @@ const REALTIME_SESSION_URL = "https://api.openai.com/v1/realtime/client_secrets"
 
 export async function POST(request) {
   try {
-    const { response: authResponse } = await requireServerSession();
+    const { response: authResponse } = await requireServerPermission({ model: ["connect"] });
     if (authResponse) return authResponse;
 
     const payload = await request.json();

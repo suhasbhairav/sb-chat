@@ -1,7 +1,10 @@
-import { BarChart3, BookOpen, ChevronDown, FileText, Menu, PanelLeft, Plus, Settings2, Sparkles, Workflow } from "lucide-react";
+import { BarChart3, BookOpen, Building2, ChevronDown, ClipboardCheck, FileText, Menu, PanelLeft, Plus, Settings2, Sparkles, Workflow } from "lucide-react";
+import { BrandMark } from "@/components/brand/BrandMark";
 import { useI18n } from "@/components/i18n/I18nProvider";
 
 export function TopBar({
+  branding,
+  brandingOrganization,
   model,
   documentChatEnabled,
   sidebarOpen,
@@ -12,17 +15,25 @@ export function TopBar({
   onOpenUsage,
   onOpenDocs,
   onOpenAgents,
+  onOpenAudit,
+  onOpenEnterprise,
   onOpenSkills,
   onToggleTemporaryChat,
   onToggleDocumentChat,
 }) {
   const { t } = useI18n();
+  const brandEnabled = Boolean(branding?.enabled || branding?.logoUrl);
   const documentChatLabel = documentChatEnabled ? t("topbar.documentChatEnabled") : t("topbar.documentChatOff");
   const temporaryChatLabel = temporaryChat ? t("topbar.temporaryEnabled") : t("topbar.enableTemporary");
 
   return (
     <header className="topbar">
       <div className="topbar-left">
+        {brandEnabled && (
+          <div className="topbar-brand-mark" title={branding.productName}>
+            <BrandMark initials={branding.logoInitials} logoUrl={branding.logoUrl} />
+          </div>
+        )}
         <button
           className={`top-icon sidebar-open-button ${sidebarOpen ? "lg-hidden" : ""}`}
           onClick={onOpenSidebar}
@@ -40,6 +51,12 @@ export function TopBar({
             <Plus size={16} />
           </button>
           <span>{t("topbar.setDefault")}</span>
+          {brandEnabled && (
+            <span className="topbar-brand-chip">
+              {branding.productName}
+              {branding.showOrgName && brandingOrganization?.organizationName ? ` · ${brandingOrganization.organizationName}` : ""}
+            </span>
+          )}
         </div>
       </div>
 
@@ -64,6 +81,26 @@ export function TopBar({
           type="button"
         >
           <Workflow size={19} />
+        </button>
+        <button
+          aria-label="Enterprise administration"
+          className="top-icon"
+          data-tooltip="Enterprise administration"
+          onClick={onOpenEnterprise}
+          title="Enterprise administration"
+          type="button"
+        >
+          <Building2 size={19} />
+        </button>
+        <button
+          aria-label="Audit and compliance"
+          className="top-icon"
+          data-tooltip="Audit and compliance"
+          onClick={onOpenAudit}
+          title="Audit and compliance"
+          type="button"
+        >
+          <ClipboardCheck size={19} />
         </button>
         <button
           aria-label={t("topbar.skills")}

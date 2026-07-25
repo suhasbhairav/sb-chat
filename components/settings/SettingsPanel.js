@@ -69,7 +69,6 @@ export function SettingsPanel({
         { id: "gpt-realtime-2.1-mini", name: "gpt-realtime-2.1-mini" },
       ];
   const voiceActive = voiceState === "connected" || voiceState === "connecting";
-
   async function handleExportChatLibrary() {
     try {
       await onExportChatLibrary();

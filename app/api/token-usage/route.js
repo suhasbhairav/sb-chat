@@ -1,9 +1,9 @@
 import { json } from "@/lib/chat-request";
-import { requireServerSession } from "@/lib/auth-session";
+import { requireServerPermission } from "@/lib/auth-session";
 import { readTokenUsageStore, resetTokenUsageStore, summarizeTokenUsage } from "@/lib/token-usage-store";
 
 export async function GET() {
-  const { response } = await requireServerSession();
+  const { response } = await requireServerPermission({ usage: ["read"] });
   if (response) return response;
 
   const store = await readTokenUsageStore();
@@ -14,7 +14,7 @@ export async function GET() {
 }
 
 export async function DELETE() {
-  const { response } = await requireServerSession();
+  const { response } = await requireServerPermission({ usage: ["reset"] });
   if (response) return response;
 
   const store = await resetTokenUsageStore();

@@ -1,5 +1,5 @@
 import { json, resolveServerApiKey } from "@/lib/chat-request";
-import { requireServerSession } from "@/lib/auth-session";
+import { requireServerPermission } from "@/lib/auth-session";
 import { createEmbeddings } from "@/lib/rag-embeddings";
 import { deleteChromaDocument, normalizeChromaCollectionName, normalizeChromaUrl, upsertChromaChunks } from "@/lib/rag-chroma";
 import {
@@ -12,6 +12,7 @@ import {
 } from "@/lib/rag-pinecone";
 import { chunkDocumentText, extractDocumentText } from "@/lib/rag-processing";
 import { getDocumentFilePath, readDocumentStore, summarizeDocuments, writeDocumentStore } from "@/lib/rag-store";
+import { recordAuditEvent } from "@/lib/compliance-store";
 
 export const runtime = "nodejs";
 
@@ -40,7 +41,7 @@ export async function POST(request, { params }) {
   let documentId = "";
 
   try {
-    const { response } = await requireServerSession();
+    const { session, response } = await requireServerPermission({ document: ["update"] });
     if (response) return response;
 
     const { id } = await params;
@@ -155,6 +156,19 @@ export async function POST(request, { params }) {
     };
 
     await writeDocumentStore(nextStore);
+    await recordAuditEvent({
+      category: "document",
+      action: "document.reindex",
+      outcome: "success",
+      actor: session.user,
+      target: { type: "document", id: document.id },
+      metadata: {
+        name: document.name,
+        vectorStoreProvider: resolvedSettings.vectorStoreProvider,
+        embeddingProvider: resolvedSettings.embeddingProvider,
+        chunkCount: indexedChunks.length,
+      },
+    }).catch(() => {});
     return json(summarizeDocuments(nextStore));
   } catch (error) {
     console.error("Document reindex failed", error);

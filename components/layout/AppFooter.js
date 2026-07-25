@@ -5,6 +5,8 @@ export function AppFooter() {
 
   return (
     <footer className="app-footer">
+      <strong>Batuk</strong>
+      <span className="footer-dot" aria-hidden="true" />
       <span>{t("common.createdBy")}</span>
       <a href="https://suhasbhairav.com" rel="noreferrer" target="_blank">
         {t("common.suhas")}

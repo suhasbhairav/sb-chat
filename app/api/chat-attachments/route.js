@@ -3,7 +3,7 @@ import { json } from "@/lib/chat-request";
 import { makeId } from "@/lib/chat-utils";
 import { extractDocumentText } from "@/lib/rag-processing";
 import { saveUploadedDocumentFile } from "@/lib/rag-store";
-import { requireServerSession } from "@/lib/auth-session";
+import { requireServerPermission } from "@/lib/auth-session";
 
 const IMAGE_TYPES = new Set(["image/jpeg", "image/png", "image/gif", "image/webp"]);
 const MAX_FILES = 8;
@@ -56,7 +56,7 @@ async function documentAttachment(file) {
 
 export async function POST(request) {
   try {
-    const { response } = await requireServerSession();
+    const { response } = await requireServerPermission({ document: ["create"] });
     if (response) return response;
 
     const formData = await request.formData();

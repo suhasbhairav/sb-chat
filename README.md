@@ -1,499 +1,189 @@
-<h1 align="center">Batuk - The Sovereign AI Chat</h1>
+<h1 align="center">Batuk</h1>
+
+<p align="center">
+  <strong>Sovereign AI chat for teams: Ollama, OpenAI, OpenRouter, Claude, Grok, Sarvam AI, and private OpenAI-compatible models in one enterprise workspace.</strong>
+</p>
 
 <p align="center">
   Created by <a href="https://suhasbhairav.com"><strong>Suhas Bhairav</strong></a>
 </p>
 
 <p align="center">
-  <img src="public/homepage.png" alt="Batuk homepage" width="100%" />
+  <img src="public/homepage.png" alt="Batuk AI chat workspace" width="100%" />
 </p>
 
 ![Next.js](https://img.shields.io/badge/Next.js-16-black?style=for-the-badge&logo=nextdotjs)
 ![React](https://img.shields.io/badge/React-19-149eca?style=for-the-badge&logo=react&logoColor=white)
-![Better Auth](https://img.shields.io/badge/Better_Auth-Sovereign_Auth-111111?style=for-the-badge)
-![SQLite](https://img.shields.io/badge/SQLite-Local_Sessions-003b57?style=for-the-badge&logo=sqlite&logoColor=white)
 ![Ollama](https://img.shields.io/badge/Ollama-Local_AI-111111?style=for-the-badge)
 ![OpenAI](https://img.shields.io/badge/OpenAI-Compatible-10a37f?style=for-the-badge&logo=openai&logoColor=white)
-![OpenRouter](https://img.shields.io/badge/OpenRouter-Models-7c3aed?style=for-the-badge)
-![Claude](https://img.shields.io/badge/Claude-Anthropic_API-d97757?style=for-the-badge)
-![Grok](https://img.shields.io/badge/Grok-xAI_API-111111?style=for-the-badge)
-![Sarvam AI](https://img.shields.io/badge/Sarvam_AI-Chat_Completions-ff6b35?style=for-the-badge)
-![RAG](https://img.shields.io/badge/RAG-Document_Chat-10a37f?style=for-the-badge)
+![RAG](https://img.shields.io/badge/RAG-JSON_ChromaDB_Pinecone-10a37f?style=for-the-badge)
+![Better Auth](https://img.shields.io/badge/Better_Auth-Enterprise_Identity-111111?style=for-the-badge)
+![Docker](https://img.shields.io/badge/Docker-Air_Gapped_Ready-2496ed?style=for-the-badge&logo=docker&logoColor=white)
 ![License](https://img.shields.io/badge/License-MIT-f59e0b?style=for-the-badge)
 
-**Batuk** is a sovereign, Next.js-native AI chat workspace for local models, hosted model APIs, reusable skills, agent workflows, document chat, voice, web search, authenticated users, protected APIs, and local-first persistence.
+Batuk is a fully open-source enterprise-native AI platform for teams. Its main purpose is simple: give users one polished chat interface for every model they are allowed to run, from local Ollama models to OpenAI and private OpenAI-compatible gateways, with document RAG, enterprise authentication, admin controls, audit evidence, and deployment-friendly storage.
 
-Built by **[Suhas Bhairav](https://suhasbhairav.com)**.
+Batuk is local-first by default and enterprise-ready when you need it. Run it on a laptop with JSON files and SQLite, or deploy it in a client environment with Docker, PostgreSQL/MySQL product data, Better Auth enterprise identity, ChromaDB, and private file storage.
 
----
+## Why Batuk
 
-## What It Is
+- **Chat with any model:** Ollama, OpenAI, OpenRouter, Claude, Grok, Sarvam AI, and custom OpenAI-compatible servers such as LM Studio, vLLM, llama.cpp, LiteLLM, or internal gateways.
+- **Bring your documents:** upload, search, reindex, download, and delete documents with RAG over PDF, TXT, Markdown, JSON, LOG, CSV, XLS, XLSX, and DOCX.
+- **Choose your vector store:** local JSON vectors by default, ChromaDB for self-hosted vector search, or Pinecone for managed vector search.
+- **Built for teams:** Better Auth users, admins, roles, organizations, teams, invitations, SSO, OAuth/OIDC provider support, and SCIM provisioning.
+- **Enterprise operations:** GDPR request workflows, audit trail, CSV evidence export, ISO 27001/SOC 2 control register, token usage, and organization-scoped storage.
+- **Whitelabel by organization:** admins can set product name, tagline, accent color, initials, and uploaded logo while the footer always preserves Batuk attribution.
 
-Batuk is a polished alternative to Open WebUI built as a straightforward JavaScript Next.js app. It is designed for people who want control over their AI stack: local Ollama models, bring-your-own API keys, OpenAI-compatible servers, local JSON data files, local SQLite auth sessions, and no mandatory hosted identity provider.
+## Core Features
 
-The product goal is **sovereign AI**: the app can run privately on your machine or server while still supporting OpenAI, Claude, Grok, Sarvam AI, OpenRouter, Ollama, and custom OpenAI-compatible endpoints.
+### Multi-Model Chat
 
----
-
-## Current Capabilities
-
-### Sovereign Authentication
-
-- Better Auth email/password authentication
-- Local SQLite auth database at `data/sb-chat-auth.sqlite`
-- Uses Node's built-in `node:sqlite` driver, avoiding native `better-sqlite3` rebuild issues
-- Local sessions with HTTP-only cookies
-- Sign in, create account, and sign out UI
-- Default sign-up name set to Suhas Bhairav
-- Protected app APIs for chat, library, models, documents, token usage, and realtime sessions
-- Auth database ignored by git
-- Migration script: `npm run auth:migrate`
-
-### Chat Experience
-
-- ChatGPT-style dark/light interface
-- SB-branded circular chat icon
-- Streaming assistant responses
-- Markdown rendering through `react-markdown` and `remark-gfm`
-- Vertical scrolling for chat history and composer input
-- Temporary chat mode with visible banner and no history persistence
-- Copy assistant messages
-- Import/export individual chats and the full chat library
-- Workspaces and folders
-- Move chats between folders
-- Search across saved chats and message content
-- Enabled Skills are injected into chat requests as reusable instructions when relevant
-
-### Providers
-
-- [Ollama](https://ollama.com) via `http://localhost:11434`
-- [OpenAI](https://platform.openai.com/docs) Chat Completions
-- [OpenAI Web Search](https://platform.openai.com/docs/guides/tools-web-search) through the Responses tools flow
-- [OpenAI Realtime](https://platform.openai.com/docs/guides/realtime) voice sessions
-- [OpenRouter](https://openrouter.ai/models) chat completions
-- [Claude](https://docs.anthropic.com) through Anthropic Messages API
-- [Grok](https://docs.x.ai) through xAI API
-- [Sarvam AI](https://docs.sarvam.ai/api-reference/chat/chat-completions) chat completions
-- Custom OpenAI-compatible endpoints such as [LM Studio](https://lmstudio.ai), [vLLM](https://docs.vllm.ai), [llama.cpp](https://github.com/ggml-org/llama.cpp), and [LiteLLM](https://docs.litellm.ai)
-- Server-side `.env` API key fallback
-- Runtime API key entry in Settings
-
-### Model Selection
-
-- Provider-specific model picker
-- OpenAI model catalog support
-- OpenRouter model catalog support
-- Ollama local model discovery from `/api/tags`
-- Claude, Grok, and Sarvam catalog fallbacks
-- Manual model entry for custom endpoints
-- Compatibility handling for models such as `gpt-5-nano` that require default temperature
-
-### Voice Chat
-
-- OpenAI Realtime over WebRTC
-- Server-created ephemeral realtime client secret
-- Automatic realtime model resolution
-- Browser microphone streaming
-- Spoken assistant replies
-- User transcript inserted into chat
-
-### Web Search
-
-- Web Search toggle inside the chat composer plus menu
-- OpenAI-only hosted search flow
-- Search stays below the composer control and uses an opaque dropdown surface
-- Streaming answer integration with normal chat messages
-
-### Guardrails
-
-- Comprehensive guardrails switch
-- Server-side request screening
-- Safer system behavior toggle
-- Detection for prompt extraction, secret exposure, and high-risk cyber requests
-- Raw model mode remains available when guardrails are disabled
+- Streaming responses with Markdown rendering.
+- Provider-specific model picker and manual model entry.
+- Runtime Settings for local evaluation and server-side configuration for deployments.
+- Temporary chat mode that avoids history persistence.
+- Workspaces, folders, search, import, export, and copy actions.
+- Web search through OpenAI hosted search when enabled.
+- OpenAI Realtime voice sessions with browser microphone input.
+- Guardrails for safer request screening and system behavior.
 
 ### Document Chat and RAG
 
-- Documents page for upload, list, search, download, delete, and reindex
-- Uploads: PDF, TXT, Markdown, JSON, LOG, CSV, XLS, XLSX, DOCX
-- Local hashed embeddings for private/offline indexing
-- OpenAI embeddings with `text-embedding-3-small`
-- Local JSON vector storage by default
-- Optional ChromaDB vector storage with configurable URL and collection
-- Optional Pinecone vector storage with configurable index, namespace, cloud, and region
-- Configurable chunk size, overlap, and Top K
-- `Enable Document Chat` top-bar toggle
-- Document-grounded system prompt that refuses unsupported answers
-- Source labels appended to answers
+- Upload documents from the Documents workspace.
+- Extract text, chunk content, embed chunks, and retrieve relevant context during chat.
+- Use local deterministic embeddings for offline/private indexing or OpenAI embeddings for higher-quality semantic search.
+- Store vectors in local JSON, ChromaDB, or Pinecone.
+- Download always returns the original uploaded file.
+- Delete removes local metadata, source files, chunk records, and remote vectors when ChromaDB or Pinecone is used.
+- Pinecone index dimension handling supports both local 384-dimensional embeddings and 1536-dimensional OpenAI embeddings.
 
-### Agent Builder
+### Enterprise Identity
 
-- Dedicated Agent Builder screen opened from the top bar
-- Workflow library with saved workflow cards and name search
-- Create, update, save, and delete multi-agent workflows
-- Add draft agents or insert reusable saved agents into a workflow
-- Search saved agents by name before inserting them into a workflow
-- Sequential agent execution where each agent receives the previous agent output
-- Uses the same provider, model, API key, temperature, and guardrail settings as chat
-- Agent 1 can receive attached documents; files are extracted and included in its context
-- Right-side flow visualizer and scrollable run trace
-- Final workflow output is sent back into the chat window
-- Local JSON persistence for agent and workflow definitions
+- Better Auth email/password authentication.
+- Admin plugin for users, roles, bans, password resets, and admin APIs.
+- Organization plugin for organizations, teams, members, invitations, and organization roles.
+- Dashboard plugin support for Better Auth infrastructure visibility.
+- OAuth 2.1/OIDC provider support with consent page.
+- SSO plugin for enterprise OIDC/SAML sign-in.
+- SCIM plugin for identity-provider provisioning.
+- Protected product APIs for chat, documents, skills, agents, usage, memory, models, attachments, realtime sessions, and workflows.
 
-### Skills
+### Administration
 
-- Dedicated Skills dashboard opened from the top bar
-- Create, update, delete, enable, and disable reusable skills
-- Search skills by name
-- Import and export the full skills library as JSON
-- Skill fields: name, description, instructions, examples, supporting resources, enabled state, timestamps
-- Enabled skills are injected into `/api/chat` as system prompt context
-- Skills are used silently when relevant to the user's request
-- Local JSON persistence at `data/skill-store.json`
+- First-owner bootstrap when no owner/admin exists.
+- Full admin user CRUD: create, view, update, reset password, ban, unban, and delete users.
+- Organization creation and active organization switching.
+- Team creation, member invitations, and role management.
+- Enterprise whitelabel controls with logo upload and locked footer attribution.
 
-### Token Usage
+### Audit and Compliance
 
-- JSON usage ledger at `data/token-usage.json`
-- Input tokens
-- Output tokens
-- Total tokens
-- Requests by provider, model, and day
-- Recent usage events
-- Temporary chat usage is tracked even when chat history is not saved
+- Dedicated Audit workspace.
+- Audit trail for access denials, admin actions, document operations, chat library mutations, privacy requests, and control changes.
+- Hash-chain integrity evidence for audit events.
+- GDPR export/request/erasure workflows.
+- Data inventory and retention notes.
+- ISO 27001 and SOC 2 control evidence register.
+- CSV export for audit review.
 
-### Internationalization
+### Skills and Agents
 
-Batuk intentionally exposes only languages with complete curated UI coverage:
+- Skills dashboard for reusable instructions, examples, and supporting resources.
+- Enable/disable skills and inject enabled skills into relevant chat requests.
+- Agent Builder for saved multi-agent workflows.
+- Attach documents to Agent 1, run agents sequentially, inspect the run trace, and send final output back to chat.
 
-- English
-- German
-- Spanish
-- Simplified Chinese
-- Hindi
-- Kannada
+## Supported Providers
 
-Locale preference is stored in browser settings. User-generated data, model output, chat titles, folder names, and document names are intentionally not translated.
-
----
-
-## Tech Stack
-
-| Layer | Technology |
+| Provider | Use Case |
 | --- | --- |
-| Framework | Next.js 16 App Router |
-| UI | React 19 |
-| Styling | Tailwind CSS 4 + custom product CSS tokens |
-| Icons | Lucide React |
-| Auth | Better Auth |
-| Auth DB | Local SQLite through Node `node:sqlite` |
-| Chat Storage | Local JSON files |
-| Markdown | `react-markdown` + `remark-gfm` |
-| Documents | `mammoth`, `xlsx`, local file processing |
-| Vector DB | Local JSON vectors, optional ChromaDB through `chromadb`, optional Pinecone through `@pinecone-database/pinecone` |
-| Skills | Local JSON skill store + prompt injection |
-| Voice | OpenAI Realtime WebRTC |
-| Providers | Ollama, OpenAI, Claude, Grok, Sarvam AI, OpenRouter, OpenAI-compatible APIs |
+| Ollama | Local models and private offline inference |
+| OpenAI | Chat, hosted web search, embeddings, and realtime voice |
+| OpenRouter | Routed access to multiple model families |
+| Claude | Anthropic Messages API |
+| Grok | xAI models |
+| Sarvam AI | Indian-language optimized chat models |
+| Custom compatible | LM Studio, vLLM, llama.cpp, LiteLLM, or enterprise gateways |
 
----
+## Storage Options
 
-## Getting Started
+| Layer | Default | Enterprise Options |
+| --- | --- | --- |
+| Auth | SQLite | SQLite, MySQL, PostgreSQL, MS SQL, MongoDB |
+| Product data | Local JSON | SQLite, MySQL, PostgreSQL |
+| Documents | Local file storage | Configurable local/container path |
+| Branding logos | `public/branding` | Configurable local/container path |
+| Vectors | Local JSON | ChromaDB, Pinecone |
 
-### 1. Install dependencies
+Product data includes chats, workspaces, folders, documents metadata/chunks, memories, skills, agents, workflows, token usage, branding, compliance records, GDPR requests, and audit trails. SQL mode scopes data by active organization and user; if there is no organization, data falls back to the user scope.
+
+## Quick Start
 
 ```bash
 npm install
-```
-
-Batuk uses the `chromadb` TypeScript client for optional ChromaDB vector storage and `@pinecone-database/pinecone` for optional Pinecone vector storage. Do not install `@chroma-core/default-embed`; Batuk creates embeddings itself and sends precomputed vectors to Chroma or Pinecone. The default embed package currently breaks Next.js/Turbopack builds in this app.
-
-### 2. Configure environment variables
-
-Create `.env` in the project root:
-
-```bash
-BETTER_AUTH_SECRET=replace_with_a_long_random_secret
-BETTER_AUTH_URL=http://localhost:3000
-BETTER_AUTH_DB_PATH=data/sb-chat-auth.sqlite
-
-OPENAI_API_KEY=your_openai_api_key
-OPENROUTER_API_KEY=your_openrouter_api_key
-ANTHROPIC_API_KEY=your_anthropic_api_key
-XAI_API_KEY=your_xai_api_key
-PINECONE_API_KEY=your_pinecone_api_key
-PINECONE_INDEX=sb-chat-documents
-PINECONE_NAMESPACE=documents
-PINECONE_CLOUD=aws
-PINECONE_REGION=us-east-1
-SARVAM_API_KEY=your_sarvam_api_key
-```
-
-Notes:
-
-- `BETTER_AUTH_SECRET` is required for production-quality sessions.
-- `BETTER_AUTH_URL` should match the public URL of your deployment.
-- `BETTER_AUTH_DB_PATH` defaults to `data/sb-chat-auth.sqlite`.
-- Provider API keys can also be entered at runtime inside Settings.
-- Server-side `.env` values are used when the Settings key field is empty.
-- Restart Next.js after editing `.env`.
-
-### 3. Create or update auth tables
-
-```bash
-npm run auth:migrate
-```
-
-This creates the Better Auth tables:
-
-```text
-user
-session
-account
-verification
-```
-
-### 4. Run the app
-
-```bash
 npm run dev
 ```
 
-Open:
+Open `http://localhost:3000`, create an account, choose a provider/model in Settings, and start chatting.
 
-```text
-http://localhost:3000
-```
-
-Create a local account, then configure your provider/model settings.
-
----
-
-## Provider Notes
-
-### Ollama
-
-[Ollama](https://ollama.com) runs local models on your machine.
+For local Ollama usage, run Ollama separately and select the Ollama provider in Batuk.
 
 ```bash
 ollama pull llama3.1
 ollama serve
 ```
 
-Settings:
+## Docker Deployment
 
-- Provider: `Ollama`
-- Base URL: `http://localhost:11434`
-- Model: any installed Ollama model
-
-### OpenAI
-
-[OpenAI Platform](https://platform.openai.com/docs) powers chat, hosted [web search](https://platform.openai.com/docs/guides/tools-web-search), [embeddings](https://platform.openai.com/docs/guides/embeddings), and [realtime voice](https://platform.openai.com/docs/guides/realtime). You can review model availability and costs on the [OpenAI pricing page](https://platform.openai.com/docs/pricing).
-
-```bash
-OPENAI_API_KEY=...
-```
-
-Batuk automatically avoids sending unsupported temperature values to models that only allow the default.
-
-### OpenRouter
-
-[OpenRouter](https://openrouter.ai) provides routed access to many model families. Batuk can use the [OpenRouter model directory](https://openrouter.ai/models) and OpenAI-compatible chat API.
-
-```bash
-OPENROUTER_API_KEY=...
-```
-
-Use the OpenAI-compatible API shape with your OpenRouter key.
-
-### Claude
-
-[Claude](https://www.anthropic.com/claude) is available through the [Anthropic API docs](https://docs.anthropic.com) and Messages API.
-
-```bash
-ANTHROPIC_API_KEY=...
-```
-
-Streaming and provider usage are supported when available.
-
-### Grok
-
-[Grok](https://x.ai) is available through the [xAI API docs](https://docs.x.ai).
-
-```bash
-XAI_API_KEY=...
-```
-
-Streaming responses are supported.
-
-### Sarvam AI
-
-[Sarvam AI](https://www.sarvam.ai) is supported through its [chat completions API](https://docs.sarvam.ai/api-reference/chat/chat-completions).
-
-```bash
-SARVAM_API_KEY=...
-```
-
-Sarvam AI is included as a first-class provider.
-
-### Custom OpenAI-Compatible Servers
-
-Examples:
-
-- [LM Studio](https://lmstudio.ai)
-- [vLLM](https://docs.vllm.ai)
-- [llama.cpp server](https://github.com/ggml-org/llama.cpp)
-- [LiteLLM](https://docs.litellm.ai)
-- OpenAI-compatible internal gateways
-
-Set the provider to custom/OpenAI-compatible, enter your base URL, and use the model ID expected by that server.
-
----
-
-## Document Chat
-
-Open the Documents icon in the top bar to manage the RAG library.
-
-Supported uploads:
-
-- PDF
-- TXT, Markdown, JSON, LOG
-- CSV
-- XLS, XLSX
-- DOCX
-
-PDF extraction uses local tooling. On macOS, install Poppler if PDF extraction needs it:
-
-```bash
-brew install poppler
-```
-
-Embedding modes:
-
-- `Local embeddings`: deterministic local hashed vectors, no API key required.
-- `OpenAI embeddings`: uses `text-embedding-3-small`.
-
-Vector storage modes:
-
-- `Local JSON vectors`: stores chunk vectors in `data/document-store.json`. This is the default and needs no extra service.
-- `ChromaDB`: stores chunk vectors in a running Chroma server while Batuk keeps document metadata locally.
-- `Pinecone`: stores chunk vectors in Pinecone while Batuk keeps document metadata and uploaded originals locally.
-
-To use ChromaDB locally, start Chroma before uploading or reindexing documents:
-
-```bash
-npx chroma run --path ./data/chroma
-```
-
-If you use Yarn:
-
-```bash
-yarn chroma run --path ./data/chroma
-```
-
-Then open **Documents -> Vector storage** and set:
+Batuk includes Docker assets for enterprise and air-gapped environments:
 
 ```text
-Vector store: ChromaDB
-Chroma URL: http://localhost:8000
-Chroma collection: sb_chat_documents
+Dockerfile
+docker-compose.yml
+.env.enterprise.example
+database/sqlite/001_enterprise_data.sql
+database/postgresql/001_enterprise_data.sql
+database/mysql/001_enterprise_data.sql
 ```
 
-Install only the Chroma client package:
+Create a runtime env file from the checked-in example, choose one database/vector profile, then start Compose.
 
 ```bash
-npm install chromadb
+cp .env.enterprise.example .env.enterprise
+docker compose up --build
 ```
 
-Do not run:
+PostgreSQL, MySQL, and ChromaDB are available behind Compose profiles so operators can enable one stack at a time:
 
 ```bash
-npm install @chroma-core/default-embed
+docker compose --profile postgres up --build
+docker compose --profile mysql up --build
+docker compose --profile postgres --profile chroma up --build
 ```
 
-or:
+Container startup validates the enterprise environment, runs Better Auth migrations when applicable, runs product-data migrations when SQL product storage is enabled, and starts the Next.js server.
+
+For fully offline installs, mirror the base images and service images used by `docker-compose.yml` into the enterprise registry. Pinecone support is included, but Pinecone itself requires approved network/private-connectivity access.
+
+## Configuration
+
+Batuk can be configured from the UI for local evaluation and from environment files for repeatable enterprise deployment. The focused README intentionally avoids long credential blocks; use these files as the source of truth:
+
+- `.env.enterprise.example` for deployment settings, identity integrations, SQL stores, vector stores, file paths, and startup behavior.
+- `docker-compose.yml` for profile-based PostgreSQL, MySQL, and ChromaDB deployment.
+- `database/*/001_enterprise_data.sql` for product data schema initialization.
+
+After changing auth database settings, run:
 
 ```bash
-yarn add @chroma-core/default-embed
+npm run auth:migrate
 ```
 
-Batuk already computes embeddings through its configured embedding mode and queries Chroma with precomputed vectors.
-
-To use Pinecone, add a Pinecone API key in `.env` or in the Documents panel:
+After changing product data SQL settings, run:
 
 ```bash
-PINECONE_API_KEY=your_pinecone_api_key
-PINECONE_INDEX=sb-chat-documents
-PINECONE_NAMESPACE=documents
-PINECONE_CLOUD=aws
-PINECONE_REGION=us-east-1
+npm run data:migrate
 ```
-
-Then open **Documents -> Vector storage** and set:
-
-```text
-Vector store: Pinecone
-Pinecone index: sb-chat-documents
-Pinecone namespace: documents
-Cloud: aws
-Region: us-east-1
-```
-
-Batuk creates the Pinecone index automatically if it does not exist. Pinecone indexes are dimension-specific, so local embeddings use `384` dimensions and OpenAI `text-embedding-3-small` uses `1536` dimensions. If the selected Pinecone index already exists with a different dimension, Batuk automatically creates and stores a sibling index such as `sb-chat-documents-1536d` for the new embedding dimension.
-
-The Documents page keeps the same management behavior for every vector store:
-
-- Upload creates local document metadata, extracts text, chunks content, embeds chunks, and stores vectors.
-- Reindex rebuilds vectors using the current embedding and vector store settings.
-- Delete removes the local uploaded file, local metadata, local chunk records, and remote vectors when applicable.
-- Download serves the original uploaded file from local storage, regardless of whether vectors live in JSON, ChromaDB, or Pinecone.
-
-When Document Chat is enabled, Batuk retrieves relevant chunks, injects them into the model request, and instructs the model to answer only from retrieved context.
-
----
-
-## Skills
-
-Open the Skills icon in the top bar to manage reusable chat behaviors.
-
-Each skill contains:
-
-- Name
-- Description
-- Instructions
-- Examples
-- Supporting resources
-- Enabled/disabled state
-
-Enabled skills are loaded from `data/skill-store.json`, formatted as reusable workflows, and prepended to chat requests as system context. The model is instructed to use one or more enabled skills silently when they are relevant.
-
-Use cases:
-
-- Enforce short story or poem formats
-- Keep code reviews consistent
-- Apply house writing style
-- Reuse response checklists
-- Add lightweight domain-specific operating rules
-
-Skills can be imported and exported as JSON from the dashboard.
-
----
-
-## Data and Privacy
-
-Batuk uses local files by default:
-
-```text
-data/chat-store.json
-data/document-store.json
-data/agent-store.json
-data/skill-store.json
-data/memory-store.json
-data/token-usage.json
-data/sb-chat-auth.sqlite
-```
-
-The auth SQLite file, memory store, skills store, and agent workflow store are ignored by git. The API key typed into Settings lives in React state and is not persisted to local storage. Temporary chats are not written to `data/chat-store.json`.
-
----
 
 ## Scripts
 
@@ -502,34 +192,36 @@ npm run dev           # Start local development
 npm run build         # Build production app
 npm run start         # Start production server
 npm run lint          # Run ESLint
-npm run auth:migrate  # Create/update Better Auth SQLite schema
+npm run env:validate  # Validate enterprise environment
+npm run auth:migrate  # Create/update Better Auth schema
+npm run data:migrate  # Create/update Batuk product data schema
 ```
 
----
+## Project Shape
+
+```text
+app/                  Next.js app routes and API endpoints
+components/           Chat, docs, enterprise, audit, settings, skills, agents
+hooks/                Chat controller and UI state orchestration
+lib/                  Providers, auth, RAG, storage, compliance, branding
+database/             SQLite, PostgreSQL, and MySQL product data schemas
+scripts/              Migration and Docker startup helpers
+data/                 Local runtime data in development
+public/branding/      Uploaded organization logos
+```
 
 ## Production Notes
 
-Before exposing Batuk outside a trusted local network:
-
-- Rotate any API key that has ever been logged or committed
-- Set a strong `BETTER_AUTH_SECRET`
-- Set `BETTER_AUTH_URL` to the deployed origin
-- Add HTTPS
-- Add rate limits
-- Consider per-user chat/document/token stores
-- Encrypt provider API keys if you decide to persist them
-- Add audit logs for auth, guardrails, imports, exports, and document actions
-- Consider Postgres or another durable database for multi-user deployments
-
----
+- Set a strong auth secret and deployment URL.
+- Use HTTPS and network-level access controls.
+- Choose durable SQL storage for multi-user production environments.
+- Back up document storage, branding assets, SQL databases, and audit records.
+- Keep provider credentials in the deployment environment or a managed secret store.
+- Treat GDPR, ISO 27001, and SOC 2 features as product evidence workflows; certification still requires organizational policy, operational controls, and auditor review.
 
 ## Creator
 
 Built by **[Suhas Bhairav](https://suhasbhairav.com)**.
-
-Part of the broader AI tooling work by Suhas Bhairav.
-
----
 
 ## License
 
