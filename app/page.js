@@ -15,6 +15,7 @@ import { Sidebar } from "@/components/layout/Sidebar";
 import { TopBar } from "@/components/layout/TopBar";
 import { SettingsPanel } from "@/components/settings/SettingsPanel";
 import { SkillsDashboard } from "@/components/skills/SkillsDashboard";
+import { McpDashboard } from "@/components/mcp/McpDashboard";
 import { TokenUsagePanel } from "@/components/usage/TokenUsagePanel";
 import { useChatController } from "@/hooks/useChatController";
 
@@ -102,7 +103,10 @@ function HomeShell({ chat }) {
         <TopBar
           branding={chat.branding}
           brandingOrganization={chat.brandingOrganization}
+          activeMcpIntegration={chat.activeMcpIntegration}
+          activeMcpIntegrationId={chat.activeMcpIntegrationId}
           documentChatEnabled={chat.documentChatEnabled}
+          mcpIntegrations={chat.mcpIntegrations}
           model={chat.model}
           sidebarOpen={chat.sidebarOpen}
           temporaryChat={chat.temporaryChat}
@@ -110,6 +114,7 @@ function HomeShell({ chat }) {
           onOpenAgents={() => {
             chat.setAuditOpen(false);
             chat.setSkillsOpen(false);
+            chat.setMcpOpen(false);
             chat.setEnterpriseOpen(false);
             chat.setAgentBuilderOpen(true);
           }}
@@ -117,12 +122,14 @@ function HomeShell({ chat }) {
             chat.setAgentBuilderOpen(false);
             chat.setEnterpriseOpen(false);
             chat.setSkillsOpen(false);
+            chat.setMcpOpen(false);
             chat.setAuditOpen(true);
           }}
           onOpenEnterprise={() => {
             chat.setAuditOpen(false);
             chat.setAgentBuilderOpen(false);
             chat.setSkillsOpen(false);
+            chat.setMcpOpen(false);
             chat.refreshBranding().catch(() => {});
             chat.setEnterpriseOpen(true);
           }}
@@ -130,8 +137,18 @@ function HomeShell({ chat }) {
             chat.setAuditOpen(false);
             chat.setAgentBuilderOpen(false);
             chat.setEnterpriseOpen(false);
+            chat.setMcpOpen(false);
             chat.setSkillsOpen(true);
           }}
+          onOpenMcp={() => {
+            chat.setAuditOpen(false);
+            chat.setAgentBuilderOpen(false);
+            chat.setEnterpriseOpen(false);
+            chat.setSkillsOpen(false);
+            chat.refreshMcp().catch(() => {});
+            chat.setMcpOpen(true);
+          }}
+          onSelectMcp={chat.setActiveMcp}
           onOpenDocs={() => chat.setDocsOpen(true)}
           onOpenSettings={async () => {
             await chat.refreshBranding().catch(() => {});
@@ -155,6 +172,17 @@ function HomeShell({ chat }) {
             onUploadBrandingLogo={chat.uploadBrandingLogo}
             onRemoveBrandingLogo={chat.removeBrandingLogo}
           />
+        ) : chat.mcpOpen ? (
+          <McpDashboard
+            activeIntegrationId={chat.activeMcpIntegrationId}
+            catalog={chat.mcpCatalog}
+            integrations={chat.mcpIntegrations}
+            onClose={() => chat.setMcpOpen(false)}
+            onDiscover={chat.discoverMcp}
+            onDelete={chat.deleteMcp}
+            onSave={chat.saveMcpIntegration}
+            onSelectActive={chat.setActiveMcp}
+          />
         ) : chat.skillsOpen ? (
           <SkillsDashboard onClose={() => chat.setSkillsOpen(false)} />
         ) : chat.agentBuilderOpen ? (
@@ -173,6 +201,16 @@ function HomeShell({ chat }) {
             {chat.documentChatEnabled && (
               <div className="document-chat-banner">
                 {t("banners.documentChat")}
+              </div>
+            )}
+
+            {chat.activeMcpIntegration && (
+              <div className="mcp-chat-banner">
+                <span>
+                  <strong>MCP connected:</strong> {chat.activeMcpIntegration.name}
+                  {chat.activeMcpIntegration.status === "connected" ? ` · ${chat.activeMcpIntegration.discovery?.tools?.length || 0} tools discovered` : ""}
+                </span>
+                <button onClick={() => chat.setActiveMcp("")} type="button">Disconnect</button>
               </div>
             )}
 

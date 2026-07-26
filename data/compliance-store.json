@@ -183,6 +183,214 @@
   ],
   "auditEvents": [
     {
+      "id": "audit-1785073389206-5804607ebc871a7f",
+      "createdAt": "2026-07-26T13:43:09.206Z",
+      "category": "data",
+      "action": "chat.upsert",
+      "outcome": "success",
+      "actor": {
+        "id": "3c4816f5-3e7e-4d26-a6ce-e827cc3c856e",
+        "emailHash": "f660ab912ec121d1b1e928a0bb4bc61b15f5ad44d5efdc4e1c92a25e99b8e44a",
+        "role": "owner"
+      },
+      "target": {
+        "type": "chat",
+        "id": "1785072898001-53360833726f8"
+      },
+      "ipHash": null,
+      "userAgent": null,
+      "metadata": {
+        "workspaceId": "workspace-1784806210171-81024ae3ddf17",
+        "folderId": null,
+        "provider": "ollama",
+        "model": "qwen3:8b"
+      },
+      "previousHash": "5f6543cad73541a76e3dc5a472d75f72c2f3e191218be3704a687b5c79f5fcde",
+      "integrityHash": "52c25f7a30f63a79ab498a3bea1b155df8f5c090e49794d81e6e39dbc3e9192d"
+    },
+    {
+      "id": "audit-1785073370585-7392f7d42f3f8ea2",
+      "createdAt": "2026-07-26T13:42:50.585Z",
+      "category": "data",
+      "action": "chat.upsert",
+      "outcome": "success",
+      "actor": {
+        "id": "3c4816f5-3e7e-4d26-a6ce-e827cc3c856e",
+        "emailHash": "f660ab912ec121d1b1e928a0bb4bc61b15f5ad44d5efdc4e1c92a25e99b8e44a",
+        "role": "owner"
+      },
+      "target": {
+        "type": "chat",
+        "id": "1785072898001-53360833726f8"
+      },
+      "ipHash": null,
+      "userAgent": null,
+      "metadata": {
+        "workspaceId": "workspace-1784806210171-81024ae3ddf17",
+        "folderId": null,
+        "provider": "ollama",
+        "model": "qwen3:8b"
+      },
+      "previousHash": "7024e319122ba4dc37f59ca2651589f028b28e1027282a1df1515eb5eb9e5304",
+      "integrityHash": "5f6543cad73541a76e3dc5a472d75f72c2f3e191218be3704a687b5c79f5fcde"
+    },
+    {
+      "id": "audit-1785073369669-02753fb4ca20e55e",
+      "createdAt": "2026-07-26T13:42:49.669Z",
+      "category": "data",
+      "action": "chat.upsert",
+      "outcome": "success",
+      "actor": {
+        "id": "3c4816f5-3e7e-4d26-a6ce-e827cc3c856e",
+        "emailHash": "f660ab912ec121d1b1e928a0bb4bc61b15f5ad44d5efdc4e1c92a25e99b8e44a",
+        "role": "owner"
+      },
+      "target": {
+        "type": "chat",
+        "id": "1785072898001-53360833726f8"
+      },
+      "ipHash": null,
+      "userAgent": null,
+      "metadata": {
+        "workspaceId": "workspace-1784806210171-81024ae3ddf17",
+        "folderId": null,
+        "provider": "ollama",
+        "model": "qwen3:8b"
+      },
+      "previousHash": "f8dfdd2d880e0b601a92c08343af4a3cd0e4a9394b8c80b8239f027e5244be6e",
+      "integrityHash": "7024e319122ba4dc37f59ca2651589f028b28e1027282a1df1515eb5eb9e5304"
+    },
+    {
+      "id": "audit-1785072910749-f88415e16c1f2509",
+      "createdAt": "2026-07-26T13:35:10.749Z",
+      "category": "data",
+      "action": "chat.upsert",
+      "outcome": "success",
+      "actor": {
+        "id": "3c4816f5-3e7e-4d26-a6ce-e827cc3c856e",
+        "emailHash": "f660ab912ec121d1b1e928a0bb4bc61b15f5ad44d5efdc4e1c92a25e99b8e44a",
+        "role": "owner"
+      },
+      "target": {
+        "type": "chat",
+        "id": "1785072898001-53360833726f8"
+      },
+      "ipHash": null,
+      "userAgent": null,
+      "metadata": {
+        "workspaceId": "workspace-1784806210171-81024ae3ddf17",
+        "folderId": null,
+        "provider": "ollama",
+        "model": "qwen3:8b"
+      },
+      "previousHash": "b98de7fc6ac2f3e2a69bf318ccef089775ac04b06e5b3346c6e7d1a8f9b232f2",
+      "integrityHash": "f8dfdd2d880e0b601a92c08343af4a3cd0e4a9394b8c80b8239f027e5244be6e"
+    },
+    {
+      "id": "audit-1785071101689-3d8d562e0e012328",
+      "createdAt": "2026-07-26T13:05:01.689Z",
+      "category": "data",
+      "action": "chat.upsert",
+      "outcome": "success",
+      "actor": {
+        "id": "3c4816f5-3e7e-4d26-a6ce-e827cc3c856e",
+        "emailHash": "f660ab912ec121d1b1e928a0bb4bc61b15f5ad44d5efdc4e1c92a25e99b8e44a",
+        "role": "owner"
+      },
+      "target": {
+        "type": "chat",
+        "id": "1785070467392-c07cca1f05ecf8"
+      },
+      "ipHash": null,
+      "userAgent": null,
+      "metadata": {
+        "workspaceId": "workspace-1784806210171-81024ae3ddf17",
+        "folderId": null,
+        "provider": "openrouter",
+        "model": "google/gemma-3n-e4b-it"
+      },
+      "previousHash": "d11a68bd5d1bbbc6443a476279f66dcbcf884b2bf025bdebead29d653e1c9cdb",
+      "integrityHash": "b98de7fc6ac2f3e2a69bf318ccef089775ac04b06e5b3346c6e7d1a8f9b232f2"
+    },
+    {
+      "id": "audit-1785071090581-9408a6210425916e",
+      "createdAt": "2026-07-26T13:04:50.581Z",
+      "category": "data",
+      "action": "chat.upsert",
+      "outcome": "success",
+      "actor": {
+        "id": "3c4816f5-3e7e-4d26-a6ce-e827cc3c856e",
+        "emailHash": "f660ab912ec121d1b1e928a0bb4bc61b15f5ad44d5efdc4e1c92a25e99b8e44a",
+        "role": "owner"
+      },
+      "target": {
+        "type": "chat",
+        "id": "1785070467392-c07cca1f05ecf8"
+      },
+      "ipHash": null,
+      "userAgent": null,
+      "metadata": {
+        "workspaceId": "workspace-1784806210171-81024ae3ddf17",
+        "folderId": null,
+        "provider": "openrouter",
+        "model": "google/gemma-3n-e4b-it"
+      },
+      "previousHash": "d1a1b5e17eb2d3621022f9564955d364e83a09cc363acdf9338f493335bed321",
+      "integrityHash": "d11a68bd5d1bbbc6443a476279f66dcbcf884b2bf025bdebead29d653e1c9cdb"
+    },
+    {
+      "id": "audit-1785071067115-c018e7770d02325c",
+      "createdAt": "2026-07-26T13:04:27.115Z",
+      "category": "data",
+      "action": "chat.upsert",
+      "outcome": "success",
+      "actor": {
+        "id": "3c4816f5-3e7e-4d26-a6ce-e827cc3c856e",
+        "emailHash": "f660ab912ec121d1b1e928a0bb4bc61b15f5ad44d5efdc4e1c92a25e99b8e44a",
+        "role": "owner"
+      },
+      "target": {
+        "type": "chat",
+        "id": "1785070467392-c07cca1f05ecf8"
+      },
+      "ipHash": null,
+      "userAgent": null,
+      "metadata": {
+        "workspaceId": "workspace-1784806210171-81024ae3ddf17",
+        "folderId": null,
+        "provider": "openrouter",
+        "model": "google/gemma-3n-e4b-it"
+      },
+      "previousHash": "9207e582f678dbbd02c1f2e9a2459685e5bc683aecf38f731112b2f9885f125f",
+      "integrityHash": "d1a1b5e17eb2d3621022f9564955d364e83a09cc363acdf9338f493335bed321"
+    },
+    {
+      "id": "audit-1785070476234-c6c8fc225674e5d5",
+      "createdAt": "2026-07-26T12:54:36.234Z",
+      "category": "data",
+      "action": "chat.upsert",
+      "outcome": "success",
+      "actor": {
+        "id": "3c4816f5-3e7e-4d26-a6ce-e827cc3c856e",
+        "emailHash": "f660ab912ec121d1b1e928a0bb4bc61b15f5ad44d5efdc4e1c92a25e99b8e44a",
+        "role": "owner"
+      },
+      "target": {
+        "type": "chat",
+        "id": "1785070467392-c07cca1f05ecf8"
+      },
+      "ipHash": null,
+      "userAgent": null,
+      "metadata": {
+        "workspaceId": "workspace-1784806210171-81024ae3ddf17",
+        "folderId": null,
+        "provider": "openrouter",
+        "model": "google/gemma-3n-e4b-it"
+      },
+      "previousHash": "7aa18a43842117e2bec1543a90f86b5be337303a9a9b0a696bfe8ff58df73cf6",
+      "integrityHash": "9207e582f678dbbd02c1f2e9a2459685e5bc683aecf38f731112b2f9885f125f"
+    },
+    {
       "id": "audit-1785070224030-63bfb7e16527a661",
       "createdAt": "2026-07-26T12:50:24.030Z",
       "category": "data",

@@ -161,6 +161,10 @@ export function useChatController() {
   const [enterpriseOpen, setEnterpriseOpen] = useState(false);
   const [agentBuilderOpen, setAgentBuilderOpen] = useState(false);
   const [skillsOpen, setSkillsOpen] = useState(false);
+  const [mcpOpen, setMcpOpen] = useState(false);
+  const [mcpCatalog, setMcpCatalog] = useState([]);
+  const [mcpIntegrations, setMcpIntegrations] = useState([]);
+  const [activeMcpIntegrationId, setActiveMcpIntegrationId] = useState("");
   const [tokenUsage, setTokenUsage] = useState(null);
   const [copiedId, setCopiedId] = useState(null);
   const [workspaces, setWorkspaces] = useState([]);
@@ -184,6 +188,10 @@ export function useChatController() {
   const visibleChats = useMemo(
     () => filterChats(chats, { selectedFolderId, selectedWorkspaceId, searchQuery }),
     [chats, searchQuery, selectedFolderId, selectedWorkspaceId],
+  );
+  const activeMcpIntegration = useMemo(
+    () => mcpIntegrations.find((integration) => integration.id === activeMcpIntegrationId) || null,
+    [activeMcpIntegrationId, mcpIntegrations],
   );
   const resolvedRealtimeModel = useMemo(
     () => resolveRealtimeModel({ modelCatalog, realtimeModel, selectedModel: model }),
@@ -254,6 +262,7 @@ export function useChatController() {
       await refreshBranding();
       await refreshTokenUsage();
       await refreshMemories();
+      await refreshMcp();
     }
 
     load().catch((error) => {
@@ -535,6 +544,62 @@ export function useChatController() {
     }
   }
 
+  async function refreshMcp() {
+    const response = await fetch("/api/mcp");
+    const data = await readApiJson(response, "Could not load MCP integrations.");
+    setMcpCatalog(data.catalog || []);
+    setMcpIntegrations(data.store?.integrations || []);
+    setActiveMcpIntegrationId(data.store?.activeIntegrationId || "");
+    return data;
+  }
+
+  async function saveMcpIntegration(integration) {
+    const response = await fetch("/api/mcp", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ action: "upsert", integration }),
+    });
+    const data = await readApiJson(response, "Could not save MCP integration.");
+    setMcpIntegrations(data.store?.integrations || []);
+    setActiveMcpIntegrationId(data.store?.activeIntegrationId || "");
+    return data;
+  }
+
+  async function setActiveMcp(integrationId) {
+    const response = await fetch("/api/mcp", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ action: "setActive", integrationId }),
+    });
+    const data = await readApiJson(response, "Could not select MCP integration.");
+    setMcpIntegrations(data.store?.integrations || []);
+    setActiveMcpIntegrationId(data.store?.activeIntegrationId || "");
+    return data;
+  }
+
+  async function discoverMcp(integrationId) {
+    const response = await fetch("/api/mcp", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ action: "discover", integrationId }),
+    });
+    const data = await readApiJson(response, "Could not connect MCP integration.");
+    setMcpIntegrations(data.store?.integrations || []);
+    return data;
+  }
+
+  async function deleteMcp(integrationId) {
+    const response = await fetch("/api/mcp", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ action: "delete", integrationId }),
+    });
+    const data = await readApiJson(response, "Could not delete MCP integration.");
+    setMcpIntegrations(data.store?.integrations || []);
+    setActiveMcpIntegrationId(data.store?.activeIntegrationId || "");
+    return data;
+  }
+
   function currentChatPayload(nextMessages = messages, overrides = {}) {
     const existingChat = chats.find((chat) => chat.id === activeChatId);
     const workspaceId = overrides.workspaceId || selectedWorkspaceId || workspaces[0]?.id;
@@ -629,6 +694,7 @@ export function useChatController() {
     setEnterpriseOpen(false);
     setAgentBuilderOpen(false);
     setSkillsOpen(false);
+    setMcpOpen(false);
     window.setTimeout(() => inputRef.current?.focus(), 0);
   }
 
@@ -662,6 +728,7 @@ export function useChatController() {
     setEnterpriseOpen(false);
     setAgentBuilderOpen(false);
     setSkillsOpen(false);
+    setMcpOpen(false);
     if (window.innerWidth <= 900) {
       setSidebarOpen(false);
     }
@@ -777,6 +844,7 @@ export function useChatController() {
           webSearch: webSearchEnabled && provider === "openai" && !attachments.length,
           documentChat: documentChatEnabled,
           memoryEnabled,
+          mcpIntegrationId: activeMcpIntegrationId,
           messages: sanitizeMessages(nextMessages, { includeAttachmentData: true }),
           temporary: temporaryChat,
           workspaceId: selectedWorkspaceId,
@@ -931,6 +999,7 @@ export function useChatController() {
           webSearch: webSearchEnabled && provider === "openai" && !updatedUserMessage.attachments?.length,
           documentChat: documentChatEnabled,
           memoryEnabled,
+          mcpIntegrationId: activeMcpIntegrationId,
           messages: sanitizeMessages(nextMessages, { includeAttachmentData: true }),
           temporary: temporaryChat,
           workspaceId: selectedWorkspaceId,
@@ -1156,6 +1225,8 @@ export function useChatController() {
 
   return {
     activeChatId,
+    activeMcpIntegration,
+    activeMcpIntegrationId,
     agentBuilderOpen,
     apiKey,
     attachmentError,
@@ -1183,6 +1254,9 @@ export function useChatController() {
     isSending,
     locale,
     memories,
+    mcpCatalog,
+    mcpIntegrations,
+    mcpOpen,
     memoryEnabled,
     memoryError,
     messages,
@@ -1232,6 +1306,7 @@ export function useChatController() {
     pickSuggestion,
     rememberMessage,
     refreshMemories,
+    refreshMcp,
     resetTokenUsage,
     refreshBranding,
     saveChat,
@@ -1263,12 +1338,17 @@ export function useChatController() {
     setSettingsOpen,
     setSidebarOpen,
     setSkillsOpen,
+    setMcpOpen,
     setTemperature,
     setTemporaryChat,
     setTheme,
     setUsageOpen,
     setWebSearchEnabled,
     uploadChatAttachments,
+    saveMcpIntegration,
+    setActiveMcp,
+    discoverMcp,
+    deleteMcp,
     updateMemory,
     toggleVoiceChat: realtime.toggleVoiceChat,
     voiceError: realtime.voiceError,

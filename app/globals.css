@@ -1255,6 +1255,43 @@ button:disabled {
   color: var(--app-text);
 }
 
+.mcp-active-icon {
+  border-color: color-mix(in srgb, var(--accent) 55%, var(--border));
+  background: color-mix(in srgb, var(--accent) 14%, transparent);
+  color: var(--accent);
+}
+
+.mcp-topbar-select {
+  display: inline-flex;
+  height: 36px;
+  max-width: 210px;
+  align-items: center;
+  gap: 7px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--muted-strong);
+  padding: 0 10px;
+}
+
+.mcp-topbar-select.active {
+  border-color: color-mix(in srgb, var(--accent) 52%, var(--border));
+  background: color-mix(in srgb, var(--accent) 13%, transparent);
+  color: var(--app-text);
+}
+
+.mcp-topbar-select select {
+  min-width: 0;
+  max-width: 150px;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 780;
+  outline: 0;
+}
+
 .chat-body {
   display: flex;
   min-height: 0;
@@ -1284,6 +1321,45 @@ button:disabled {
   padding: 10px 14px;
   font-size: 14px;
   font-weight: 720;
+}
+
+.mcp-chat-banner {
+  display: flex;
+  width: min(850px, calc(100% - 32px));
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 6px auto 0;
+  border: 1px solid color-mix(in srgb, var(--accent) 48%, var(--border));
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--accent) 11%, var(--stage));
+  color: var(--app-text);
+  padding: 10px 12px 10px 14px;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.mcp-chat-banner span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.mcp-chat-banner button {
+  min-height: 30px;
+  flex: 0 0 auto;
+  border: 1px solid color-mix(in srgb, var(--accent) 45%, var(--border));
+  border-radius: 999px;
+  background: var(--composer);
+  color: var(--app-text);
+  padding: 0 11px;
+  font-size: 12px;
+  font-weight: 820;
+}
+
+.mcp-chat-banner button:hover {
+  background: color-mix(in srgb, var(--accent) 14%, var(--composer));
 }
 
 .chat-body.empty {
@@ -4481,6 +4557,314 @@ button:disabled {
   grid-template-columns: 1fr;
 }
 
+.mcp-dashboard-screen {
+  min-height: 0;
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--accent) 4%, transparent), transparent 240px),
+    var(--stage);
+}
+
+.mcp-dashboard-header {
+  flex: 0 0 auto;
+}
+
+.mcp-header-icon,
+.mcp-card-icon,
+.mcp-connected-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid color-mix(in srgb, var(--accent) 32%, var(--border));
+  background: color-mix(in srgb, var(--accent) 10%, var(--composer));
+  color: var(--accent);
+}
+
+.mcp-header-icon {
+  width: 42px;
+  height: 42px;
+  flex: 0 0 42px;
+  border-radius: 10px;
+}
+
+.mcp-dashboard-grid {
+  align-items: stretch;
+  grid-template-columns: minmax(0, 1fr) minmax(390px, 0.38fr);
+}
+
+.mcp-card-grid {
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 14px;
+}
+
+.mcp-directory-card {
+  display: grid;
+  min-height: 210px;
+  align-content: start;
+  gap: 12px;
+  border-radius: 8px;
+  padding: 18px;
+  text-align: left;
+}
+
+.mcp-directory-card::before {
+  display: none;
+}
+
+.mcp-directory-card:hover {
+  transform: translateY(-1px);
+}
+
+.mcp-card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.mcp-card-icon {
+  width: 38px;
+  height: 38px;
+  border-radius: 8px;
+}
+
+.mcp-transport-chip {
+  display: inline-flex;
+  min-height: 26px;
+  align-items: center;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--composer) 86%, var(--hover));
+  color: var(--muted-strong);
+  padding: 0 9px;
+  font-size: 11px;
+  font-weight: 850;
+  text-transform: uppercase;
+}
+
+.mcp-directory-card strong {
+  color: var(--app-text);
+  font-size: 18px;
+  line-height: 1.18;
+}
+
+.mcp-directory-card small {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 760;
+  line-height: 1.2;
+}
+
+.mcp-directory-card p {
+  margin: 0;
+  color: var(--muted-strong);
+  font-size: 14px;
+  line-height: 1.48;
+}
+
+.mcp-connected-list {
+  display: grid;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.mcp-connected {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 10px;
+  align-items: center;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 12px;
+  background: var(--panel);
+}
+
+.mcp-connected.active {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent) 35%, transparent);
+}
+
+.mcp-connected > button {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.mcp-connected-icon {
+  width: 32px;
+  height: 32px;
+  flex: 0 0 32px;
+  border-radius: 8px;
+}
+
+.mcp-connected > button > span:last-child {
+  display: grid;
+  min-width: 0;
+  gap: 2px;
+}
+
+.mcp-connected strong,
+.mcp-connected small {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.mcp-connected small,
+.muted-panel-copy {
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.3;
+}
+
+.mcp-connected div {
+  display: flex;
+  gap: 6px;
+}
+
+.mcp-connected .danger-icon {
+  color: #dc2626;
+}
+
+.mcp-connected .danger-icon:hover {
+  border-color: color-mix(in srgb, #dc2626 45%, var(--border));
+  background: color-mix(in srgb, #dc2626 10%, transparent);
+}
+
+.mcp-editor {
+  display: grid;
+  gap: 11px;
+  border-top: 1px solid var(--border);
+  padding-top: 18px;
+}
+
+.mcp-editor h3 {
+  margin: 0 0 4px;
+  font-size: 19px;
+  line-height: 1.2;
+}
+
+.mcp-config-field {
+  min-height: clamp(320px, 42vh, 560px);
+  resize: vertical;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+  font-size: 13px;
+  line-height: 1.5;
+  white-space: pre;
+}
+
+.mcp-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.mcp-actions .primary-button,
+.mcp-actions .secondary-button {
+  min-height: 42px;
+  align-items: center;
+  gap: 8px;
+  border-radius: 8px;
+  padding-inline: 14px;
+}
+
+.spin-icon {
+  animation: spin 0.9s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (max-width: 1180px) {
+  .mcp-dashboard-grid {
+    grid-template-columns: minmax(0, 1fr) minmax(340px, 0.42fr);
+  }
+
+  .mcp-card-grid {
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  }
+}
+
+@media (max-width: 900px) {
+  .mcp-dashboard-grid {
+    grid-template-columns: 1fr;
+    overflow-y: auto;
+  }
+
+  .mcp-dashboard-grid .agent-editor-panel,
+  .mcp-dashboard-grid .agent-flow-panel {
+    overflow: visible;
+  }
+
+  .mcp-dashboard-grid .agent-flow-panel {
+    border-left: 0;
+    border-top: 1px solid var(--border);
+  }
+
+  .mcp-config-field {
+    min-height: 360px;
+  }
+}
+
+@media (max-width: 640px) {
+  .mcp-dashboard-header {
+    align-items: flex-start;
+    padding: 14px;
+  }
+
+  .mcp-dashboard-header .agent-builder-title-row {
+    display: grid;
+    grid-template-columns: 38px minmax(0, 1fr);
+    gap: 10px;
+  }
+
+  .mcp-header-icon {
+    width: 38px;
+    height: 38px;
+    flex-basis: 38px;
+  }
+
+  .mcp-dashboard-header h1 {
+    font-size: 21px;
+  }
+
+  .mcp-card-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .mcp-directory-card {
+    min-height: 0;
+    padding: 15px;
+  }
+
+  .mcp-actions {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .mcp-actions .primary-button,
+  .mcp-actions .secondary-button {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .mcp-connected {
+    grid-template-columns: 1fr;
+  }
+
+  .mcp-connected div {
+    justify-content: flex-end;
+  }
+}
+
 .skill-card {
   border-radius: 10px;
 }
@@ -4731,6 +5115,27 @@ button:disabled {
 
   .doc-chat-toggle span {
     display: none;
+  }
+
+  .mcp-topbar-select {
+    max-width: 150px;
+  }
+
+  .mcp-topbar-select select {
+    max-width: 95px;
+  }
+
+  .mcp-chat-banner {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .mcp-chat-banner span {
+    white-space: normal;
+  }
+
+  .mcp-chat-banner button {
+    width: 100%;
   }
 
   .empty-title {

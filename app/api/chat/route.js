@@ -6,6 +6,8 @@ import { recordTokenUsage } from "@/lib/token-usage-store";
 import { requireServerPermission } from "@/lib/auth-session";
 import { formatMemoriesForPrompt, listMemories } from "@/lib/memory-store";
 import { formatSkillsForPrompt, listEnabledSkills } from "@/lib/skill-store";
+import { formatMcpContextForPrompt, getActiveMcpIntegration } from "@/lib/mcp-store";
+import { readMcpResource } from "@/lib/mcp-client";
 
 function encodeEvent(event) {
   return new TextEncoder().encode(`${JSON.stringify(event)}\n`);
@@ -22,6 +24,25 @@ function ndjsonHeaders() {
     "Cache-Control": "no-cache, no-transform",
     "Content-Type": "application/x-ndjson; charset=utf-8",
   };
+}
+
+async function readSelectedMcpResourceContext(integration) {
+  const resources = (integration?.discovery?.resources || []).filter((resource) => resource.uri).slice(0, 3);
+  if (!resources.length) return "";
+
+  const reads = await Promise.allSettled(resources.map((resource) => readMcpResource(integration, resource.uri)));
+  const blocks = reads.flatMap((result, index) => {
+    if (result.status !== "fulfilled") return [];
+    const contents = result.value?.contents || [];
+    const text = contents
+      .map((content) => content.text || content.blob || "")
+      .filter(Boolean)
+      .join("\n")
+      .slice(0, 6000);
+    return text ? [`Resource ${index + 1}: ${resources[index].name || resources[index].uri}\nURI: ${resources[index].uri}\n${text}`] : [];
+  });
+
+  return blocks.join("\n\n---\n\n");
 }
 
 export async function POST(request) {
@@ -49,6 +70,25 @@ export async function POST(request) {
     const memoryEnabled = payload.memoryEnabled !== false;
     const activeMemories = memoryEnabled ? await listMemories(session.user.id) : [];
     const memoryContext = formatMemoriesForPrompt(activeMemories);
+    const activeMcpIntegration = payload.mcpIntegrationId ? await getActiveMcpIntegration(payload.mcpIntegrationId) : null;
+    const mcpContext = formatMcpContextForPrompt(activeMcpIntegration);
+    const mcpResourceContext = await readSelectedMcpResourceContext(activeMcpIntegration).catch(() => "");
+
+    if (mcpContext) {
+      modelRequest = {
+        ...modelRequest,
+        messages: [
+          {
+            role: "system",
+            content:
+              "An MCP product is selected for this chat. Use the discovered tools, resources, and prompts below as product context. Be precise about what is available and do not invent unseen external data.\n\n" +
+              mcpContext +
+              (mcpResourceContext ? "\n\nReadable MCP resource context:\n\n" + mcpResourceContext : ""),
+          },
+          ...modelRequest.messages,
+        ],
+      };
+    }
 
     if (skillsContext) {
       modelRequest = {

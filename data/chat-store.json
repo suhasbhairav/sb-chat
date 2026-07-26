@@ -34,6 +34,86 @@
   ],
   "chats": [
     {
+      "id": "1785072898001-53360833726f8",
+      "workspaceId": "workspace-1784806210171-81024ae3ddf17",
+      "folderId": null,
+      "title": "Show me a code snippet of a websit",
+      "messages": [
+        {
+          "role": "user",
+          "content": "Show me a code snippet of a website's sticky header in Next.js.",
+          "id": "1785072898001-53360833726f8-0-user-Show me a code snippet o"
+        },
+        {
+          "role": "assistant",
+          "content": "Here's a Next.js code snippet for a sticky header:\n\n```tsx\n// components/Navigation.tsx\nimport Link from 'next/link'\n\nexport default function Navigation() {\n  return (\n    <header style={{ position: 'sticky', top: 0, zIndex: 100, backgroundColor: '#fff', padding: '1rem 2rem' }}>\n      <nav>\n        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>\n          <div>\n            <Link href=\"/\" style={{ textDecoration: 'none', color: '#333' }}>\n              MySite\n            </Link>\n          </div>\n          <div>\n            <Link href=\"/about\" style={{ margin: '0 1rem', color: '#333' }}>\n              About\n            </Link>\n            <Link href=\"/contact\" style={{ color: '#333' }}>\n              Contact\n            </Link>\n          </div>\n        </div>\n      </nav>\n    </header>\n  )\n}\n```\n\nThis creates a sticky header with:\n1. `position: sticky` to keep it fixed at the top\n2. `zIndex: 100` to ensure it stays above other content\n3. Basic styling for visibility and spacing\n4. Next.js Link components for client-side navigation\n\nMake sure to add this component to your page layout or use it as a reusable component across your Next.js application.",
+          "id": "1785072898001-53360833726f8-1-assistant-Here's a Next.js code sn"
+        }
+      ],
+      "provider": "ollama",
+      "model": "qwen3:8b",
+      "baseUrl": "http://localhost:11434",
+      "guardrails": true,
+      "temperature": 0.7,
+      "createdAt": "2026-07-26T13:35:10.739Z",
+      "updatedAt": "2026-07-26T13:43:09.203Z"
+    },
+    {
+      "id": "1785070467392-c07cca1f05ecf8",
+      "workspaceId": "workspace-1784806210171-81024ae3ddf17",
+      "folderId": null,
+      "title": "Give me practical tips to overcome",
+      "messages": [
+        {
+          "role": "user",
+          "content": "Give me practical tips to overcome procrastination today.",
+          "id": "1785070467392-c07cca1f05ecf8-0-user-Give me practical tips t"
+        },
+        {
+          "role": "assistant",
+          "content": "Okay, here are some practical tips to help you overcome procrastination today. I've focused on actionable strategies you can implement quickly.\n\n**1. Break It Down:** Large tasks are daunting. Divide your work into smaller, more manageable steps.  Focus on completing just *one* small step.\n\n**2. The Two-Minute Rule:** If a task takes less than two minutes, do it *now*. This prevents small things from piling up.\n\n**3. Prioritize (Eat the Frog):** Identify the most important or unpleasant task (\"the frog\") and tackle it first thing. Getting it out of the way boosts momentum.\n\n**4. Time Blocking:** Schedule specific blocks of time for focused work. Treat these blocks as appointments you can't miss.\n\n**5. Eliminate Distractions:** Turn off notifications, close unnecessary tabs, and find a quiet workspace.\n\n**6. Reward Yourself:**  Set up small rewards for completing tasks. This provides positive reinforcement.\n\n**7. The Pomodoro Technique:** Work in focused 25-minute intervals, followed by a 5-minute break. After four \"pomodoros,\" take a longer break (20-30 minutes).\n\n**8.  Forgive Yourself:** Don't beat yourself up if you slip up. Acknowledge it, learn from it, and get back on track.\n\n\nHere's a simple bar chart illustrating the potential impact of these techniques:\n\n```chart\n{\"type\":\"bar\",\"title\":\"Procrastination Reduction\",\"xLabel\":\"Technique\",\"yLabel\":\"Impact (1-5)\",\"data\":[{\"label\":\"Break Down Tasks\",\"value\":4},{\"label\":\"Two-Minute Rule\",\"value\":3},{\"label\":\"Prioritize\",\"value\":5},{\"label\":\"Time Blocking\",\"value\":4},{\"label\":\"Eliminate Distractions\",\"value\":5},{\"label\":\"Reward Yourself\",\"value\":3},{\"label\":\"Pomodoro\",\"value\":4},{\"label\":\"Forgive Yourself\",\"value\":2}]}\n```\n\nI hope these tips are helpful! Let me know if you'd like me to elaborate on any of them.\n\n\n\n",
+          "id": "1785070467392-c07cca1f05ecf8-1-assistant-Okay, here are some prac"
+        },
+        {
+          "role": "user",
+          "content": "Who is Elon Musk",
+          "id": "1785070467392-c07cca1f05ecf8-2-user-Who is Elon Musk"
+        },
+        {
+          "role": "assistant",
+          "content": "Elon Musk is a well-known entrepreneur and business magnate. He's the founder, CEO, and CTO of SpaceX; early investor, CEO, and product architect of Tesla, Inc.; founder of The Boring Company; and co-founder of Neuralink and OpenAI. He's involved in a wide range of ventures aiming to revolutionize space travel, sustainable energy, transportation, and artificial intelligence. He's often a prominent figure in public discourse due to his ambitious goals and sometimes controversial statements.\n\n\n\nHere's a simple pie chart illustrating some of his key ventures:\n\n```chart\n{\"type\":\"pie\",\"title\":\"Elon Musk's Ventures\",\"data\":[{\"label\":\"SpaceX\",\"value\":30},{\"label\":\"Tesla\",\"value\":30},{\"label\":\"The Boring Company\",\"value\":10},{\"label\":\"Neuralink\",\"value\":15},{\"label\":\"OpenAI\",\"value\":15}]}\n```",
+          "id": "1785070467392-c07cca1f05ecf8-3-assistant-Elon Musk is a well-know"
+        },
+        {
+          "role": "user",
+          "content": "Generate a simple graph",
+          "id": "1785070467392-c07cca1f05ecf8-4-user-Generate a simple graph"
+        },
+        {
+          "role": "assistant",
+          "content": "Okay, here's a simple line graph showing the hypothetical growth of a small business over time.\n\n```chart\n{\"type\":\"line\",\"title\":\"Business Growth\",\"xLabel\":\"Year\",\"yLabel\":\"Revenue (in thousands)\",\"data\":[{\"label\":\"2020\",\"value\":50},{\"label\":\"2021\",\"value\":75},{\"label\":\"2022\",\"value\":110},{\"label\":\"2023\",\"value\":150}]}\n```\n\nThis chart shows a steady upward trend in revenue from 2020 to 2023.  Let me know if you'd like a different type of graph or data!\n\n\n\n",
+          "id": "1785070467392-c07cca1f05ecf8-5-assistant-Okay, here's a simple li"
+        },
+        {
+          "role": "user",
+          "content": "Another complex piechart",
+          "id": "1785070467392-c07cca1f05ecf8-6-user-Another complex piechart"
+        },
+        {
+          "role": "assistant",
+          "content": "Okay, here's a more complex pie chart illustrating the breakdown of global internet traffic sources.\n\n```chart\n{\"type\":\"pie\",\"title\":\"Global Internet Traffic Sources\",\"data\":[{\"label\":\"Social Media\",\"value\":25},{\"label\":\"Streaming Services\",\"value\":20},{\"label\":\"E-commerce\",\"value\":15},{\"label\":\"Search Engines\",\"value\":12},{\"label\":\"News & Information\",\"value\":10},{\"label\":\"Gaming\",\"value\":8},{\"label\":\"Other\",\"value\":10}]}\n```\n\nThis chart shows the distribution of internet traffic across various categories, with social media and streaming services being the largest contributors.\n\n\n\n",
+          "id": "1785070467392-c07cca1f05ecf8-7-assistant-Okay, here's a more comp"
+        }
+      ],
+      "provider": "openrouter",
+      "model": "google/gemma-3n-e4b-it",
+      "baseUrl": "https://openrouter.ai/api/v1",
+      "guardrails": true,
+      "temperature": 0.7,
+      "createdAt": "2026-07-26T12:54:36.231Z",
+      "updatedAt": "2026-07-26T13:05:01.687Z"
+    },
+    {
       "id": "1784811113767-ee8b56deb84278",
       "workspaceId": "workspace-personal",
       "folderId": null,

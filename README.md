@@ -99,6 +99,10 @@ Batuk is local-first by default and enterprise-ready when you need it. Run it on
 - Agent Builder for saved multi-agent workflows.
 - Attach documents to Agent 1, run agents sequentially, inspect the run trace, and send final output back to chat.
 
+### MCP Integrations Status
+
+MCP integration work is currently in progress. Batuk includes an early MCP dashboard for saving custom Streamable HTTP, SSE, and stdio MCP server records, discovering tools/resources/prompts, selecting or unselecting an active MCP product for chat, and deleting saved MCP connection records. This surface is not yet production-complete: hosted OAuth flows, provider-specific credential UX, deeper tool-calling loops, and a larger verified MCP directory are still being developed.
+
 ## Supported Providers
 
 | Provider | Use Case |
@@ -121,7 +125,7 @@ Batuk is local-first by default and enterprise-ready when you need it. Run it on
 | Branding logos | `public/branding` | Configurable local/container path |
 | Vectors | Local JSON | ChromaDB, Pinecone |
 
-Product data includes chats, workspaces, folders, documents metadata/chunks, memories, skills, agents, workflows, token usage, branding, compliance records, GDPR requests, and audit trails. SQL mode scopes data by active organization and user; if there is no organization, data falls back to the user scope.
+Product data includes chats, workspaces, folders, documents metadata/chunks, memories, skills, MCP integration records, agents, workflows, token usage, branding, compliance records, GDPR requests, and audit trails. SQL mode scopes data by active organization and user; if there is no organization, data falls back to the user scope.
 
 ## Quick Start
 
@@ -235,9 +239,9 @@ Yarn users can run the same gates as `yarn test:unit`, `yarn test:integration`, 
 
 ```text
 app/                  Next.js app routes and API endpoints
-components/           Chat, docs, enterprise, audit, settings, skills, agents
+components/           Chat, docs, enterprise, audit, settings, skills, MCP, agents
 hooks/                Chat controller and UI state orchestration
-lib/                  Providers, auth, RAG, storage, compliance, branding
+lib/                  Providers, auth, RAG, MCP, storage, compliance, branding
 database/             SQLite, PostgreSQL, and MySQL product data schemas
 scripts/              Migration and Docker startup helpers
 tests/                Unit, integration, E2E, load, security, and regression gates

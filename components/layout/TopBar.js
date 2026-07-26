@@ -1,10 +1,13 @@
-import { BarChart3, BookOpen, Building2, ChevronDown, ClipboardCheck, FileText, Menu, PanelLeft, Plus, Settings2, Sparkles, Workflow } from "lucide-react";
+import { BarChart3, BookOpen, Building2, ChevronDown, ClipboardCheck, FileText, Menu, PanelLeft, PlugZap, Plus, Settings2, Sparkles, Workflow } from "lucide-react";
 import { BrandMark } from "@/components/brand/BrandMark";
 import { useI18n } from "@/components/i18n/I18nProvider";
 
 export function TopBar({
   branding,
   brandingOrganization,
+  activeMcpIntegration,
+  activeMcpIntegrationId,
+  mcpIntegrations = [],
   model,
   documentChatEnabled,
   sidebarOpen,
@@ -18,6 +21,8 @@ export function TopBar({
   onOpenAudit,
   onOpenEnterprise,
   onOpenSkills,
+  onOpenMcp,
+  onSelectMcp,
   onToggleTemporaryChat,
   onToggleDocumentChat,
 }) {
@@ -112,6 +117,29 @@ export function TopBar({
         >
           <Sparkles size={19} />
         </button>
+        <button
+          aria-label="MCP integrations"
+          className={`top-icon ${activeMcpIntegration ? "mcp-active-icon" : ""}`}
+          data-tooltip="MCP integrations"
+          onClick={onOpenMcp}
+          title={activeMcpIntegration ? `MCP: ${activeMcpIntegration.name}` : "MCP integrations"}
+          type="button"
+        >
+          <PlugZap size={19} />
+        </button>
+        {mcpIntegrations.length > 0 && (
+          <label className={`mcp-topbar-select ${activeMcpIntegration ? "active" : ""}`} title={activeMcpIntegration ? `Chatting with ${activeMcpIntegration.name}` : "No MCP selected"}>
+            <PlugZap size={15} />
+            <select aria-label="Select MCP product for chat" value={activeMcpIntegrationId || ""} onChange={(event) => onSelectMcp(event.target.value)}>
+              <option value="">No MCP</option>
+              {mcpIntegrations.map((integration) => (
+                <option key={integration.id} value={integration.id}>
+                  {integration.name}
+                </option>
+              ))}
+            </select>
+          </label>
+        )}
         <button
           aria-label={t("topbar.openDocuments")}
           className="top-icon"
