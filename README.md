@@ -21,6 +21,12 @@
 ![Docker](https://img.shields.io/badge/Docker-Air_Gapped_Ready-2496ed?style=for-the-badge&logo=docker&logoColor=white)
 ![License](https://img.shields.io/badge/License-MIT-f59e0b?style=for-the-badge)
 
+<p align="center">
+  <a href="https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fsuhasbhairav%2Fsb-chat&project-name=batuk&repository-name=batuk">
+    <img src="https://vercel.com/button" alt="Deploy with Vercel" />
+  </a>
+</p>
+
 Batuk is a fully open-source enterprise-native AI platform for teams. Its main purpose is simple: give users one polished chat interface for every model they are allowed to run, from local Ollama models to OpenAI and private OpenAI-compatible gateways, with document RAG, enterprise authentication, admin controls, audit evidence, and deployment-friendly storage.
 
 Batuk is local-first by default and enterprise-ready when you need it. Run it on a laptop with JSON files and SQLite, or deploy it in a client environment with Docker, PostgreSQL/MySQL product data, Better Auth enterprise identity, ChromaDB, and private file storage.
@@ -164,6 +170,12 @@ docker compose --profile postgres --profile chroma up --build
 Container startup validates the enterprise environment, runs Better Auth migrations when applicable, runs product-data migrations when SQL product storage is enabled, and starts the Next.js server.
 
 For fully offline installs, mirror the base images and service images used by `docker-compose.yml` into the enterprise registry. Pinecone support is included, but Pinecone itself requires approved network/private-connectivity access.
+
+## Vercel Deployment
+
+For hosted evaluation or internet-connected team pilots, use the one-click Vercel button at the top of this README. After the project is created, configure the required runtime variables from `.env.enterprise.example` in Vercel Project Settings, then redeploy.
+
+Vercel is ideal for quick managed Next.js hosting. Use Docker Compose for air-gapped enterprise installs, private SQL services, local ChromaDB, and controlled filesystem storage.
 
 ## Configuration
 

@@ -2,8 +2,8 @@
   "documents": [],
   "chunks": [],
   "settings": {
-    "embeddingProvider": "openai",
-    "embeddingModel": "text-embedding-3-small",
+    "embeddingProvider": "local",
+    "embeddingModel": "local-hash-v1",
     "vectorStoreProvider": "json",
     "chromaUrl": "http://localhost:8000",
     "chromaCollection": "sb_chat_documents",

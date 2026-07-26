@@ -34,56 +34,6 @@
   ],
   "chats": [
     {
-      "id": "1785002381283-92b768f4716fa8",
-      "workspaceId": "workspace-1784806210171-81024ae3ddf17",
-      "folderId": null,
-      "title": "Show me a code snippet of a websit",
-      "messages": [
-        {
-          "role": "user",
-          "content": "Show me a code snippet of a website's sticky header in Next.js.",
-          "id": "1785002381283-92b768f4716fa8-0-user-Show me a code snippet o"
-        },
-        {
-          "role": "assistant",
-          "content": "Here's a Next.js code snippet for a sticky header using CSS:\n\n```jsx\n// components/Header.js\nexport default function Header() {\n  return (\n    <header style={{ position: 'sticky', top: 0, zIndex: 10, backgroundColor: '#fff', padding: '1rem' }}>\n      <nav>\n        <div>My Website</div>\n      </nav>\n    </header>\n  );\n}\n```\n\n```jsx\n// pages/index.js\nimport Header from '../components/Header';\n\nexport default function Home() {\n  return (\n    <>\n      <Header />\n      <main style={{ marginTop: '64px' }}>\n        <h1>Welcome to My Website</h1>\n        <p>This is a sticky header example in Next.js.</p>\n      </main>\n    </>\n  );\n}\n```\n\nThis creates a sticky header that:\n1. Stays at the top of the viewport when scrolling\n2. Has a white background to prevent content bleed-through\n3. Includes a margin on the main content area to account for the header height\n4. Uses basic styling for visibility and spacing\n\nYou can customize the styles further to match your design system.",
-          "id": "1785002381283-92b768f4716fa8-1-assistant-Here's a Next.js code sn"
-        }
-      ],
-      "provider": "ollama",
-      "model": "qwen3:8b",
-      "baseUrl": "http://localhost:11434",
-      "guardrails": true,
-      "temperature": 0.7,
-      "createdAt": "2026-07-25T18:00:04.379Z",
-      "updatedAt": "2026-07-25T18:00:04.379Z"
-    },
-    {
-      "id": "1785001129233-c5594d688617b",
-      "workspaceId": "workspace-1784806210171-81024ae3ddf17",
-      "folderId": null,
-      "title": "Give me practical tips to overcome",
-      "messages": [
-        {
-          "role": "user",
-          "content": "Give me practical tips to overcome procrastination today.",
-          "id": "1785001129233-c5594d688617b-0-user-Give me practical tips t"
-        },
-        {
-          "role": "assistant",
-          "content": "1. **Start small**: Commit to just 2 minutes on the task—often, momentum kicks in.  \n2. **Time-box**: Use the Pomodoro Technique (25 minutes work + 5-minute breaks).  \n3. **Prioritize**: Tackle the easiest task first to build confidence.  \n4. **Remove distractions**: Silence notifications or use website blockers.  \n5. **Set a specific time**: Tell yourself, “I’ll start at 3 PM,” and hold yourself accountable.  \n6. **Break tasks into steps**: Focus on one tiny action at a time.  \n7. **Reward progress**: Give yourself a small treat after completing a task.  \n8. **Reflect**: At the end of the day, note what worked and adjust tomorrow.",
-          "id": "1785001129233-c5594d688617b-1-assistant-1. **Start small**: Comm"
-        }
-      ],
-      "provider": "ollama",
-      "model": "qwen3:8b",
-      "baseUrl": "http://localhost:11434",
-      "guardrails": true,
-      "temperature": 0.7,
-      "createdAt": "2026-07-25T17:39:02.854Z",
-      "updatedAt": "2026-07-25T17:39:02.854Z"
-    },
-    {
       "id": "1784811113767-ee8b56deb84278",
       "workspaceId": "workspace-personal",
       "folderId": null,

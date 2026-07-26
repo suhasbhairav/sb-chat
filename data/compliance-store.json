@@ -157,8 +157,395 @@
       "retention": "365 days by default"
     }
   ],
-  "dataRequests": [],
+  "dataRequests": [
+    {
+      "id": "dsar-1785068492592-a3e3be00ba5ca02f",
+      "type": "erasure",
+      "status": "open",
+      "subjectUserId": "3c4816f5-3e7e-4d26-a6ce-e827cc3c856e",
+      "subjectEmailHash": "f660ab912ec121d1b1e928a0bb4bc61b15f5ad44d5efdc4e1c92a25e99b8e44a",
+      "requestedBy": "3c4816f5-3e7e-4d26-a6ce-e827cc3c856e",
+      "notes": "",
+      "createdAt": "2026-07-26T12:21:32.592Z",
+      "updatedAt": "2026-07-26T12:21:32.592Z"
+    },
+    {
+      "id": "dsar-1785068483992-ec068211d28a518f",
+      "type": "erasure",
+      "status": "open",
+      "subjectUserId": "3c4816f5-3e7e-4d26-a6ce-e827cc3c856e",
+      "subjectEmailHash": "f660ab912ec121d1b1e928a0bb4bc61b15f5ad44d5efdc4e1c92a25e99b8e44a",
+      "requestedBy": "3c4816f5-3e7e-4d26-a6ce-e827cc3c856e",
+      "notes": "",
+      "createdAt": "2026-07-26T12:21:23.992Z",
+      "updatedAt": "2026-07-26T12:21:23.992Z"
+    }
+  ],
   "auditEvents": [
+    {
+      "id": "audit-1785068492598-08ee75cea5ed9080",
+      "createdAt": "2026-07-26T12:21:32.598Z",
+      "category": "privacy",
+      "action": "gdpr.request.created",
+      "outcome": "success",
+      "actor": {
+        "id": "3c4816f5-3e7e-4d26-a6ce-e827cc3c856e",
+        "emailHash": "f660ab912ec121d1b1e928a0bb4bc61b15f5ad44d5efdc4e1c92a25e99b8e44a",
+        "role": "owner"
+      },
+      "target": {
+        "type": "dataRequest",
+        "id": "dsar-1785068492592-a3e3be00ba5ca02f"
+      },
+      "ipHash": "eff8e7ca506627fe15dda5e0e512fcaad70b6d520f37cc76597fdb4f2d83a1a3",
+      "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36",
+      "metadata": {},
+      "previousHash": "7231647f64d0e991b85a620369aa21c2962a932967d6797d0e4feb49ee499ae6",
+      "integrityHash": "7549ecbefdb01a722ccf8ab2f911c131b119a71b50fceff23c262f804aff57f7"
+    },
+    {
+      "id": "audit-1785068492596-72fdc5ed5509e363",
+      "createdAt": "2026-07-26T12:21:32.596Z",
+      "category": "privacy",
+      "action": "gdpr.erasure.request",
+      "outcome": "success",
+      "actor": {
+        "id": "3c4816f5-3e7e-4d26-a6ce-e827cc3c856e",
+        "emailHash": "f660ab912ec121d1b1e928a0bb4bc61b15f5ad44d5efdc4e1c92a25e99b8e44a",
+        "role": "owner"
+      },
+      "target": {
+        "type": "dataRequest",
+        "id": "dsar-1785068492592-a3e3be00ba5ca02f"
+      },
+      "ipHash": null,
+      "userAgent": null,
+      "metadata": {},
+      "previousHash": "3250515e7cbb75549c174d2b20a806a68ae8b3f9e70dfee589b6f8da87c6a8e2",
+      "integrityHash": "7231647f64d0e991b85a620369aa21c2962a932967d6797d0e4feb49ee499ae6"
+    },
+    {
+      "id": "audit-1785068483996-8bc3dc94cd98ba3b",
+      "createdAt": "2026-07-26T12:21:23.996Z",
+      "category": "privacy",
+      "action": "gdpr.request.created",
+      "outcome": "success",
+      "actor": {
+        "id": "3c4816f5-3e7e-4d26-a6ce-e827cc3c856e",
+        "emailHash": "f660ab912ec121d1b1e928a0bb4bc61b15f5ad44d5efdc4e1c92a25e99b8e44a",
+        "role": "owner"
+      },
+      "target": {
+        "type": "dataRequest",
+        "id": "dsar-1785068483992-ec068211d28a518f"
+      },
+      "ipHash": "eff8e7ca506627fe15dda5e0e512fcaad70b6d520f37cc76597fdb4f2d83a1a3",
+      "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36",
+      "metadata": {},
+      "previousHash": "ba8cdbd9125201de61bc5d59d2a3470326a0a40ca708cc7353cec000fd12f53a",
+      "integrityHash": "3250515e7cbb75549c174d2b20a806a68ae8b3f9e70dfee589b6f8da87c6a8e2"
+    },
+    {
+      "id": "audit-1785068483994-4aa780093c4d85be",
+      "createdAt": "2026-07-26T12:21:23.994Z",
+      "category": "privacy",
+      "action": "gdpr.erasure.request",
+      "outcome": "success",
+      "actor": {
+        "id": "3c4816f5-3e7e-4d26-a6ce-e827cc3c856e",
+        "emailHash": "f660ab912ec121d1b1e928a0bb4bc61b15f5ad44d5efdc4e1c92a25e99b8e44a",
+        "role": "owner"
+      },
+      "target": {
+        "type": "dataRequest",
+        "id": "dsar-1785068483992-ec068211d28a518f"
+      },
+      "ipHash": null,
+      "userAgent": null,
+      "metadata": {},
+      "previousHash": "28433d915c6c6584681dd09f2fd6f3e3c7983a0349b4a5078dea312fc00e5726",
+      "integrityHash": "ba8cdbd9125201de61bc5d59d2a3470326a0a40ca708cc7353cec000fd12f53a"
+    },
+    {
+      "id": "audit-1785068463998-3e4e09b1cf30caa4",
+      "createdAt": "2026-07-26T12:21:03.998Z",
+      "category": "admin",
+      "action": "branding.logo.remove",
+      "outcome": "success",
+      "actor": {
+        "id": "3c4816f5-3e7e-4d26-a6ce-e827cc3c856e",
+        "emailHash": "f660ab912ec121d1b1e928a0bb4bc61b15f5ad44d5efdc4e1c92a25e99b8e44a",
+        "role": "owner"
+      },
+      "target": {
+        "type": "organization",
+        "id": "global"
+      },
+      "ipHash": "eff8e7ca506627fe15dda5e0e512fcaad70b6d520f37cc76597fdb4f2d83a1a3",
+      "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36",
+      "metadata": {
+        "footerLocked": true
+      },
+      "previousHash": "523dbca018cf19e38a80ceb5244a122da569f101540d78bc5373d2e6ec4da9e3",
+      "integrityHash": "28433d915c6c6584681dd09f2fd6f3e3c7983a0349b4a5078dea312fc00e5726"
+    },
+    {
+      "id": "audit-1785068458931-d8bc176eb10c959f",
+      "createdAt": "2026-07-26T12:20:58.931Z",
+      "category": "data",
+      "action": "chat.delete",
+      "outcome": "success",
+      "actor": {
+        "id": "3c4816f5-3e7e-4d26-a6ce-e827cc3c856e",
+        "emailHash": "f660ab912ec121d1b1e928a0bb4bc61b15f5ad44d5efdc4e1c92a25e99b8e44a",
+        "role": "owner"
+      },
+      "target": {
+        "type": "chat",
+        "id": "1785006441823-d85376acd9eb88"
+      },
+      "ipHash": null,
+      "userAgent": null,
+      "metadata": {},
+      "previousHash": "28cfe143261f42c5363c379c778d84b7cd18a259474319f92f2b256f2c880e40",
+      "integrityHash": "523dbca018cf19e38a80ceb5244a122da569f101540d78bc5373d2e6ec4da9e3"
+    },
+    {
+      "id": "audit-1785068458008-75f891ec63df3c5d",
+      "createdAt": "2026-07-26T12:20:58.008Z",
+      "category": "data",
+      "action": "chat.delete",
+      "outcome": "success",
+      "actor": {
+        "id": "3c4816f5-3e7e-4d26-a6ce-e827cc3c856e",
+        "emailHash": "f660ab912ec121d1b1e928a0bb4bc61b15f5ad44d5efdc4e1c92a25e99b8e44a",
+        "role": "owner"
+      },
+      "target": {
+        "type": "chat",
+        "id": "1785005356698-cd3376d28b3d3"
+      },
+      "ipHash": null,
+      "userAgent": null,
+      "metadata": {},
+      "previousHash": "86a0c019c23ff45e07d2f9309c160016b7528430e82b3fed8d3e1ae0e109a8b4",
+      "integrityHash": "28cfe143261f42c5363c379c778d84b7cd18a259474319f92f2b256f2c880e40"
+    },
+    {
+      "id": "audit-1785068457219-248c42c0a1c49c40",
+      "createdAt": "2026-07-26T12:20:57.219Z",
+      "category": "data",
+      "action": "chat.delete",
+      "outcome": "success",
+      "actor": {
+        "id": "3c4816f5-3e7e-4d26-a6ce-e827cc3c856e",
+        "emailHash": "f660ab912ec121d1b1e928a0bb4bc61b15f5ad44d5efdc4e1c92a25e99b8e44a",
+        "role": "owner"
+      },
+      "target": {
+        "type": "chat",
+        "id": "1785002381283-92b768f4716fa8"
+      },
+      "ipHash": null,
+      "userAgent": null,
+      "metadata": {},
+      "previousHash": "5ba8cc0b30a4e9b0c4e4dcd1474436c4c4b96ad9866b77591b562f821b1f816f",
+      "integrityHash": "86a0c019c23ff45e07d2f9309c160016b7528430e82b3fed8d3e1ae0e109a8b4"
+    },
+    {
+      "id": "audit-1785068456319-d726bd867bf7b1ad",
+      "createdAt": "2026-07-26T12:20:56.319Z",
+      "category": "data",
+      "action": "chat.delete",
+      "outcome": "success",
+      "actor": {
+        "id": "3c4816f5-3e7e-4d26-a6ce-e827cc3c856e",
+        "emailHash": "f660ab912ec121d1b1e928a0bb4bc61b15f5ad44d5efdc4e1c92a25e99b8e44a",
+        "role": "owner"
+      },
+      "target": {
+        "type": "chat",
+        "id": "1785005345150-c2b87112fc443"
+      },
+      "ipHash": null,
+      "userAgent": null,
+      "metadata": {},
+      "previousHash": "bf1ad2a7046a42f8a6f1212dbf40f3ea273b18bfdf5dea4d1001f2ae881122e2",
+      "integrityHash": "5ba8cc0b30a4e9b0c4e4dcd1474436c4c4b96ad9866b77591b562f821b1f816f"
+    },
+    {
+      "id": "audit-1785068455350-67f88376915af921",
+      "createdAt": "2026-07-26T12:20:55.350Z",
+      "category": "data",
+      "action": "chat.delete",
+      "outcome": "success",
+      "actor": {
+        "id": "3c4816f5-3e7e-4d26-a6ce-e827cc3c856e",
+        "emailHash": "f660ab912ec121d1b1e928a0bb4bc61b15f5ad44d5efdc4e1c92a25e99b8e44a",
+        "role": "owner"
+      },
+      "target": {
+        "type": "chat",
+        "id": "1785001129233-c5594d688617b"
+      },
+      "ipHash": null,
+      "userAgent": null,
+      "metadata": {},
+      "previousHash": "be7c79f29b4b4119694e13be2a7963c029c625baec0a97e23ce8b6ebad5b2173",
+      "integrityHash": "bf1ad2a7046a42f8a6f1212dbf40f3ea273b18bfdf5dea4d1001f2ae881122e2"
+    },
+    {
+      "id": "audit-1785006463914-8118b68c3233f6e1",
+      "createdAt": "2026-07-25T19:07:43.914Z",
+      "category": "data",
+      "action": "chat.upsert",
+      "outcome": "success",
+      "actor": {
+        "id": "3c4816f5-3e7e-4d26-a6ce-e827cc3c856e",
+        "emailHash": "f660ab912ec121d1b1e928a0bb4bc61b15f5ad44d5efdc4e1c92a25e99b8e44a",
+        "role": "owner"
+      },
+      "target": {
+        "type": "chat",
+        "id": "1785006441823-d85376acd9eb88"
+      },
+      "ipHash": null,
+      "userAgent": null,
+      "metadata": {
+        "workspaceId": "workspace-1784806210171-81024ae3ddf17",
+        "folderId": null,
+        "provider": "ollama",
+        "model": "qwen3:8b"
+      },
+      "previousHash": "86455777f2f921d85a399af2b967032d6eef9131611ee43c288d6c1b3e83c0ed",
+      "integrityHash": "be7c79f29b4b4119694e13be2a7963c029c625baec0a97e23ce8b6ebad5b2173"
+    },
+    {
+      "id": "audit-1785005465847-e08cdb3375f2781d",
+      "createdAt": "2026-07-25T18:51:05.847Z",
+      "category": "document",
+      "action": "document.settings.update",
+      "outcome": "success",
+      "actor": {
+        "id": "3c4816f5-3e7e-4d26-a6ce-e827cc3c856e",
+        "emailHash": "f660ab912ec121d1b1e928a0bb4bc61b15f5ad44d5efdc4e1c92a25e99b8e44a",
+        "role": "owner"
+      },
+      "target": null,
+      "ipHash": null,
+      "userAgent": null,
+      "metadata": {
+        "embeddingProvider": "local",
+        "vectorStoreProvider": "json",
+        "chromaCollection": "sb_chat_documents",
+        "pineconeIndex": "sb-chat-documents-1536d"
+      },
+      "previousHash": "ddbf856a0d3a94a0c8d3166c1cf65dbc97d3228dedec9623fea1a00e7007f457",
+      "integrityHash": "86455777f2f921d85a399af2b967032d6eef9131611ee43c288d6c1b3e83c0ed"
+    },
+    {
+      "id": "audit-1785005370195-e6575a993333db3f",
+      "createdAt": "2026-07-25T18:49:30.195Z",
+      "category": "data",
+      "action": "chat.upsert",
+      "outcome": "success",
+      "actor": {
+        "id": "3c4816f5-3e7e-4d26-a6ce-e827cc3c856e",
+        "emailHash": "f660ab912ec121d1b1e928a0bb4bc61b15f5ad44d5efdc4e1c92a25e99b8e44a",
+        "role": "owner"
+      },
+      "target": {
+        "type": "chat",
+        "id": "1785005356698-cd3376d28b3d3"
+      },
+      "ipHash": null,
+      "userAgent": null,
+      "metadata": {
+        "workspaceId": "workspace-1784806210171-81024ae3ddf17",
+        "folderId": null,
+        "provider": "ollama",
+        "model": "qwen3:8b"
+      },
+      "previousHash": "dc58e32f223199f5b546902651ae2ed1b35b3328256117ffc644762610b2a327",
+      "integrityHash": "ddbf856a0d3a94a0c8d3166c1cf65dbc97d3228dedec9623fea1a00e7007f457"
+    },
+    {
+      "id": "audit-1785005348814-3747e5cbb38be366",
+      "createdAt": "2026-07-25T18:49:08.814Z",
+      "category": "data",
+      "action": "chat.upsert",
+      "outcome": "success",
+      "actor": {
+        "id": "3c4816f5-3e7e-4d26-a6ce-e827cc3c856e",
+        "emailHash": "f660ab912ec121d1b1e928a0bb4bc61b15f5ad44d5efdc4e1c92a25e99b8e44a",
+        "role": "owner"
+      },
+      "target": {
+        "type": "chat",
+        "id": "1785005345150-c2b87112fc443"
+      },
+      "ipHash": null,
+      "userAgent": null,
+      "metadata": {
+        "workspaceId": "workspace-1784806210171-81024ae3ddf17",
+        "folderId": null,
+        "provider": "ollama",
+        "model": "llama3.1"
+      },
+      "previousHash": "814bfda8a1036067b4737c910d73eda6ddf0a1a77779b46d67be8d11b9652f29",
+      "integrityHash": "dc58e32f223199f5b546902651ae2ed1b35b3328256117ffc644762610b2a327"
+    },
+    {
+      "id": "audit-1785005345255-cae3196fc0507a11",
+      "createdAt": "2026-07-25T18:49:05.255Z",
+      "category": "data",
+      "action": "chat.upsert",
+      "outcome": "success",
+      "actor": {
+        "id": "3c4816f5-3e7e-4d26-a6ce-e827cc3c856e",
+        "emailHash": "f660ab912ec121d1b1e928a0bb4bc61b15f5ad44d5efdc4e1c92a25e99b8e44a",
+        "role": "owner"
+      },
+      "target": {
+        "type": "chat",
+        "id": "1785005345150-c2b87112fc443"
+      },
+      "ipHash": null,
+      "userAgent": null,
+      "metadata": {
+        "workspaceId": "workspace-1784806210171-81024ae3ddf17",
+        "folderId": null,
+        "provider": "ollama",
+        "model": "llama3.1"
+      },
+      "previousHash": "c203f3b5dd4571205c18b385d007b1a2fca09b3d3173215b2aca5dbef5a30bd0",
+      "integrityHash": "814bfda8a1036067b4737c910d73eda6ddf0a1a77779b46d67be8d11b9652f29"
+    },
+    {
+      "id": "audit-1785005321491-a2faffb9b91c1050",
+      "createdAt": "2026-07-25T18:48:41.491Z",
+      "category": "admin",
+      "action": "branding.logo.upload",
+      "outcome": "success",
+      "actor": {
+        "id": "3c4816f5-3e7e-4d26-a6ce-e827cc3c856e",
+        "emailHash": "f660ab912ec121d1b1e928a0bb4bc61b15f5ad44d5efdc4e1c92a25e99b8e44a",
+        "role": "owner"
+      },
+      "target": {
+        "type": "organization",
+        "id": "global"
+      },
+      "ipHash": "eff8e7ca506627fe15dda5e0e512fcaad70b6d520f37cc76597fdb4f2d83a1a3",
+      "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36",
+      "metadata": {
+        "logoName": "openai-image-1784110514035.png",
+        "logoUrl": "/branding/global-1785005321486.png",
+        "footerLocked": true
+      },
+      "previousHash": "02d649e2e0a6a4ef9404e6a83046ebfaeda8eb7c59e5df133128d1cc58b7704b",
+      "integrityHash": "c203f3b5dd4571205c18b385d007b1a2fca09b3d3173215b2aca5dbef5a30bd0"
+    },
     {
       "id": "audit-1785004091023-765b536dae82dcb8",
       "createdAt": "2026-07-25T18:28:11.023Z",
