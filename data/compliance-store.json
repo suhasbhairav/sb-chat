@@ -183,6 +183,53 @@
   ],
   "auditEvents": [
     {
+      "id": "audit-1785070224030-63bfb7e16527a661",
+      "createdAt": "2026-07-26T12:50:24.030Z",
+      "category": "data",
+      "action": "chat.delete",
+      "outcome": "success",
+      "actor": {
+        "id": "3c4816f5-3e7e-4d26-a6ce-e827cc3c856e",
+        "emailHash": "f660ab912ec121d1b1e928a0bb4bc61b15f5ad44d5efdc4e1c92a25e99b8e44a",
+        "role": "owner"
+      },
+      "target": {
+        "type": "chat",
+        "id": "1785070203062-5cb04c35cd9c8"
+      },
+      "ipHash": null,
+      "userAgent": null,
+      "metadata": {},
+      "previousHash": "94f3fe0f435a54e941d5349baa21b166680d6d4f4506596b13a56c8135ccea98",
+      "integrityHash": "7aa18a43842117e2bec1543a90f86b5be337303a9a9b0a696bfe8ff58df73cf6"
+    },
+    {
+      "id": "audit-1785070220529-72ac2453323c3031",
+      "createdAt": "2026-07-26T12:50:20.529Z",
+      "category": "data",
+      "action": "chat.upsert",
+      "outcome": "success",
+      "actor": {
+        "id": "3c4816f5-3e7e-4d26-a6ce-e827cc3c856e",
+        "emailHash": "f660ab912ec121d1b1e928a0bb4bc61b15f5ad44d5efdc4e1c92a25e99b8e44a",
+        "role": "owner"
+      },
+      "target": {
+        "type": "chat",
+        "id": "1785070203062-5cb04c35cd9c8"
+      },
+      "ipHash": null,
+      "userAgent": null,
+      "metadata": {
+        "workspaceId": "workspace-1784806210171-81024ae3ddf17",
+        "folderId": null,
+        "provider": "ollama",
+        "model": "qwen3:8b"
+      },
+      "previousHash": "7549ecbefdb01a722ccf8ab2f911c131b119a71b50fceff23c262f804aff57f7",
+      "integrityHash": "94f3fe0f435a54e941d5349baa21b166680d6d4f4506596b13a56c8135ccea98"
+    },
+    {
       "id": "audit-1785068492598-08ee75cea5ed9080",
       "createdAt": "2026-07-26T12:21:32.598Z",
       "category": "privacy",

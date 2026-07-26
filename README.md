@@ -209,6 +209,28 @@ npm run auth:migrate  # Create/update Better Auth schema
 npm run data:migrate  # Create/update Batuk product data schema
 ```
 
+## Test Commands
+
+Batuk includes visible test gates for local development, release checks, and enterprise deployment validation.
+
+```bash
+npm run test:unit         # Unit tests for pure chat, guardrail, and utility behavior
+npm run test:integration  # Integration tests for env validation, SQL schema, and scoped SQLite product data
+npm run test:e2e          # Builds the app and runs a real Next.js HTTP smoke test
+npm run test:load         # Builds the app and runs concurrent HTTP load smoke checks
+npm run test:security     # Builds the app and verifies security headers plus protected API behavior
+npm run test:regression   # Lint, unit, integration, and production build regression gate
+npm run test:all          # Full enterprise gate: regression, E2E, load, and security
+```
+
+Load checks can be tuned without editing code:
+
+```bash
+BATUK_LOAD_REQUESTS=200 BATUK_LOAD_CONCURRENCY=25 npm run test:load
+```
+
+Yarn users can run the same gates as `yarn test:unit`, `yarn test:integration`, `yarn test:e2e`, `yarn test:load`, `yarn test:security`, `yarn test:regression`, and `yarn test:all`.
+
 ## Project Shape
 
 ```text
@@ -218,6 +240,7 @@ hooks/                Chat controller and UI state orchestration
 lib/                  Providers, auth, RAG, storage, compliance, branding
 database/             SQLite, PostgreSQL, and MySQL product data schemas
 scripts/              Migration and Docker startup helpers
+tests/                Unit, integration, E2E, load, security, and regression gates
 data/                 Local runtime data in development
 public/branding/      Uploaded organization logos
 ```

@@ -2,6 +2,7 @@
   "name": "sb-chat",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "license": "MIT",
   "scripts": {
     "dev": "next dev",
@@ -10,7 +11,18 @@
     "data:migrate": "node scripts/migrate-product-data.mjs",
     "env:validate": "node scripts/validate-enterprise-env.mjs",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "test": "npm run test:unit",
+    "test:unit": "node --test tests/unit/*.test.mjs",
+    "test:integration": "node --test tests/integration/*.test.mjs",
+    "pretest:e2e": "npm run build",
+    "test:e2e": "node tests/e2e/http-smoke.mjs",
+    "pretest:load": "npm run build",
+    "test:load": "node tests/load/http-load.mjs",
+    "pretest:security": "npm run build",
+    "test:security": "node tests/security/security-check.mjs",
+    "test:regression": "npm run lint && npm run test:unit && npm run test:integration && npm run build",
+    "test:all": "npm run test:regression && npm run test:e2e && npm run test:load && npm run test:security"
   },
   "dependencies": {
     "@better-auth/infra": "^0.3.7",
