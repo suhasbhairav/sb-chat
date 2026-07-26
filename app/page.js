@@ -83,10 +83,16 @@ function HomeShell({ chat }) {
         selectedFolderId={chat.selectedFolderId}
         selectedWorkspaceId={chat.selectedWorkspaceId}
         workspaces={chat.workspaces}
+        canManageSharedWorkspaces={chat.canManageSharedWorkspaces}
         onChangeSearch={chat.setSearchQuery}
         onClose={() => chat.setSidebarOpen(false)}
         onCreateFolder={chat.createFolder}
         onCreateWorkspace={chat.createWorkspace}
+        onCreateSharedWorkspace={chat.createSharedWorkspace}
+        onDeleteSharedWorkspace={chat.deleteSharedWorkspace}
+        onEditSharedWorkspace={chat.editSharedWorkspace}
+        onAddWorkspaceMemberByEmail={chat.addWorkspaceMemberByEmail}
+        onRemoveWorkspaceMember={chat.removeWorkspaceMember}
         onDeleteChat={chat.deleteSavedChat}
         onMoveChat={chat.moveSavedChat}
         onNewChat={chat.newChat}
@@ -307,6 +313,7 @@ function HomeShell({ chat }) {
           apiKey={chat.apiKey}
           documentChatEnabled={chat.documentChatEnabled}
           openAIBaseUrl={chat.provider === "openai" ? chat.baseUrl : "https://api.openai.com/v1"}
+          selectedWorkspaceId={chat.selectedWorkspaceId}
           onClose={() => chat.setDocumentsOpen(false)}
           onToggleDocumentChat={() => chat.setDocumentChatEnabled((value) => !value)}
         />

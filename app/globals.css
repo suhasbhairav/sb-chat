@@ -973,6 +973,114 @@ button:disabled {
   font-weight: 620;
 }
 
+.workspace-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.workspace-row .sidebar-link {
+  min-width: 0;
+  flex: 1;
+}
+
+.workspace-actions {
+  display: flex;
+  gap: 2px;
+}
+
+.workspace-actions button {
+  display: grid;
+  width: 27px;
+  height: 27px;
+  place-items: center;
+  border: 0;
+  border-radius: 7px;
+  background: transparent;
+  color: var(--muted);
+}
+
+.workspace-actions button:hover {
+  background: var(--hover);
+  color: var(--app-text);
+}
+
+.workspace-members {
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  padding: 12px 0;
+}
+
+.workspace-rag-pill {
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 7px;
+}
+
+.workspace-member-form {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 30px;
+  gap: 6px;
+  margin-bottom: 9px;
+}
+
+.workspace-member-form input {
+  min-width: 0;
+  height: 32px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--sidebar-strong);
+  color: var(--app-text);
+  padding: 0 8px;
+}
+
+.workspace-member-form button {
+  display: grid;
+  place-items: center;
+  border: 0;
+  border-radius: 8px;
+  background: var(--accent);
+  color: #fff;
+}
+
+.workspace-member-list {
+  display: grid;
+  gap: 5px;
+}
+
+.workspace-member-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 6px;
+  min-height: 30px;
+}
+
+.workspace-member-row span {
+  overflow: hidden;
+  color: var(--muted-strong);
+  font-size: 12px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.workspace-member-row button {
+  border: 0;
+  border-radius: 7px;
+  background: var(--hover);
+  color: var(--muted-strong);
+  font-size: 11px;
+  font-weight: 700;
+  padding: 5px 7px;
+}
+
+.workspace-member-row button:hover {
+  color: var(--danger);
+}
+
 .sidebar-link.active,
 .chat-history-row.active .chat-history-item {
   background: var(--hover);

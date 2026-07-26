@@ -13,6 +13,10 @@ create table if not exists batuk_workspaces (
   id varchar(160) primary key,
   organization_id varchar(160),
   user_id varchar(160),
+  scope_type varchar(40) not null default 'personal',
+  owner_id varchar(160),
+  members json,
+  rag_enabled boolean not null default true,
   name varchar(120) not null,
   metadata json,
   created_at timestamp not null default current_timestamp,
@@ -83,6 +87,8 @@ create table if not exists batuk_documents (
   id varchar(160) primary key,
   organization_id varchar(160),
   user_id varchar(160),
+  scope_type varchar(40) not null default 'personal',
+  workspace_id varchar(160),
   name text not null,
   stored_name text not null,
   mime_type varchar(240),
@@ -98,7 +104,8 @@ create table if not exists batuk_documents (
   metadata json,
   created_at timestamp not null default current_timestamp,
   updated_at timestamp not null default current_timestamp on update current_timestamp,
-  key batuk_documents_scope_idx (organization_id, user_id, created_at)
+  key batuk_documents_scope_idx (organization_id, user_id, created_at),
+  key batuk_documents_rag_scope_idx (scope_type, organization_id, user_id, workspace_id, created_at)
 ) engine=InnoDB default charset=utf8mb4 collate=utf8mb4_unicode_ci;
 
 create table if not exists batuk_document_chunks (
@@ -106,13 +113,16 @@ create table if not exists batuk_document_chunks (
   document_id varchar(160) not null,
   organization_id varchar(160),
   user_id varchar(160),
+  scope_type varchar(40) not null default 'personal',
+  workspace_id varchar(160),
   chunk_index integer not null,
   content mediumtext not null,
   embedding_json json,
   vector_ref varchar(320),
   metadata json,
   created_at timestamp not null default current_timestamp,
-  key batuk_document_chunks_document_idx (document_id, chunk_index)
+  key batuk_document_chunks_document_idx (document_id, chunk_index),
+  key batuk_document_chunks_rag_scope_idx (scope_type, organization_id, user_id, workspace_id, document_id)
 ) engine=InnoDB default charset=utf8mb4 collate=utf8mb4_unicode_ci;
 
 create table if not exists batuk_vector_index_refs (
@@ -120,13 +130,16 @@ create table if not exists batuk_vector_index_refs (
   provider varchar(80) not null,
   organization_id varchar(160),
   user_id varchar(160),
+  scope_type varchar(40) not null default 'personal',
+  workspace_id varchar(160),
   document_id varchar(160),
   index_name varchar(240),
   namespace varchar(240),
   collection_name varchar(240),
   metadata json,
   created_at timestamp not null default current_timestamp,
-  key batuk_vector_refs_scope_idx (provider, organization_id, user_id)
+  key batuk_vector_refs_scope_idx (provider, organization_id, user_id),
+  key batuk_vector_refs_rag_scope_idx (provider, scope_type, organization_id, user_id, workspace_id)
 ) engine=InnoDB default charset=utf8mb4 collate=utf8mb4_unicode_ci;
 
 create table if not exists batuk_token_usage_events (

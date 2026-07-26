@@ -32,7 +32,7 @@ function documentIcon(name) {
   return /\.(csv|xls|xlsx)$/i.test(name) ? FileSpreadsheet : FileText;
 }
 
-export function DocumentsPanel({ apiKey, documentChatEnabled, openAIBaseUrl, onClose, onToggleDocumentChat }) {
+export function DocumentsPanel({ apiKey, documentChatEnabled, openAIBaseUrl, selectedWorkspaceId, onClose, onToggleDocumentChat }) {
   const { locale, t } = useI18n();
   const [documents, setDocuments] = useState([]);
   const [settings, setSettings] = useState(DEFAULT_DOCUMENT_SETTINGS);
@@ -51,7 +51,8 @@ export function DocumentsPanel({ apiKey, documentChatEnabled, openAIBaseUrl, onC
     setStatus("loading");
     setError("");
     try {
-      const response = await fetch("/api/documents");
+      const params = selectedWorkspaceId ? `?workspaceId=${encodeURIComponent(selectedWorkspaceId)}` : "";
+      const response = await fetch(`/api/documents${params}`);
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || "Could not load documents.");
       setDocuments(data.documents || []);
@@ -61,7 +62,7 @@ export function DocumentsPanel({ apiKey, documentChatEnabled, openAIBaseUrl, onC
       setError(loadError.message || "Could not load documents.");
       setStatus("error");
     }
-  }, []);
+  }, [selectedWorkspaceId]);
 
   useEffect(() => {
     const timeout = setTimeout(() => {
@@ -76,7 +77,7 @@ export function DocumentsPanel({ apiKey, documentChatEnabled, openAIBaseUrl, onC
     const response = await fetch("/api/documents", {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(nextSettings),
+      body: JSON.stringify({ ...nextSettings, workspaceId: selectedWorkspaceId }),
     });
     const data = await response.json();
     if (response.ok) {
@@ -93,6 +94,7 @@ export function DocumentsPanel({ apiKey, documentChatEnabled, openAIBaseUrl, onC
     const formData = new FormData();
     files.forEach((file) => formData.append("files", file));
     Object.entries(settings).forEach(([key, value]) => formData.append(key, value));
+    if (selectedWorkspaceId) formData.append("workspaceId", selectedWorkspaceId);
     if (apiKey) formData.append("apiKey", apiKey);
     if (openAIBaseUrl) formData.append("openAIBaseUrl", openAIBaseUrl);
 
@@ -114,7 +116,8 @@ export function DocumentsPanel({ apiKey, documentChatEnabled, openAIBaseUrl, onC
   }
 
   async function deleteDocument(id) {
-    const response = await fetch(`/api/documents/${id}`, { method: "DELETE" });
+    const params = selectedWorkspaceId ? `?workspaceId=${encodeURIComponent(selectedWorkspaceId)}` : "";
+    const response = await fetch(`/api/documents/${id}${params}`, { method: "DELETE" });
     const data = await response.json();
     if (response.ok) {
       setDocuments(data.documents || []);
@@ -133,6 +136,7 @@ export function DocumentsPanel({ apiKey, documentChatEnabled, openAIBaseUrl, onC
         ...settings,
         apiKey,
         openAIBaseUrl,
+        workspaceId: selectedWorkspaceId,
       }),
     });
     const data = await response.json();
@@ -378,7 +382,11 @@ export function DocumentsPanel({ apiKey, documentChatEnabled, openAIBaseUrl, onC
                           {document.status === "failed" ? ` · ${document.error}` : ""}
                         </span>
                       </div>
-                      <a className="top-icon" href={`/api/documents/${document.id}/download`} title={t("documents.download")}>
+                      <a
+                        className="top-icon"
+                        href={`/api/documents/${document.id}/download${selectedWorkspaceId ? `?workspaceId=${encodeURIComponent(selectedWorkspaceId)}` : ""}`}
+                        title={t("documents.download")}
+                      >
                         <Download size={17} />
                       </a>
                       <button className="top-icon" onClick={() => reindexDocument(document.id)} title={t("documents.reindex")} type="button">

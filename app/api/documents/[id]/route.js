@@ -4,15 +4,19 @@ import { deleteChromaDocument } from "@/lib/rag-chroma";
 import { deletePineconeDocument } from "@/lib/rag-pinecone";
 import { deleteDocument, readDocumentStore, summarizeDocuments } from "@/lib/rag-store";
 import { recordAuditEvent } from "@/lib/compliance-store";
+import { withProductDataScope } from "@/lib/product-data-store";
+import { resolveDocumentProductDataScope } from "@/lib/workspace-access";
 
 export const runtime = "nodejs";
 
-export async function DELETE(_request, { params }) {
+export async function DELETE(request, { params }) {
   const { session, response } = await requireServerPermission({ document: ["delete"] });
   if (response) return response;
 
   const { id } = await params;
-  const currentStore = await readDocumentStore();
+  const { searchParams } = new URL(request.url);
+  const scope = await resolveDocumentProductDataScope(session, searchParams.get("workspaceId"));
+  const currentStore = await withProductDataScope(scope, () => readDocumentStore());
   const document = currentStore.documents.find((item) => item.id === id);
 
   if (document?.vectorStoreProvider === "chroma" || currentStore.settings.vectorStoreProvider === "chroma") {
@@ -30,7 +34,7 @@ export async function DELETE(_request, { params }) {
     }).catch(() => {});
   }
 
-  const store = await deleteDocument(id);
+  const store = await withProductDataScope(scope, () => deleteDocument(id));
   await recordAuditEvent({
     category: "document",
     action: "document.delete",

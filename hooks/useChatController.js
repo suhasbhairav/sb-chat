@@ -168,6 +168,7 @@ export function useChatController() {
   const [tokenUsage, setTokenUsage] = useState(null);
   const [copiedId, setCopiedId] = useState(null);
   const [workspaces, setWorkspaces] = useState([]);
+  const [canManageSharedWorkspaces, setCanManageSharedWorkspaces] = useState(false);
   const [folders, setFolders] = useState([]);
   const [chats, setChats] = useState([]);
   const [activeChatId, setActiveChatId] = useState(null);
@@ -258,6 +259,7 @@ export function useChatController() {
       setWorkspaces(store.workspaces || []);
       setFolders(store.folders || []);
       setChats(store.chats || []);
+      setCanManageSharedWorkspaces(Boolean(store.canManageSharedWorkspaces));
       setSelectedWorkspaceId(store.workspaces?.[0]?.id || null);
       await refreshBranding();
       await refreshTokenUsage();
@@ -489,6 +491,9 @@ export function useChatController() {
     setWorkspaces(store.workspaces || []);
     setFolders(store.folders || []);
     setChats(store.chats || []);
+    setCanManageSharedWorkspaces((current) =>
+      store.canManageSharedWorkspaces === undefined ? current : Boolean(store.canManageSharedWorkspaces),
+    );
   }
 
   async function refreshTokenUsage() {
@@ -757,6 +762,81 @@ export function useChatController() {
     setSelectedFolderId(null);
     newChat();
     setSelectedWorkspaceId(result.workspace.id);
+  }
+
+  async function createSharedWorkspace() {
+    try {
+      const name = window.prompt("Shared workspace name");
+      if (!name?.trim()) return;
+      const membersInput = window.prompt("Member emails, separated by commas", "");
+      const memberEmails = String(membersInput || "")
+        .split(",")
+        .map((member) => member.trim())
+        .filter(Boolean);
+
+      const result = await libraryAction("createWorkspace", { name, shared: true, memberEmails, ragEnabled: true });
+      replaceStore(result.store);
+      setSelectedWorkspaceId(result.workspace.id);
+      setSelectedFolderId(null);
+      newChat();
+      setSelectedWorkspaceId(result.workspace.id);
+    } catch (error) {
+      window.alert(error.message || "Could not create shared workspace.");
+    }
+  }
+
+  async function editSharedWorkspace(workspaceId) {
+    const workspace = workspaces.find((item) => item.id === workspaceId);
+    if (!workspace) return;
+
+    const name = window.prompt("Shared workspace name", workspace.name);
+    if (!name?.trim()) return;
+    const ragInput = window.confirm("Enable RAG for this workspace?");
+
+    try {
+      const result = await libraryAction("updateWorkspace", { workspaceId, name, ragEnabled: ragInput });
+      replaceStore(result.store);
+    } catch (error) {
+      window.alert(error.message || "Could not update shared workspace.");
+    }
+  }
+
+  async function addWorkspaceMemberByEmail(workspaceId, email) {
+    try {
+      const result = await libraryAction("addWorkspaceMember", { workspaceId, email });
+      replaceStore(result.store);
+    } catch (error) {
+      window.alert(error.message || "Could not add user to workspace.");
+    }
+  }
+
+  async function removeWorkspaceMember(workspaceId, userId) {
+    try {
+      const result = await libraryAction("removeWorkspaceMember", { workspaceId, userId });
+      replaceStore(result.store);
+    } catch (error) {
+      window.alert(error.message || "Could not remove user from workspace.");
+    }
+  }
+
+  async function deleteSharedWorkspace(workspaceId) {
+    const workspace = workspaces.find((item) => item.id === workspaceId);
+    if (!workspace) return;
+    if (!window.confirm(`Delete shared workspace "${workspace.name}" and its workspace RAG data?`)) return;
+
+    try {
+      const result = await libraryAction("deleteWorkspace", { workspaceId });
+      replaceStore(result.store);
+      if (selectedWorkspaceId === workspaceId) {
+        const nextWorkspaceId = result.store.workspaces?.[0]?.id || null;
+        setSelectedWorkspaceId(nextWorkspaceId);
+        setSelectedFolderId(null);
+        newChat();
+        setSelectedWorkspaceId(nextWorkspaceId);
+      }
+    } catch (error) {
+      window.alert(error.message || "Could not delete shared workspace.");
+    }
   }
 
   async function createFolder() {
@@ -1235,6 +1315,7 @@ export function useChatController() {
     branding,
     brandingOrganization,
     canSend,
+    canManageSharedWorkspaces,
     chatAttachmentInputRef,
     chatAttachments,
     chatTitle,
@@ -1290,6 +1371,11 @@ export function useChatController() {
     copyMessage,
     createFolder,
     createWorkspace,
+    createSharedWorkspace,
+    editSharedWorkspace,
+    deleteSharedWorkspace,
+    addWorkspaceMemberByEmail,
+    removeWorkspaceMember,
     clearMessages,
     deleteSavedChat,
     deleteMessage,

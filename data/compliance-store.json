@@ -183,6 +183,48 @@
   ],
   "auditEvents": [
     {
+      "id": "audit-1785074106909-981a2add728ed54c",
+      "createdAt": "2026-07-26T13:55:06.909Z",
+      "category": "data",
+      "action": "chat.delete",
+      "outcome": "success",
+      "actor": {
+        "id": "3c4816f5-3e7e-4d26-a6ce-e827cc3c856e",
+        "emailHash": "f660ab912ec121d1b1e928a0bb4bc61b15f5ad44d5efdc4e1c92a25e99b8e44a",
+        "role": "owner"
+      },
+      "target": {
+        "type": "chat",
+        "id": "1785070467392-c07cca1f05ecf8"
+      },
+      "ipHash": null,
+      "userAgent": null,
+      "metadata": {},
+      "previousHash": "38be95ed423ac64252f8f09311f7c1fdce2bd3c76c3c1a36b33f63ce3e7af638",
+      "integrityHash": "949b3bf41555b922a0051206cf0018c2a7a1ac352bbe742acd45f34b31e5fed0"
+    },
+    {
+      "id": "audit-1785074106230-72d883d078ad1c40",
+      "createdAt": "2026-07-26T13:55:06.230Z",
+      "category": "data",
+      "action": "chat.delete",
+      "outcome": "success",
+      "actor": {
+        "id": "3c4816f5-3e7e-4d26-a6ce-e827cc3c856e",
+        "emailHash": "f660ab912ec121d1b1e928a0bb4bc61b15f5ad44d5efdc4e1c92a25e99b8e44a",
+        "role": "owner"
+      },
+      "target": {
+        "type": "chat",
+        "id": "1785072898001-53360833726f8"
+      },
+      "ipHash": null,
+      "userAgent": null,
+      "metadata": {},
+      "previousHash": "52c25f7a30f63a79ab498a3bea1b155df8f5c090e49794d81e6e39dbc3e9192d",
+      "integrityHash": "38be95ed423ac64252f8f09311f7c1fdce2bd3c76c3c1a36b33f63ce3e7af638"
+    },
+    {
       "id": "audit-1785073389206-5804607ebc871a7f",
       "createdAt": "2026-07-26T13:43:09.206Z",
       "category": "data",

@@ -8,6 +8,8 @@ import { formatMemoriesForPrompt, listMemories } from "@/lib/memory-store";
 import { formatSkillsForPrompt, listEnabledSkills } from "@/lib/skill-store";
 import { formatMcpContextForPrompt, getActiveMcpIntegration } from "@/lib/mcp-store";
 import { readMcpResource } from "@/lib/mcp-client";
+import { withProductDataScope } from "@/lib/product-data-store";
+import { resolveDocumentProductDataScope } from "@/lib/workspace-access";
 
 function encodeEvent(event) {
   return new TextEncoder().encode(`${JSON.stringify(event)}\n`);
@@ -122,7 +124,15 @@ export async function POST(request) {
 
     if (chatRequest.documentChat) {
       const latestUserMessage = [...payload.messages].reverse().find((message) => message.role === "user")?.content || "";
-      const retrieval = await retrieveDocumentContext(latestUserMessage);
+      const documentScope = await resolveDocumentProductDataScope(session, payload.workspaceId);
+      const retrieval = await withProductDataScope(documentScope, () =>
+        retrieveDocumentContext(latestUserMessage, {
+          scopeType: documentScope.scopeType,
+          organizationId: documentScope.organizationId,
+          userId: documentScope.userId,
+          workspaceId: documentScope.workspaceId,
+        }),
+      );
       documentSources = retrieval.sources;
 
       if (!retrieval.context) {

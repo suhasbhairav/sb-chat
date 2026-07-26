@@ -13,6 +13,8 @@ import {
 import { chunkDocumentText, extractDocumentText } from "@/lib/rag-processing";
 import { readDocumentStore, saveUploadedDocumentFile, summarizeDocuments, writeDocumentStore } from "@/lib/rag-store";
 import { recordAuditEvent } from "@/lib/compliance-store";
+import { withProductDataScope } from "@/lib/product-data-store";
+import { resolveDocumentProductDataScope } from "@/lib/workspace-access";
 
 export const runtime = "nodejs";
 
@@ -36,11 +38,13 @@ function normalizeSettings(settings = {}) {
   };
 }
 
-export async function GET() {
-  const { response } = await requireServerPermission({ document: ["read"] });
+export async function GET(request) {
+  const { session, response } = await requireServerPermission({ document: ["read"] });
   if (response) return response;
 
-  const store = await readDocumentStore();
+  const { searchParams } = new URL(request.url);
+  const scope = await resolveDocumentProductDataScope(session, searchParams.get("workspaceId"));
+  const store = await withProductDataScope(scope, () => readDocumentStore());
   return json(summarizeDocuments(store));
 }
 
@@ -49,13 +53,14 @@ export async function PATCH(request) {
   if (response) return response;
 
   const payload = await request.json();
-  const store = await readDocumentStore();
+  const scope = await resolveDocumentProductDataScope(session, payload.workspaceId);
+  const store = await withProductDataScope(scope, () => readDocumentStore());
   const nextStore = {
     ...store,
     settings: normalizeSettings({ ...store.settings, ...payload }),
   };
 
-  await writeDocumentStore(nextStore);
+  await withProductDataScope(scope, () => writeDocumentStore(nextStore));
   await recordAuditEvent({
     category: "document",
     action: "document.settings.update",
@@ -77,6 +82,7 @@ export async function POST(request) {
     if (response) return response;
 
     const formData = await request.formData();
+    const scope = await resolveDocumentProductDataScope(session, formData.get("workspaceId"));
     const files = formData.getAll("files").filter((file) => file?.name);
     const settings = normalizeSettings({
       embeddingProvider: formData.get("embeddingProvider"),
@@ -94,13 +100,19 @@ export async function POST(request) {
       pineconeApiKey: formData.get("pineconeApiKey"),
       openAIBaseUrl: formData.get("openAIBaseUrl"),
     });
+    Object.assign(settings, {
+      scopeType: scope.scopeType,
+      organizationId: scope.organizationId,
+      userId: scope.userId,
+      workspaceId: scope.workspaceId,
+    });
     const apiKey = String(formData.get("apiKey") || "") || resolveServerApiKey("openai", "");
 
     if (!files.length) {
       return json({ error: "Choose at least one document." }, 400);
     }
 
-    let store = await readDocumentStore();
+    let store = await withProductDataScope(scope, () => readDocumentStore());
     const uploaded = [];
 
     for (const file of files) {
@@ -147,6 +159,10 @@ export async function POST(request) {
           embedding: embeddings[index],
           embeddingProvider: settings.embeddingProvider,
           embeddingModel: settings.embeddingModel,
+          scopeType: scope.scopeType,
+          organizationId: scope.organizationId,
+          userId: scope.userId,
+          workspaceId: scope.workspaceId,
           createdAt,
         }));
         if (settings.vectorStoreProvider === "chroma") {
@@ -196,7 +212,7 @@ export async function POST(request) {
       }
     }
 
-    await writeDocumentStore(store);
+    await withProductDataScope(scope, () => writeDocumentStore(store));
     await recordAuditEvent({
       category: "document",
       action: "document.upload",

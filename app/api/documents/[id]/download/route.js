@@ -3,15 +3,19 @@ import { json } from "@/lib/chat-request";
 import { requireServerPermission } from "@/lib/auth-session";
 import { getDocumentFilePath, readDocumentStore } from "@/lib/rag-store";
 import { recordAuditEvent } from "@/lib/compliance-store";
+import { withProductDataScope } from "@/lib/product-data-store";
+import { resolveDocumentProductDataScope } from "@/lib/workspace-access";
 
 export const runtime = "nodejs";
 
-export async function GET(_request, { params }) {
+export async function GET(request, { params }) {
   const { session, response } = await requireServerPermission({ document: ["download"] });
   if (response) return response;
 
   const { id } = await params;
-  const store = await readDocumentStore();
+  const { searchParams } = new URL(request.url);
+  const scope = await resolveDocumentProductDataScope(session, searchParams.get("workspaceId"));
+  const store = await withProductDataScope(scope, () => readDocumentStore());
   const document = store.documents.find((item) => item.id === id);
 
   if (!document) {

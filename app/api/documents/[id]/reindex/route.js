@@ -13,11 +13,13 @@ import {
 import { chunkDocumentText, extractDocumentText } from "@/lib/rag-processing";
 import { getDocumentFilePath, readDocumentStore, summarizeDocuments, writeDocumentStore } from "@/lib/rag-store";
 import { recordAuditEvent } from "@/lib/compliance-store";
+import { withProductDataScope } from "@/lib/product-data-store";
+import { resolveDocumentProductDataScope } from "@/lib/workspace-access";
 
 export const runtime = "nodejs";
 
-async function markDocumentReindexFailed(documentId, error) {
-  const store = await readDocumentStore();
+async function markDocumentReindexFailed(documentId, error, scope) {
+  const store = await withProductDataScope(scope, () => readDocumentStore());
   const message = error.message || "Document reindex failed.";
   const nextStore = {
     ...store,
@@ -33,12 +35,13 @@ async function markDocumentReindexFailed(documentId, error) {
     ),
   };
 
-  await writeDocumentStore(nextStore);
+  await withProductDataScope(scope, () => writeDocumentStore(nextStore));
   return nextStore;
 }
 
 export async function POST(request, { params }) {
   let documentId = "";
+  let activeScope = null;
 
   try {
     const { session, response } = await requireServerPermission({ document: ["update"] });
@@ -47,7 +50,8 @@ export async function POST(request, { params }) {
     const { id } = await params;
     documentId = id;
     const payload = await request.json().catch(() => ({}));
-    const store = await readDocumentStore();
+    activeScope = await resolveDocumentProductDataScope(session, payload.workspaceId);
+    const store = await withProductDataScope(activeScope, () => readDocumentStore());
     const document = store.documents.find((item) => item.id === id);
 
     if (!document) {
@@ -68,6 +72,10 @@ export async function POST(request, { params }) {
       pineconeNamespace: normalizePineconeNamespace(payload.pineconeNamespace || store.settings.pineconeNamespace),
       pineconeCloud: normalizePineconeCloud(payload.pineconeCloud || store.settings.pineconeCloud),
       pineconeRegion: normalizePineconeRegion(payload.pineconeRegion || store.settings.pineconeRegion),
+      scopeType: activeScope.scopeType,
+      organizationId: activeScope.organizationId,
+      userId: activeScope.userId,
+      workspaceId: activeScope.workspaceId,
     };
     const filePath = getDocumentFilePath(document);
     const text = await extractDocumentText(filePath, document.name);
@@ -93,6 +101,10 @@ export async function POST(request, { params }) {
       embedding: embeddings[index],
       embeddingProvider: settings.embeddingProvider,
       embeddingModel: settings.embeddingModel,
+      scopeType: activeScope.scopeType,
+      organizationId: activeScope.organizationId,
+      userId: activeScope.userId,
+      workspaceId: activeScope.workspaceId,
       createdAt,
     }));
     if (settings.vectorStoreProvider === "chroma") {
@@ -155,7 +167,7 @@ export async function POST(request, { params }) {
       ],
     };
 
-    await writeDocumentStore(nextStore);
+    await withProductDataScope(activeScope, () => writeDocumentStore(nextStore));
     await recordAuditEvent({
       category: "document",
       action: "document.reindex",
@@ -172,8 +184,8 @@ export async function POST(request, { params }) {
     return json(summarizeDocuments(nextStore));
   } catch (error) {
     console.error("Document reindex failed", error);
-    if (documentId) {
-      const failedStore = await markDocumentReindexFailed(documentId, error).catch(() => null);
+    if (documentId && activeScope) {
+      const failedStore = await markDocumentReindexFailed(documentId, error, activeScope).catch(() => null);
       return json(
         {
           ...(failedStore ? summarizeDocuments(failedStore) : {}),

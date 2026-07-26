@@ -15,6 +15,10 @@ create table if not exists batuk_workspaces (
   id varchar(160) primary key,
   organization_id varchar(160),
   user_id varchar(160),
+  scope_type varchar(40) not null default 'personal',
+  owner_id varchar(160),
+  members jsonb not null default '[]'::jsonb,
+  rag_enabled boolean not null default true,
   name varchar(120) not null,
   metadata jsonb not null default '{}'::jsonb,
   created_at timestamptz not null default now(),
@@ -80,6 +84,8 @@ create table if not exists batuk_documents (
   id varchar(160) primary key,
   organization_id varchar(160),
   user_id varchar(160),
+  scope_type varchar(40) not null default 'personal',
+  workspace_id varchar(160),
   name text not null,
   stored_name text not null,
   mime_type varchar(240),
@@ -102,6 +108,8 @@ create table if not exists batuk_document_chunks (
   document_id varchar(160) not null,
   organization_id varchar(160),
   user_id varchar(160),
+  scope_type varchar(40) not null default 'personal',
+  workspace_id varchar(160),
   chunk_index integer not null,
   content text not null,
   embedding_json jsonb,
@@ -115,6 +123,8 @@ create table if not exists batuk_vector_index_refs (
   provider varchar(80) not null,
   organization_id varchar(160),
   user_id varchar(160),
+  scope_type varchar(40) not null default 'personal',
+  workspace_id varchar(160),
   document_id varchar(160),
   index_name varchar(240),
   namespace varchar(240),
@@ -255,5 +265,8 @@ create table if not exists batuk_application_logs (
 create index if not exists batuk_chats_scope_idx on batuk_chats (organization_id, user_id, updated_at desc);
 create index if not exists batuk_messages_chat_idx on batuk_chat_messages (chat_id, created_at);
 create index if not exists batuk_documents_scope_idx on batuk_documents (organization_id, user_id, created_at desc);
+create index if not exists batuk_documents_rag_scope_idx on batuk_documents (scope_type, organization_id, user_id, workspace_id, created_at desc);
+create index if not exists batuk_document_chunks_rag_scope_idx on batuk_document_chunks (scope_type, organization_id, user_id, workspace_id, document_id);
+create index if not exists batuk_vector_refs_rag_scope_idx on batuk_vector_index_refs (provider, scope_type, organization_id, user_id, workspace_id);
 create index if not exists batuk_token_usage_scope_idx on batuk_token_usage_events (organization_id, user_id, created_at desc);
 create index if not exists batuk_audit_scope_idx on batuk_audit_events (organization_id, user_id, created_at desc);

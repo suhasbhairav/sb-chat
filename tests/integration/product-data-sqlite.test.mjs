@@ -12,6 +12,7 @@ const {
   isSqlProductDataStoreEnabled,
   readSqlDomainStore,
   resolveProductDataScope,
+  resolveWorkspaceProductDataScope,
   withProductDataScope,
   writeSqlDomainStore,
 } = await import("../../lib/product-data-store.js");
@@ -38,10 +39,21 @@ describe("SQLite product data store", () => {
     assert.equal(userStore.chats[0].id, "chat-2");
   });
 
-  it("falls back to user scope when no active organization exists", () => {
+  it("falls back to a private personal scope when no active organization exists", () => {
     assert.deepEqual(resolveProductDataScope({ user: { id: "user-only" } }), {
-      organizationId: "user-only",
+      organizationId: "personal",
       userId: "user-only",
+      scopeType: "personal",
+      workspaceId: null,
+    });
+  });
+
+  it("uses an explicit workspace scope only when requested", () => {
+    assert.deepEqual(resolveWorkspaceProductDataScope({ user: { id: "user-a" }, session: { activeOrganizationId: "org-a" } }, "workspace-a"), {
+      organizationId: "org-a",
+      userId: "workspace:workspace-a",
+      scopeType: "workspace",
+      workspaceId: "workspace-a",
     });
   });
 });
