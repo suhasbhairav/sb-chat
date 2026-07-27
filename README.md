@@ -31,6 +31,12 @@
   <a href="https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fsuhasbhairav%2Fsb-chat&project-name=batuk&repository-name=batuk">
     <img src="https://vercel.com/button" alt="Deploy with Vercel" />
   </a>
+  <a href="https://render.com/deploy?repo=https%3A%2F%2Fgithub.com%2Fsuhasbhairav%2Fsb-chat">
+    <img src="https://render.com/images/deploy-to-render-button.svg" alt="Deploy to Render" />
+  </a>
+  <a href="https://railway.com/new/template?template=https%3A%2F%2Fgithub.com%2Fsuhasbhairav%2Fsb-chat&utm_campaign=batuk">
+    <img src="https://railway.com/button.svg" alt="Deploy on Railway" />
+  </a>
 </p>
 
 Batuk is a fully open-source enterprise-native AI platform for teams. Its main purpose is simple: give users one polished chat interface for every model they are allowed to run, from local Ollama models to OpenAI and private OpenAI-compatible gateways, with document RAG, enterprise authentication, admin controls, audit evidence, and deployment-friendly storage.
@@ -232,6 +238,16 @@ For fully offline installs, mirror the base images and service images used by `d
 For hosted evaluation or internet-connected team pilots, use the one-click Vercel button at the top of this README. After the project is created, configure the required runtime variables from `.env.enterprise.example` in Vercel Project Settings, then redeploy.
 
 Vercel is ideal for quick managed Next.js hosting. Use Docker Compose for air-gapped enterprise installs, private SQL services, local ChromaDB, and controlled filesystem storage.
+
+## Render and Railway Deployment
+
+The README includes one-click buttons for Render and Railway.
+
+- Render uses `render.yaml` to create a Node web service with `npm install && npm run build` and `npm run start`.
+- Railway uses `railway.json` with Nixpacks and the same build/start commands.
+- Set `BETTER_AUTH_URL` to the final public deployment URL after the service is created.
+- Keep `BETTER_AUTH_SECRET` strong and unique per deployment.
+- Local JSON/SQLite storage is fine for demos. Use Docker Compose or SQL product storage for durable multi-user production deployments.
 
 ## Configuration
 

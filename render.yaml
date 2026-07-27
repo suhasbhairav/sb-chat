@@ -1,0 +1,19 @@
+services:
+  - type: web
+    name: batuk
+    runtime: node
+    plan: free
+    buildCommand: npm install && npm run build
+    startCommand: npm run start
+    autoDeploy: false
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: BETTER_AUTH_SECRET
+        generateValue: true
+      - key: BETTER_AUTH_URL
+        sync: false
+      - key: BATUK_DATA_STORE_PROVIDER
+        value: json
+      - key: BETTER_AUTH_DATABASE_PROVIDER
+        value: sqlite
