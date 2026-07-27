@@ -179,6 +179,7 @@ export async function POST(request) {
           if (usage.totalTokens > 0 || usage.inputTokens > 0 || usage.outputTokens > 0) {
             await recordTokenUsage({
               userId: session.user.id,
+              userEmail: session.user.email,
               chatId: payload.chatId,
               workspaceId: payload.workspaceId,
               folderId: payload.folderId,
@@ -186,6 +187,7 @@ export async function POST(request) {
               model: modelRequest.model,
               temporary: Boolean(payload.temporary),
               ...usage,
+              source: "chat",
             });
           }
 

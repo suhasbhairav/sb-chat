@@ -1,7 +1,6 @@
-import { FolderPlus, MessageSquarePlus, PanelLeft, Pencil, Plus, Search, Sparkles, Trash2, Users } from "lucide-react";
+import { FolderPlus, MessageSquarePlus, PanelLeft, Plus, Search, Sparkles, Trash2 } from "lucide-react";
 import { BrandMark } from "@/components/brand/BrandMark";
 import { useI18n } from "@/components/i18n/I18nProvider";
-import { useState } from "react";
 
 export function Sidebar({
   activeChatId,
@@ -13,16 +12,10 @@ export function Sidebar({
   selectedFolderId,
   selectedWorkspaceId,
   workspaces,
-  canManageSharedWorkspaces,
   onChangeSearch,
   onClose,
   onCreateFolder,
   onCreateWorkspace,
-  onCreateSharedWorkspace,
-  onDeleteSharedWorkspace,
-  onEditSharedWorkspace,
-  onAddWorkspaceMemberByEmail,
-  onRemoveWorkspaceMember,
   onDeleteChat,
   onMoveChat,
   onNewChat,
@@ -35,18 +28,6 @@ export function Sidebar({
   const productName = brandEnabled ? branding.productName : "Batuk";
   const visibleFolders = folders.filter((folder) => folder.workspaceId === selectedWorkspaceId);
   const visibleChats = chats.filter((chat) => chat.workspaceId === selectedWorkspaceId);
-  const selectedWorkspace = workspaces.find((workspace) => workspace.id === selectedWorkspaceId);
-  const selectedWorkspaceMembers = selectedWorkspace?.memberDetails?.length
-    ? selectedWorkspace.memberDetails
-    : (selectedWorkspace?.members || []).map((id) => ({ id, email: id }));
-  const [memberEmail, setMemberEmail] = useState("");
-
-  async function addMember(event) {
-    event.preventDefault();
-    if (!selectedWorkspace?.id || !memberEmail.trim()) return;
-    await onAddWorkspaceMemberByEmail(selectedWorkspace.id, memberEmail.trim());
-    setMemberEmail("");
-  }
 
   return (
     <aside className={`sidebar ${isOpen ? "is-open" : ""}`}>
@@ -70,12 +51,6 @@ export function Sidebar({
           <Sparkles size={20} />
           {t("sidebar.newWorkspace")}
         </button>
-        {canManageSharedWorkspaces && (
-          <button onClick={onCreateSharedWorkspace} type="button">
-            <Users size={20} />
-            Shared workspace
-          </button>
-        )}
       </nav>
 
       <div className="sidebar-search">
@@ -105,53 +80,9 @@ export function Sidebar({
               <span>{workspace.scope === "workspace" ? "@" : "#"}</span>
               {workspace.name}
             </button>
-            {canManageSharedWorkspaces && workspace.scope === "workspace" && (
-              <div className="workspace-actions">
-                <button onClick={() => onEditSharedWorkspace(workspace.id)} title="Edit shared workspace" type="button">
-                  <Pencil size={13} />
-                </button>
-                <button onClick={() => onDeleteSharedWorkspace(workspace.id)} title="Delete shared workspace" type="button">
-                  <Trash2 size={13} />
-                </button>
-              </div>
-            )}
           </div>
         ))}
       </div>
-
-      {canManageSharedWorkspaces && selectedWorkspace?.scope === "workspace" && (
-        <div className="sidebar-section workspace-members">
-          <div className="section-heading-row">
-            <p>Users</p>
-            <span className="workspace-rag-pill">{selectedWorkspace.ragEnabled === false ? "RAG off" : "RAG on"}</span>
-          </div>
-          <form className="workspace-member-form" onSubmit={addMember}>
-            <input
-              onChange={(event) => setMemberEmail(event.target.value)}
-              placeholder="user@example.com"
-              type="email"
-              value={memberEmail}
-            />
-            <button type="submit" title="Add user by email">
-              <Plus size={14} />
-            </button>
-          </form>
-          <div className="workspace-member-list">
-            {selectedWorkspaceMembers.length ? (
-              selectedWorkspaceMembers.map((member) => (
-                <div className="workspace-member-row" key={member.id}>
-                  <span>{member.email || member.name || member.id}</span>
-                  <button onClick={() => onRemoveWorkspaceMember(selectedWorkspace.id, member.id)} title={`Remove ${member.email || member.id}`} type="button">
-                    Remove
-                  </button>
-                </div>
-              ))
-            ) : (
-              <div className="empty-sidebar-copy">No users added.</div>
-            )}
-          </div>
-        </div>
-      )}
 
       <div className="sidebar-section">
         <div className="section-heading-row">

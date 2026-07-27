@@ -10,6 +10,7 @@
     "auth:migrate": "node scripts/migrate-auth.mjs",
     "data:migrate": "node scripts/migrate-product-data.mjs",
     "env:validate": "node scripts/validate-enterprise-env.mjs",
+    "capture:readme-gif": "node scripts/capture-readme-gif.mjs",
     "start": "next start",
     "lint": "eslint",
     "test": "npm run test:unit",
@@ -53,6 +54,7 @@
     "@tailwindcss/postcss": "^4",
     "eslint": "^9",
     "eslint-config-next": "16.2.11",
+    "playwright": "^1.62.0",
     "tailwindcss": "^4",
     "typescript": "^6.0.3"
   }

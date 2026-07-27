@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { ClipboardCheck, Database, Download, FileClock, RefreshCw, ShieldCheck, X } from "lucide-react";
+import { ArrowLeft, ClipboardCheck, Database, Download, FileClock, RefreshCw, ShieldCheck, X } from "lucide-react";
 
 async function complianceRequest(action, payload = {}) {
   const response = await fetch("/api/compliance", {
@@ -35,7 +35,7 @@ function formatDate(value) {
   return new Date(value).toLocaleString();
 }
 
-export function AuditPanel({ onClose }) {
+export function AuditPanel({ onBackToMenu, onClose }) {
   const [compliance, setCompliance] = useState(null);
   const [status, setStatus] = useState("loading");
   const [error, setError] = useState("");
@@ -100,6 +100,10 @@ export function AuditPanel({ onClose }) {
           <h2>Audit, compliance, and privacy operations</h2>
         </div>
         <div className="audit-header-actions">
+          <button className="secondary-button panel-back-button" onClick={onBackToMenu} type="button">
+            <ArrowLeft size={16} />
+            Back to menu
+          </button>
           <button className="top-icon" onClick={load} title="Refresh audit data" type="button">
             <RefreshCw size={18} />
           </button>

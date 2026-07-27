@@ -12,6 +12,12 @@
   <img src="public/homepage.png" alt="Batuk AI chat workspace" width="100%" />
 </p>
 
+<p align="center">
+  <a href="https://app.arcade.software/share/videos/UZnHQSj8q0OA8UurPFvW">
+    <strong>Watch the Batuk demo video</strong>
+  </a>
+</p>
+
 ![Next.js](https://img.shields.io/badge/Next.js-16-black?style=for-the-badge&logo=nextdotjs)
 ![React](https://img.shields.io/badge/React-19-149eca?style=for-the-badge&logo=react&logoColor=white)
 ![Ollama](https://img.shields.io/badge/Ollama-Local_AI-111111?style=for-the-badge)
@@ -38,6 +44,7 @@ Batuk is local-first by default and enterprise-ready when you need it. Run it on
 - **Choose your vector store:** local JSON vectors by default, ChromaDB for self-hosted vector search, or Pinecone for managed vector search.
 - **Built for teams:** Better Auth users, admins, roles, organizations, teams, invitations, SSO, OAuth/OIDC provider support, and SCIM provisioning.
 - **Enterprise operations:** GDPR request workflows, audit trail, CSV evidence export, ISO 27001/SOC 2 control register, token usage, and organization-scoped storage.
+- **Internal model API gateway:** users can generate personal API keys and call admin-enabled models through OpenAI-compatible endpoints.
 - **Whitelabel by organization:** admins can set product name, tagline, accent color, initials, and uploaded logo while the footer always preserves Batuk attribution.
 
 ## Core Features
@@ -48,7 +55,8 @@ Batuk is local-first by default and enterprise-ready when you need it. Run it on
 - Provider-specific model picker and manual model entry.
 - Runtime Settings for local evaluation and server-side configuration for deployments.
 - Temporary chat mode that avoids history persistence.
-- Workspaces, folders, search, import, export, and copy actions.
+- Personal workspaces, shared workspaces, folders, search, import, export, and copy actions.
+- A Workspace tools menu with separate pages for Provider settings, API access, Workspace management, Chat history and data, Token usage, Enterprise management, and Audit and compliance.
 - Web search through OpenAI hosted search when enabled.
 - OpenAI Realtime voice sessions with browser microphone input.
 - Guardrails for safer request screening and system behavior.
@@ -59,6 +67,9 @@ Batuk is local-first by default and enterprise-ready when you need it. Run it on
 - Extract text, chunk content, embed chunks, and retrieve relevant context during chat.
 - Use local deterministic embeddings for offline/private indexing or OpenAI embeddings for higher-quality semantic search.
 - Store vectors in local JSON, ChromaDB, or Pinecone.
+- Personal document uploads and memories are private to the signed-in user, even when the user belongs to an organization.
+- Shared workspace RAG is available only inside an admin-created shared workspace and only to admins or users added to that workspace.
+- ChromaDB and Pinecone chunks carry scope metadata so retrieval filters by personal or workspace scope before context reaches the model.
 - Download always returns the original uploaded file.
 - Delete removes local metadata, source files, chunk records, and remote vectors when ChromaDB or Pinecone is used.
 - Pinecone index dimension handling supports both local 384-dimensional embeddings and 1536-dimensional OpenAI embeddings.
@@ -80,7 +91,48 @@ Batuk is local-first by default and enterprise-ready when you need it. Run it on
 - Full admin user CRUD: create, view, update, reset password, ban, unban, and delete users.
 - Organization creation and active organization switching.
 - Team creation, member invitations, and role management.
+- Shared workspace CRUD for admins: create, rename, enable/disable workspace RAG, delete, add users by email, and remove users from the workspace member list.
 - Enterprise whitelabel controls with logo upload and locked footer attribution.
+
+### API Access and Model Gateway
+
+- Every signed-in user can open **API access**, generate their own Batuk API key, copy the secret once, and revoke the key when it is no longer needed.
+- API keys are user-scoped. A non-admin can only see and revoke their own keys.
+- Admins can see all user API keys, revoke individual keys, or revoke all active API access for a user.
+- Admins manage public API model routes that map external model IDs such as `company/support-large` to the provider/model/base URL configured for Batuk.
+- Raw API keys are never stored. Batuk stores a SHA-256 hash, short preview, owner metadata, status, created/revoked timestamps, and last-used timestamp.
+- API Access is visible to all signed-in users. Workspace Management, Enterprise Management, and Audit and Compliance are admin-only menu entries.
+- Programmatic clients use OpenAI-compatible endpoints:
+
+```bash
+curl -H "Authorization: Bearer batuk_..." http://localhost:3000/api/v1/models
+
+curl -X POST http://localhost:3000/api/v1/chat/completions \
+  -H "Authorization: Bearer batuk_..." \
+  -H "Content-Type: application/json" \
+  -d '{"model":"ollama/llama3.1","messages":[{"role":"user","content":"Hello"}]}'
+```
+
+- The API gateway records token usage with `source: "api"`, API key ID, user ID/email, provider, and public model ID so chat and API usage can be separated in reporting.
+- The gateway has been smoke tested end-to-end against local Ollama `qwen3:8b` through `POST /api/v1/chat/completions`.
+
+### Token Usage Dashboard
+
+- Token usage now separates chat traffic from API traffic.
+- The dashboard aggregates input, output, total tokens, and request count across the organization-level usage store.
+- Usage can be reviewed by channel, user, chat, API key, provider, model, day, month, and year with numeric tables and lightweight charts.
+- Chat requests record `source: "chat"` and API requests record `source: "api"` so costs and adoption patterns do not get mixed together.
+
+### Workspace Privacy Model
+
+- Personal chats, folders, uploaded documents, memories, and local JSON stores are scoped to the signed-in user.
+- Shared workspaces are stored in an organization-level registry, but their chats, folders, documents, chunks, and vectors use a separate workspace scope.
+- Users only see shared workspaces where they are members. Admins can see and manage shared workspaces.
+- Non-admin users can enter shared workspaces they belong to, but they do not see admin-only management pages.
+- Shared workspace membership is managed by email in the UI; Batuk resolves email addresses to existing Better Auth users and stores user IDs for authorization.
+- Deleting personal chats affects only the signed-in user's personal workspace.
+- Shared workspace chats can be deleted by admins and by users who belong to that workspace.
+- Deleting a shared workspace removes its shared RAG metadata, local uploaded source files, JSON chunks, and remote ChromaDB/Pinecone vectors where metadata is available.
 
 ### Audit and Compliance
 
@@ -125,7 +177,7 @@ MCP integration work is currently in progress. Batuk includes an early MCP dashb
 | Branding logos | `public/branding` | Configurable local/container path |
 | Vectors | Local JSON | ChromaDB, Pinecone |
 
-Product data includes chats, workspaces, folders, documents metadata/chunks, memories, skills, MCP integration records, agents, workflows, token usage, branding, compliance records, GDPR requests, and audit trails. SQL mode scopes data by active organization and user; if there is no organization, data falls back to the user scope.
+Product data includes chats, workspaces, folders, documents metadata/chunks, memories, API management records, skills, MCP integration records, agents, workflows, token usage, branding, compliance records, GDPR requests, and audit trails. Personal product data is scoped to the signed-in user by default. Shared workspace data is scoped explicitly to the workspace and is only loaded after membership or admin access checks pass. Local JSON mode uses scoped files under `data/scoped-chat` and `data/scoped-documents`; SQL mode stores each domain by scope in `batuk_app_state`, with schema initialization files also exposing first-class scope columns, API key/model route tables, and token usage dimensions for enterprise deployments.
 
 ## Quick Start
 
@@ -211,6 +263,7 @@ npm run lint          # Run ESLint
 npm run env:validate  # Validate enterprise environment
 npm run auth:migrate  # Create/update Better Auth schema
 npm run data:migrate  # Create/update Batuk product data schema
+npm run capture:readme-gif # Capture README demo frames with Playwright
 ```
 
 ## Test Commands
@@ -234,6 +287,39 @@ BATUK_LOAD_REQUESTS=200 BATUK_LOAD_CONCURRENCY=25 npm run test:load
 ```
 
 Yarn users can run the same gates as `yarn test:unit`, `yarn test:integration`, `yarn test:e2e`, `yarn test:load`, `yarn test:security`, `yarn test:regression`, and `yarn test:all`.
+
+### API Gateway Smoke Test
+
+The unit suite mocks provider calls for deterministic coverage, and the gateway has also been validated with a real local Ollama model. A manual smoke test uses an admin-enabled route pointing at `qwen3:8b`, then calls Batuk's OpenAI-compatible endpoint:
+
+```bash
+curl -X POST http://localhost:3000/api/v1/chat/completions \
+  -H "Authorization: Bearer batuk_..." \
+  -H "Content-Type: application/json" \
+  -d '{"model":"batuk/qwen3-8b","messages":[{"role":"user","content":"Reply with exactly: Batuk API Ollama smoke test passed"}],"temperature":0}'
+```
+
+Expected shape:
+
+```json
+{
+  "object": "chat.completion",
+  "model": "batuk/qwen3-8b",
+  "choices": [
+    {
+      "message": {
+        "role": "assistant",
+        "content": "Batuk API Ollama smoke test passed"
+      }
+    }
+  ],
+  "usage": {
+    "prompt_tokens": 23,
+    "completion_tokens": 217,
+    "total_tokens": 240
+  }
+}
+```
 
 ## Project Shape
 

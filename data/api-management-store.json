@@ -1,0 +1,47 @@
+{
+  "version": 1,
+  "settings": {
+    "enabled": true,
+    "requireUserKeys": true
+  },
+  "modelRoutes": [
+    {
+      "id": "ollama/llama3.1",
+      "label": "Ollama llama3.1",
+      "provider": "ollama",
+      "model": "llama3.1",
+      "baseUrl": "http://localhost:11434",
+      "enabled": true,
+      "createdAt": "2026-07-27T10:26:31.792Z",
+      "updatedAt": "2026-07-27T10:26:31.792Z"
+    }
+  ],
+  "keys": [
+    {
+      "id": "1785148674906-c85738c9ddb0a",
+      "userId": "real-ollama-test-user",
+      "userEmail": "real-ollama-test@example.com",
+      "name": "Real Ollama smoke test",
+      "keyHash": "411551a1555af2021fb909de426b17b5bda70e33e88753596e75f6deb40e37fa",
+      "preview": "batuk_0LFz...sGTM",
+      "status": "revoked",
+      "createdAt": "2026-07-27T10:37:54.906Z",
+      "lastUsedAt": "2026-07-27T10:38:14.125Z",
+      "revokedAt": "2026-07-27T10:38:29.322Z",
+      "revokedBy": "codex-smoke-test"
+    },
+    {
+      "id": "1785148015324-9a04683c45fcd8",
+      "userId": "3c4816f5-3e7e-4d26-a6ce-e827cc3c856e",
+      "userEmail": "test@test.com",
+      "name": "TestDefault API key",
+      "keyHash": "edfc963048d368b242822bb361502f04d521b462cf7dd8d899ba5abda511ec88",
+      "preview": "batuk_zSAu...W94H",
+      "status": "active",
+      "createdAt": "2026-07-27T10:26:55.324Z",
+      "lastUsedAt": null,
+      "revokedAt": null,
+      "revokedBy": null
+    }
+  ]
+}

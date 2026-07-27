@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { Building2, Crown, LockKeyhole, Palette, RefreshCw, ShieldCheck, Trash2, Upload, UsersRound, X } from "lucide-react";
+import { ArrowLeft, Building2, Crown, LockKeyhole, Palette, RefreshCw, ShieldCheck, Trash2, Upload, UsersRound, X } from "lucide-react";
 import { BrandMark } from "@/components/brand/BrandMark";
 
 const ROLE_OPTIONS = ["owner", "admin", "member", "viewer", "user"];
@@ -29,6 +29,7 @@ async function enterpriseRequest(action, payload = {}) {
 export function EnterprisePanel({
   branding,
   brandingOrganization,
+  onBackToMenu,
   onClose,
   onRefreshBranding,
   onRemoveBrandingLogo,
@@ -185,6 +186,10 @@ export function EnterprisePanel({
           <h2>Teams, admins, users, and roles</h2>
         </div>
         <div className="enterprise-header-actions">
+          <button className="secondary-button panel-back-button" onClick={onBackToMenu} type="button">
+            <ArrowLeft size={16} />
+            Back to menu
+          </button>
           <button className="top-icon" onClick={load} title="Refresh enterprise data" type="button">
             <RefreshCw size={18} />
           </button>

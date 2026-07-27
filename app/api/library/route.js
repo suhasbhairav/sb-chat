@@ -12,9 +12,9 @@ import {
 import { json } from "@/lib/chat-request";
 import { requireServerPermission } from "@/lib/auth-session";
 import { recordAuditEvent } from "@/lib/compliance-store";
-import { isAdminSession } from "@/lib/workspace-access";
+import { getAccessibleWorkspace, isAdminSession } from "@/lib/workspace-access";
 import { deleteSharedWorkspace, readSharedWorkspaceRegistry, updateSharedWorkspace, upsertSharedWorkspace } from "@/lib/workspace-registry";
-import { resolveWorkspaceProductDataScope, withProductDataScope } from "@/lib/product-data-store";
+import { resolvePersonalProductDataScope, resolveWorkspaceProductDataScope, withProductDataScope } from "@/lib/product-data-store";
 import { deleteDocument, readDocumentStore } from "@/lib/rag-store";
 import { deleteChromaDocument } from "@/lib/rag-chroma";
 import { deletePineconeDocument } from "@/lib/rag-pinecone";
@@ -63,7 +63,7 @@ async function resolveUsersByEmail(emails = []) {
 }
 
 async function buildLibraryResponseStore(session) {
-  const store = await readChatStore();
+  const store = await withProductDataScope(resolvePersonalProductDataScope(session), () => readChatStore());
   const registry = await readSharedWorkspaceRegistry(session);
   const userId = String(session.user.id);
   const visibleSharedWorkspaces = registry.workspaces.filter((workspace) => {
@@ -71,7 +71,53 @@ async function buildLibraryResponseStore(session) {
     return workspace.ownerId === userId || members.includes(userId) || isAdminSession(session);
   });
   const workspaceMap = new Map([...visibleSharedWorkspaces, ...(store.workspaces || [])].map((workspace) => [workspace.id, workspace]));
-  return { ...store, canManageSharedWorkspaces: isAdminSession(session), workspaces: Array.from(workspaceMap.values()) };
+  const sharedStores = await Promise.all(
+    visibleSharedWorkspaces.map((workspace) =>
+      withProductDataScope(resolveWorkspaceProductDataScope(session, workspace.id), () => readChatStore()).then((sharedStore) => ({
+        workspace,
+        store: sharedStore,
+      })),
+    ),
+  );
+  const sharedFolders = sharedStores.flatMap(({ workspace, store: sharedStore }) =>
+    (sharedStore.folders || []).map((folder) => ({ ...folder, workspaceId: workspace.id, shared: true })),
+  );
+  const sharedChats = sharedStores.flatMap(({ workspace, store: sharedStore }) =>
+    (sharedStore.chats || []).map((chat) => ({ ...chat, workspaceId: workspace.id, shared: true })),
+  );
+
+  return {
+    ...store,
+    canManageSharedWorkspaces: isAdminSession(session),
+    workspaces: Array.from(workspaceMap.values()),
+    folders: [...(store.folders || []), ...sharedFolders],
+    chats: [...sharedChats, ...(store.chats || [])],
+  };
+}
+
+async function workspaceScopeForChatAction(session, workspaceId) {
+  const workspace = await getAccessibleWorkspace(session, workspaceId);
+  if (workspace?.scope === "workspace") {
+    return resolveWorkspaceProductDataScope(session, workspace.id);
+  }
+  return resolvePersonalProductDataScope(session);
+}
+
+async function findChatScope(session, chatId) {
+  const personalScope = resolvePersonalProductDataScope(session);
+  const personalStore = await withProductDataScope(personalScope, () => readChatStore());
+  if (personalStore.chats.some((chat) => chat.id === chatId)) return personalScope;
+
+  const registry = await readSharedWorkspaceRegistry(session);
+  for (const workspace of registry.workspaces) {
+    const accessible = await getAccessibleWorkspace(session, workspace.id);
+    if (!accessible) continue;
+    const scope = resolveWorkspaceProductDataScope(session, workspace.id);
+    const store = await withProductDataScope(scope, () => readChatStore());
+    if (store.chats.some((chat) => chat.id === chatId)) return scope;
+  }
+
+  return personalScope;
 }
 
 export async function GET() {
@@ -234,7 +280,9 @@ export async function POST(request) {
     }
 
     if (body.action === "createFolder") {
-      const result = await createFolder({ workspaceId: body.workspaceId, name: body.name });
+      const scope = await workspaceScopeForChatAction(session, body.workspaceId);
+      const result = await withProductDataScope(scope, () => createFolder({ workspaceId: body.workspaceId, name: body.name }));
+      result.store = await buildLibraryResponseStore(session);
       await recordAuditEvent({
         category: "data",
         action: "folder.create",
@@ -247,7 +295,9 @@ export async function POST(request) {
     }
 
     if (body.action === "upsertChat") {
-      const result = await upsertChat(body.chat);
+      const scope = await workspaceScopeForChatAction(session, body.chat?.workspaceId);
+      const result = await withProductDataScope(scope, () => upsertChat(body.chat));
+      result.store = await buildLibraryResponseStore(session);
       await recordAuditEvent({
         category: "data",
         action: "chat.upsert",
@@ -260,7 +310,9 @@ export async function POST(request) {
     }
 
     if (body.action === "deleteChat") {
-      const result = await deleteChat(body.chatId);
+      const scope = await findChatScope(session, body.chatId);
+      const result = await withProductDataScope(scope, () => deleteChat(body.chatId));
+      result.store = await buildLibraryResponseStore(session);
       await recordAuditEvent({
         category: "data",
         action: "chat.delete",
@@ -272,11 +324,13 @@ export async function POST(request) {
     }
 
     if (body.action === "moveChat") {
-      const result = await moveChat({
+      const scope = await workspaceScopeForChatAction(session, body.workspaceId);
+      const result = await withProductDataScope(scope, () => moveChat({
         chatId: body.chatId,
         folderId: body.folderId,
         workspaceId: body.workspaceId,
-      });
+      }));
+      result.store = await buildLibraryResponseStore(session);
       await recordAuditEvent({
         category: "data",
         action: "chat.move",

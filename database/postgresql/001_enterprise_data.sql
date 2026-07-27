@@ -137,9 +137,12 @@ create table if not exists batuk_token_usage_events (
   id varchar(160) primary key,
   organization_id varchar(160),
   user_id varchar(160),
+  user_email varchar(240),
   chat_id varchar(160),
   workspace_id varchar(160),
   folder_id varchar(160),
+  api_key_id varchar(160),
+  api_model varchar(180),
   provider varchar(80) not null,
   model varchar(180) not null,
   input_tokens bigint not null default 0,
@@ -149,6 +152,36 @@ create table if not exists batuk_token_usage_events (
   temporary boolean not null default false,
   metadata jsonb not null default '{}'::jsonb,
   created_at timestamptz not null default now()
+);
+
+create table if not exists batuk_api_keys (
+  id varchar(160) primary key,
+  organization_id varchar(160),
+  user_id varchar(160) not null,
+  user_email varchar(240),
+  name varchar(120) not null,
+  key_hash varchar(128) not null unique,
+  preview varchar(40) not null,
+  status varchar(40) not null default 'active',
+  last_used_at timestamptz,
+  revoked_at timestamptz,
+  revoked_by varchar(160),
+  metadata jsonb not null default '{}'::jsonb,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+create table if not exists batuk_api_model_routes (
+  id varchar(160) primary key,
+  organization_id varchar(160),
+  label varchar(160) not null,
+  provider varchar(80) not null,
+  model varchar(180) not null,
+  base_url text,
+  enabled boolean not null default true,
+  metadata jsonb not null default '{}'::jsonb,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
 );
 
 create table if not exists batuk_audit_events (
@@ -269,4 +302,7 @@ create index if not exists batuk_documents_rag_scope_idx on batuk_documents (sco
 create index if not exists batuk_document_chunks_rag_scope_idx on batuk_document_chunks (scope_type, organization_id, user_id, workspace_id, document_id);
 create index if not exists batuk_vector_refs_rag_scope_idx on batuk_vector_index_refs (provider, scope_type, organization_id, user_id, workspace_id);
 create index if not exists batuk_token_usage_scope_idx on batuk_token_usage_events (organization_id, user_id, created_at desc);
+create index if not exists batuk_token_usage_channel_idx on batuk_token_usage_events (organization_id, source, api_key_id, created_at desc);
+create index if not exists batuk_api_keys_user_idx on batuk_api_keys (organization_id, user_id, status, created_at desc);
+create index if not exists batuk_api_model_routes_enabled_idx on batuk_api_model_routes (organization_id, enabled, provider);
 create index if not exists batuk_audit_scope_idx on batuk_audit_events (organization_id, user_id, created_at desc);

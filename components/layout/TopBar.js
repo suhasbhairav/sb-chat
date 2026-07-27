@@ -1,4 +1,4 @@
-import { BarChart3, BookOpen, Building2, ChevronDown, ClipboardCheck, FileText, Menu, PanelLeft, PlugZap, Plus, Settings2, Sparkles, Workflow } from "lucide-react";
+import { BookOpen, ChevronDown, FileText, Menu, PanelLeft, PlugZap, Plus, Sparkles, Workflow } from "lucide-react";
 import { BrandMark } from "@/components/brand/BrandMark";
 import { useI18n } from "@/components/i18n/I18nProvider";
 
@@ -13,13 +13,11 @@ export function TopBar({
   sidebarOpen,
   temporaryChat,
   onOpenDocuments,
+  onOpenMenu,
   onOpenSettings,
   onOpenSidebar,
-  onOpenUsage,
   onOpenDocs,
   onOpenAgents,
-  onOpenAudit,
-  onOpenEnterprise,
   onOpenSkills,
   onOpenMcp,
   onSelectMcp,
@@ -88,26 +86,6 @@ export function TopBar({
           <Workflow size={19} />
         </button>
         <button
-          aria-label="Enterprise administration"
-          className="top-icon"
-          data-tooltip="Enterprise administration"
-          onClick={onOpenEnterprise}
-          title="Enterprise administration"
-          type="button"
-        >
-          <Building2 size={19} />
-        </button>
-        <button
-          aria-label="Audit and compliance"
-          className="top-icon"
-          data-tooltip="Audit and compliance"
-          onClick={onOpenAudit}
-          title="Audit and compliance"
-          type="button"
-        >
-          <ClipboardCheck size={19} />
-        </button>
-        <button
           aria-label={t("topbar.skills")}
           className="top-icon"
           data-tooltip={t("topbar.skills")}
@@ -159,26 +137,6 @@ export function TopBar({
           type="button"
         />
         <button
-          aria-label={t("topbar.providerSettings")}
-          className="top-icon"
-          data-tooltip={t("topbar.providerSettings")}
-          onClick={onOpenSettings}
-          title={t("topbar.providerSettings")}
-          type="button"
-        >
-          <Settings2 size={19} />
-        </button>
-        <button
-          aria-label={t("topbar.tokenUsage")}
-          className="top-icon"
-          data-tooltip={t("topbar.tokenUsage")}
-          onClick={onOpenUsage}
-          title={t("topbar.tokenUsage")}
-          type="button"
-        >
-          <BarChart3 size={19} />
-        </button>
-        <button
           aria-label={t("topbar.documentation")}
           className="top-icon"
           data-tooltip={t("topbar.documentation")}
@@ -187,6 +145,16 @@ export function TopBar({
           type="button"
         >
           <BookOpen size={19} />
+        </button>
+        <button
+          aria-label="Open menu"
+          className="top-icon"
+          data-tooltip="Menu"
+          onClick={onOpenMenu}
+          title="Menu"
+          type="button"
+        >
+          <Menu size={19} />
         </button>
       </div>
     </header>

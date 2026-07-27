@@ -38,9 +38,19 @@ export function DocumentationPanel({ onClose }) {
     { icon: Radio, title: t("docs.cardStreamingTitle"), copy: t("docs.cardStreamingCopy") },
     { icon: Globe2, title: t("docs.cardWebTitle"), copy: t("docs.cardWebCopy") },
     {
+      icon: Boxes,
+      title: "Workspace tools menu",
+      copy: "Provider settings, chat history and data, token usage, enterprise management, and audit/compliance each live on their own menu page with Back to menu navigation.",
+    },
+    {
       icon: FileText,
       title: "Document Chat and RAG",
-      copy: "Upload documents, index with local or OpenAI embeddings, store vectors in JSON, ChromaDB, or Pinecone, and cite document sources.",
+      copy: "Upload private personal documents or shared workspace documents, index with local or OpenAI embeddings, store vectors in JSON, ChromaDB, or Pinecone, and cite document sources.",
+    },
+    {
+      icon: UsersRound,
+      title: "Private and shared workspaces",
+      copy: "Personal chats, documents, and memories stay user-scoped. Admin-created shared workspaces expose chats and RAG only to admins and users added by email.",
     },
     {
       icon: Waypoints,
@@ -93,6 +103,7 @@ export function DocumentationPanel({ onClose }) {
     t("docs.workflow4"),
     t("docs.workflow5"),
     t("docs.workflow6"),
+    "Open the Workspace tools menu for provider settings, history/data actions, token usage, enterprise management, and audit/compliance pages.",
     "Open Agent Builder to save repeatable multi-agent workflows that use the same model and settings as chat.",
     "Open Skills to create reusable response rules that Batuk can apply automatically during chat.",
   ];
@@ -205,17 +216,18 @@ Custom -> LM Studio, vLLM, LiteLLM, gateways`}</code>
           <section className="docs-split">
             <div className="docs-copy-block">
               <span>Enterprise administration</span>
-              <h2>Use Better Auth teams, admins, users, and roles.</h2>
+              <h2>Use Better Auth teams, admins, users, roles, and shared workspaces.</h2>
               <p>
                 Batuk enables Better Auth Admin and Organization plugins with a shared access controller. The Enterprise
                 console can bootstrap the first owner, create organizations, switch active organizations, create teams,
-                invite members, change organization roles, and manage global user roles.
+                invite members, change organization roles, manage global user roles, and administer shared workspaces.
               </p>
               <ul>
                 {[
                   "Global roles: owner, admin, member, viewer, user",
                   "Organization roles, invitations, teams, and dynamic access control are enabled",
                   "Admins can create, read, update, ban, unban, reset passwords, and delete users",
+                  "Admins can create shared workspaces, add users by email, remove users from the member list, rename workspaces, toggle workspace RAG, and delete shared workspaces",
                   "Admins can whitelabel the active organization with an uploaded logo while the Batuk/Suhas Bhairav footer stays locked",
                   "Better Auth Infrastructure can provide dashboard analytics and audit-log integration when configured",
                   "OAuth Provider, SSO, and SCIM plugins are mounted for enterprise identity workflows",
@@ -252,6 +264,57 @@ Custom -> LM Studio, vLLM, LiteLLM, gateways`}</code>
   sso(),
   scim()
 ]`}</code>
+              </pre>
+            </div>
+          </section>
+
+          <section className="docs-split">
+            <div className="docs-copy-block">
+              <span>Workspace privacy</span>
+              <h2>Personal context and shared context never mix.</h2>
+              <p>
+                Batuk treats personal work and shared workspace work as separate scopes. A user can upload personal
+                documents and save memories without exposing them to other users in the same organization. Shared RAG
+                becomes visible only inside a shared workspace created by an admin and only to users who are workspace
+                members.
+              </p>
+              <ul>
+                {[
+                  "Personal chats, folders, documents, chunks, memories, and local JSON stores are scoped to the signed-in user",
+                  "Shared workspace chats and folders are stored in the workspace scope and loaded only for admins or workspace members",
+                  "Workspace members are added by email; Batuk resolves the email to an existing Better Auth user and stores the user ID for access checks",
+                  "Deleting personal chats affects only the signed-in user's personal workspace",
+                  "Shared workspace chats can be deleted by admins and by users who belong to that workspace",
+                  "ChromaDB and Pinecone vectors include scope metadata and are filtered by scope before retrieved document context is added to chat",
+                ].map((item) => (
+                  <li key={item}>
+                    <CheckCircle2 size={16} />
+                    {item}
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div className="docs-code-card">
+              <div className="code-dots" aria-hidden="true">
+                <span />
+                <span />
+                <span />
+              </div>
+              <pre>
+                <code>{`Scopes:
+personal:
+  organizationId = active org or "personal"
+  userId = signed-in user
+
+workspace:
+  organizationId = active org
+  userId = "workspace:<workspaceId>"
+  workspaceId = shared workspace
+
+Retrieval:
+  require membership/admin
+  filter vectors by scope
+  inject only matching context`}</code>
               </pre>
             </div>
           </section>
@@ -463,16 +526,19 @@ await requireServerSession();`}</code>
           <section className="docs-split">
             <div className="docs-copy-block">
               <span>Document Chat</span>
-              <h2>Use JSON, ChromaDB, or Pinecone for document vectors.</h2>
+              <h2>Use scoped JSON, ChromaDB, or Pinecone for document vectors.</h2>
               <p>
                 The Documents panel stores uploaded originals locally, then extracts text, chunks content, creates local
-                or OpenAI embeddings, and writes vectors to the selected store. Pinecone can be configured with an API key,
-                index, namespace, cloud, and region while keeping download and delete behavior identical to ChromaDB.
+                or OpenAI embeddings, and writes vectors to the selected store. Personal uploads are visible only to the
+                signed-in user. Shared workspace uploads are visible only to admins and workspace members. Pinecone can be
+                configured with an API key, index, namespace, cloud, and region while keeping download and delete behavior
+                identical to ChromaDB.
               </p>
               <ul>
                 {[
                   "Pinecone can be configured from environment or the Documents panel",
                   "Default Pinecone index and namespace are configurable per deployment",
+                  "Personal and workspace RAG stores are separated in local JSON and filtered in ChromaDB/Pinecone by scope metadata",
                   "Local embeddings use 384 dimensions; OpenAI text-embedding-3-small uses 1536",
                   "If an existing Pinecone index has the wrong dimension, Batuk creates a sibling index such as sb-chat-documents-1536d",
                   "Delete removes remote vectors when applicable; download always returns the locally stored original file",

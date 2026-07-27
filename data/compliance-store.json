@@ -183,6 +183,27 @@
   ],
   "auditEvents": [
     {
+      "id": "audit-1785148015327-0fc036370d4427e1",
+      "createdAt": "2026-07-27T10:26:55.327Z",
+      "category": "admin",
+      "action": "api.key.create",
+      "outcome": "success",
+      "actor": {
+        "id": "3c4816f5-3e7e-4d26-a6ce-e827cc3c856e",
+        "emailHash": "f660ab912ec121d1b1e928a0bb4bc61b15f5ad44d5efdc4e1c92a25e99b8e44a",
+        "role": "owner"
+      },
+      "target": {
+        "type": "api_key",
+        "id": "1785148015324-9a04683c45fcd8"
+      },
+      "ipHash": null,
+      "userAgent": null,
+      "metadata": {},
+      "previousHash": "949b3bf41555b922a0051206cf0018c2a7a1ac352bbe742acd45f34b31e5fed0",
+      "integrityHash": "0fdcb6df5a77a9117a7ec894a766c05ca8d9aee8a72d09fdc4150b0980d6a070"
+    },
+    {
       "id": "audit-1785074106909-981a2add728ed54c",
       "createdAt": "2026-07-26T13:55:06.909Z",
       "category": "data",

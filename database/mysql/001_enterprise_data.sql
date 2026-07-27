@@ -146,9 +146,12 @@ create table if not exists batuk_token_usage_events (
   id varchar(160) primary key,
   organization_id varchar(160),
   user_id varchar(160),
+  user_email varchar(240),
   chat_id varchar(160),
   workspace_id varchar(160),
   folder_id varchar(160),
+  api_key_id varchar(160),
+  api_model varchar(180),
   provider varchar(80) not null,
   model varchar(180) not null,
   input_tokens bigint not null default 0,
@@ -158,7 +161,40 @@ create table if not exists batuk_token_usage_events (
   temporary boolean not null default false,
   metadata json,
   created_at timestamp not null default current_timestamp,
-  key batuk_token_usage_scope_idx (organization_id, user_id, created_at)
+  key batuk_token_usage_scope_idx (organization_id, user_id, created_at),
+  key batuk_token_usage_channel_idx (organization_id, source, api_key_id, created_at)
+) engine=InnoDB default charset=utf8mb4 collate=utf8mb4_unicode_ci;
+
+create table if not exists batuk_api_keys (
+  id varchar(160) primary key,
+  organization_id varchar(160),
+  user_id varchar(160) not null,
+  user_email varchar(240),
+  name varchar(120) not null,
+  key_hash varchar(128) not null unique,
+  preview varchar(40) not null,
+  status varchar(40) not null default 'active',
+  last_used_at timestamp null,
+  revoked_at timestamp null,
+  revoked_by varchar(160),
+  metadata json,
+  created_at timestamp not null default current_timestamp,
+  updated_at timestamp not null default current_timestamp on update current_timestamp,
+  key batuk_api_keys_user_idx (organization_id, user_id, status, created_at)
+) engine=InnoDB default charset=utf8mb4 collate=utf8mb4_unicode_ci;
+
+create table if not exists batuk_api_model_routes (
+  id varchar(160) primary key,
+  organization_id varchar(160),
+  label varchar(160) not null,
+  provider varchar(80) not null,
+  model varchar(180) not null,
+  base_url text,
+  enabled boolean not null default true,
+  metadata json,
+  created_at timestamp not null default current_timestamp,
+  updated_at timestamp not null default current_timestamp on update current_timestamp,
+  key batuk_api_model_routes_enabled_idx (organization_id, enabled, provider)
 ) engine=InnoDB default charset=utf8mb4 collate=utf8mb4_unicode_ci;
 
 create table if not exists batuk_audit_events (

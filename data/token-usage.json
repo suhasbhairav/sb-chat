@@ -1,12 +1,30 @@
 {
   "version": 1,
   "totals": {
-    "inputTokens": 4668,
-    "outputTokens": 1982,
-    "totalTokens": 6650,
-    "requests": 6
+    "inputTokens": 4691,
+    "outputTokens": 2199,
+    "totalTokens": 6890,
+    "requests": 7
   },
   "events": [
+    {
+      "id": "usage-1785148701085-d8c5289ddd7d9",
+      "userId": "real-ollama-test-user",
+      "chatId": null,
+      "workspaceId": null,
+      "folderId": null,
+      "userEmail": "real-ollama-test@example.com",
+      "apiKeyId": "1785148674906-c85738c9ddb0a",
+      "apiModel": "batuk/qwen3-8b-smoke",
+      "provider": "ollama",
+      "model": "batuk/qwen3-8b-smoke",
+      "inputTokens": 23,
+      "outputTokens": 217,
+      "totalTokens": 240,
+      "source": "api",
+      "temporary": false,
+      "createdAt": "2026-07-27T10:38:21.085Z"
+    },
     {
       "id": "usage-1785073389185-0452b654167fd",
       "userId": "3c4816f5-3e7e-4d26-a6ce-e827cc3c856e",

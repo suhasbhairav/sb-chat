@@ -17,6 +17,10 @@ import { SettingsPanel } from "@/components/settings/SettingsPanel";
 import { SkillsDashboard } from "@/components/skills/SkillsDashboard";
 import { McpDashboard } from "@/components/mcp/McpDashboard";
 import { TokenUsagePanel } from "@/components/usage/TokenUsagePanel";
+import { ApiManagementPanel } from "@/components/api/ApiManagementPanel";
+import { AppMenuPanel } from "@/components/menu/AppMenuPanel";
+import { HistoryPanel } from "@/components/history/HistoryPanel";
+import { WorkspaceManagementPanel } from "@/components/workspaces/WorkspaceManagementPanel";
 import { useChatController } from "@/hooks/useChatController";
 
 export default function Home() {
@@ -39,6 +43,31 @@ function AuthenticatedHome() {
 
 function HomeShell({ chat }) {
   const { dir, t } = useI18n();
+
+  async function openMenuItem(item) {
+    chat.setAppMenuOpen(false);
+    if (item === "settings") {
+      await chat.refreshBranding().catch(() => {});
+      chat.setSettingsOpen(true);
+    }
+    if (item === "api") chat.setApiManagementOpen(true);
+    if (item === "workspaces") chat.setWorkspaceManagementOpen(true);
+    if (item === "history") chat.setHistoryOpen(true);
+    if (item === "usage") chat.setUsageOpen(true);
+    if (item === "enterprise") chat.setEnterpriseOpen(true);
+    if (item === "audit") chat.setAuditOpen(true);
+  }
+
+  function backToMenu() {
+    chat.setSettingsOpen(false);
+    chat.setHistoryOpen(false);
+    chat.setWorkspaceManagementOpen(false);
+    chat.setApiManagementOpen(false);
+    chat.setUsageOpen(false);
+    chat.setEnterpriseOpen(false);
+    chat.setAuditOpen(false);
+    chat.setAppMenuOpen(true);
+  }
 
   const composer = (
     <ChatComposer
@@ -83,16 +112,10 @@ function HomeShell({ chat }) {
         selectedFolderId={chat.selectedFolderId}
         selectedWorkspaceId={chat.selectedWorkspaceId}
         workspaces={chat.workspaces}
-        canManageSharedWorkspaces={chat.canManageSharedWorkspaces}
         onChangeSearch={chat.setSearchQuery}
         onClose={() => chat.setSidebarOpen(false)}
         onCreateFolder={chat.createFolder}
         onCreateWorkspace={chat.createWorkspace}
-        onCreateSharedWorkspace={chat.createSharedWorkspace}
-        onDeleteSharedWorkspace={chat.deleteSharedWorkspace}
-        onEditSharedWorkspace={chat.editSharedWorkspace}
-        onAddWorkspaceMemberByEmail={chat.addWorkspaceMemberByEmail}
-        onRemoveWorkspaceMember={chat.removeWorkspaceMember}
         onDeleteChat={chat.deleteSavedChat}
         onMoveChat={chat.moveSavedChat}
         onNewChat={chat.newChat}
@@ -156,23 +179,24 @@ function HomeShell({ chat }) {
           }}
           onSelectMcp={chat.setActiveMcp}
           onOpenDocs={() => chat.setDocsOpen(true)}
+          onOpenMenu={() => chat.setAppMenuOpen(true)}
           onOpenSettings={async () => {
             await chat.refreshBranding().catch(() => {});
             chat.setSettingsOpen(true);
           }}
           onOpenSidebar={() => chat.setSidebarOpen(true)}
-          onOpenUsage={() => chat.setUsageOpen(true)}
           onToggleDocumentChat={() => chat.setDocumentChatEnabled((value) => !value)}
           onToggleTemporaryChat={() => chat.setTemporaryChat((value) => !value)}
         />
 
         {chat.auditOpen ? (
-          <AuditPanel onClose={() => chat.setAuditOpen(false)} />
+          <AuditPanel onClose={() => chat.setAuditOpen(false)} onBackToMenu={backToMenu} />
         ) : chat.enterpriseOpen ? (
           <EnterprisePanel
             branding={chat.branding}
             brandingOrganization={chat.brandingOrganization}
-            onClose={() => chat.setEnterpriseOpen(false)}
+          onClose={() => chat.setEnterpriseOpen(false)}
+          onBackToMenu={backToMenu}
             onRefreshBranding={chat.refreshBranding}
             onSaveBranding={chat.saveBranding}
             onUploadBrandingLogo={chat.uploadBrandingLogo}
@@ -290,6 +314,7 @@ function HomeShell({ chat }) {
           onChangeLocale={chat.setLocale}
           onClearMessages={chat.clearMessages}
           onClose={() => chat.setSettingsOpen(false)}
+          onBackToMenu={backToMenu}
           onExportChat={chat.exportChat}
           onExportChatLibrary={chat.exportChatLibrary}
           onImportChatLibrary={chat.importChatLibrary}
@@ -306,7 +331,47 @@ function HomeShell({ chat }) {
         />
       )}
 
-      {chat.usageOpen && <TokenUsagePanel usage={chat.tokenUsage} onClose={() => chat.setUsageOpen(false)} />}
+      {chat.appMenuOpen && <AppMenuPanel canManageAdmin={chat.canManageSharedWorkspaces} onClose={() => chat.setAppMenuOpen(false)} onOpen={openMenuItem} />}
+      {chat.apiManagementOpen && (
+        <ApiManagementPanel
+          onClose={() => chat.setApiManagementOpen(false)}
+          onBackToMenu={backToMenu}
+        />
+      )}
+      {chat.workspaceManagementOpen && (
+        <WorkspaceManagementPanel
+          canManageSharedWorkspaces={chat.canManageSharedWorkspaces}
+          selectedWorkspaceId={chat.selectedWorkspaceId}
+          workspaces={chat.workspaces}
+          onAddWorkspaceMemberByEmail={chat.addWorkspaceMemberByEmail}
+          onBackToMenu={backToMenu}
+          onClose={() => chat.setWorkspaceManagementOpen(false)}
+          onCreateSharedWorkspace={chat.createSharedWorkspace}
+          onDeleteSharedWorkspace={chat.deleteSharedWorkspace}
+          onEditSharedWorkspace={chat.editSharedWorkspace}
+          onRemoveWorkspaceMember={chat.removeWorkspaceMember}
+          onSelectWorkspace={chat.selectWorkspace}
+        />
+      )}
+      {chat.historyOpen && (
+        <HistoryPanel
+          folders={chat.folders}
+          hasMessages={chat.hasMessages}
+          importChatsRef={chat.importChatsRef}
+          selectedFolderId={chat.selectedFolderId}
+          selectedWorkspaceId={chat.selectedWorkspaceId}
+          temporaryChat={chat.temporaryChat}
+          onClearMessages={chat.clearMessages}
+          onClose={() => chat.setHistoryOpen(false)}
+          onBackToMenu={backToMenu}
+          onExportChat={chat.exportChat}
+          onExportChatLibrary={chat.exportChatLibrary}
+          onImportChatLibrary={chat.importChatLibrary}
+          onMoveChat={chat.moveActiveChat}
+          onSaveChat={() => chat.saveChat()}
+        />
+      )}
+      {chat.usageOpen && <TokenUsagePanel usage={chat.tokenUsage} onClose={() => chat.setUsageOpen(false)} onBackToMenu={backToMenu} onResetTokenUsage={chat.resetTokenUsage} />}
       {chat.docsOpen && <DocumentationPanel onClose={() => chat.setDocsOpen(false)} />}
       {chat.documentsOpen && (
         <DocumentsPanel

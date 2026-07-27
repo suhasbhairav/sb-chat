@@ -154,6 +154,10 @@ export function useChatController() {
   const [isSending, setIsSending] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const [appMenuOpen, setAppMenuOpen] = useState(false);
+  const [historyOpen, setHistoryOpen] = useState(false);
+  const [workspaceManagementOpen, setWorkspaceManagementOpen] = useState(false);
+  const [apiManagementOpen, setApiManagementOpen] = useState(false);
   const [usageOpen, setUsageOpen] = useState(false);
   const [docsOpen, setDocsOpen] = useState(false);
   const [documentsOpen, setDocumentsOpen] = useState(false);
@@ -656,6 +660,9 @@ export function useChatController() {
     setAttachmentStatus("idle");
     replaceQueuedMessages([]);
     setSettingsOpen(false);
+    setAppMenuOpen(false);
+    setHistoryOpen(false);
+    setWorkspaceManagementOpen(false);
 
     if (!temporaryChat) {
       await saveChatEvenIfEmpty([], activeChatId ? { id: activeChatId } : {});
@@ -692,6 +699,9 @@ export function useChatController() {
     replaceQueuedMessages([]);
     setTemporaryChat(false);
     setSettingsOpen(false);
+    setAppMenuOpen(false);
+    setHistoryOpen(false);
+    setWorkspaceManagementOpen(false);
     setUsageOpen(false);
     setDocsOpen(false);
     setDocumentsOpen(false);
@@ -726,6 +736,9 @@ export function useChatController() {
     setInput("");
     setChatAttachments([]);
     setSettingsOpen(false);
+    setAppMenuOpen(false);
+    setHistoryOpen(false);
+    setWorkspaceManagementOpen(false);
     setUsageOpen(false);
     setDocsOpen(false);
     setDocumentsOpen(false);
@@ -1355,6 +1368,10 @@ export function useChatController() {
     selectedFolderId,
     selectedWorkspaceId,
     settingsOpen,
+    appMenuOpen,
+    historyOpen,
+    workspaceManagementOpen,
+    apiManagementOpen,
     sidebarOpen,
     skillsOpen,
     temperature,
@@ -1409,6 +1426,7 @@ export function useChatController() {
     setAgentBuilderOpen,
     setAuditOpen,
     setBaseUrl,
+    setApiManagementOpen,
     setDocumentChatEnabled,
     setDocumentsOpen,
     setEnterpriseOpen,
@@ -1422,6 +1440,9 @@ export function useChatController() {
     setRealtimeModel,
     setSearchQuery,
     setSettingsOpen,
+    setAppMenuOpen,
+    setHistoryOpen,
+    setWorkspaceManagementOpen,
     setSidebarOpen,
     setSkillsOpen,
     setMcpOpen,

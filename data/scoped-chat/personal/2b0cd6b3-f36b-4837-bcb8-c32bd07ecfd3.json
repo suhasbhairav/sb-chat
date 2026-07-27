@@ -1,0 +1,35 @@
+{
+  "version": 1,
+  "workspaces": [
+    {
+      "id": "workspace-personal",
+      "name": "Personal",
+      "scope": "personal",
+      "ownerId": null,
+      "members": [],
+      "memberDetails": [],
+      "ragEnabled": true,
+      "createdAt": "2026-07-27T14:38:22.219Z",
+      "updatedAt": "2026-07-27T14:38:22.219Z"
+    }
+  ],
+  "folders": [
+    {
+      "id": "folder-finance",
+      "workspaceId": "workspace-personal",
+      "name": "Finance",
+      "icon": "💵",
+      "createdAt": "2026-07-27T14:38:22.219Z",
+      "updatedAt": "2026-07-27T14:38:22.219Z"
+    },
+    {
+      "id": "folder-study",
+      "workspaceId": "workspace-personal",
+      "name": "Study",
+      "icon": "📕",
+      "createdAt": "2026-07-27T14:38:22.219Z",
+      "updatedAt": "2026-07-27T14:38:22.219Z"
+    }
+  ],
+  "chats": []
+}
