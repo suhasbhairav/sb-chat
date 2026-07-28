@@ -181,19 +181,19 @@ Batuk is designed like an enterprise model control plane: admins decide which mo
 
 | Provider | Default Base URL | Default Model | Notes |
 | --- | --- | --- | --- |
-| Ollama | `http://localhost:11434` | `llama3.1` | Local/private inference through Ollama's chat API. |
-| OpenAI | `https://api.openai.com/v1` | `gpt-5.1-mini` | Chat completions, hosted web search, embeddings, and realtime voice. |
-| OpenRouter | `https://openrouter.ai/api/v1` | `openai/gpt-4o-mini` | Routed access to many model families through an OpenAI-compatible API. |
-| Claude | `https://api.anthropic.com/v1` | `claude-sonnet-5` | Anthropic Messages API with streaming and usage reporting. |
-| Grok | `https://api.x.ai/v1` | `grok-4.5` | xAI Responses API. |
-| Sarvam AI | `https://api.sarvam.ai/v1` | `sarvam-105b` | Indian-language optimized chat models. |
-| Together AI | `https://api.together.ai/v1` | `MiniMaxAI/MiniMax-M3` | OpenAI-compatible inference, including Together-hosted open and commercial models. |
-| Mistral AI | `https://api.mistral.ai/v1` | `mistral-large-latest` | Mistral chat completions. |
-| Kimi | `https://api.moonshot.ai/v1` | `kimi-k3` | Moonshot AI's OpenAI-compatible Kimi API. |
-| DeepSeek | `https://api.deepseek.com` | `deepseek-v4-pro` | OpenAI-compatible chat completions with `thinking` enabled and `reasoning_effort: "high"`. |
-| Qwen | `https://dashscope-intl.aliyuncs.com/compatible-mode/v1` | `qwen3.7-max` | DashScope OpenAI-compatible mode with `enable_thinking: true`. |
-| Perplexity | `https://api.perplexity.ai` | `sonar-pro` | Sonar chat completions plus Batuk API access to Perplexity Search. |
-| OpenAI-compatible | `http://localhost:1234/v1` | `local-model` | LM Studio, vLLM, llama.cpp, LiteLLM, LocalAI, private gateways, or internal model routers. |
+| [Ollama](https://ollama.com/) | `http://localhost:11434` | `llama3.1` | Local/private inference through Ollama's chat API. |
+| [OpenAI](https://platform.openai.com/docs) | `https://api.openai.com/v1` | `gpt-5.1-mini` | Chat completions, hosted web search, embeddings, and realtime voice. |
+| [OpenRouter](https://openrouter.ai/) | `https://openrouter.ai/api/v1` | `openai/gpt-4o-mini` | Routed access to many model families through an OpenAI-compatible API. |
+| [Claude](https://docs.anthropic.com/) | `https://api.anthropic.com/v1` | `claude-sonnet-5` | Anthropic Messages API with streaming and usage reporting. |
+| [Grok](https://docs.x.ai/) | `https://api.x.ai/v1` | `grok-4.5` | xAI Responses API. |
+| [Sarvam AI](https://docs.sarvam.ai/) | `https://api.sarvam.ai/v1` | `sarvam-105b` | Indian-language optimized chat models. |
+| [Together AI](https://docs.together.ai/) | `https://api.together.ai/v1` | `MiniMaxAI/MiniMax-M3` | OpenAI-compatible inference, including Together-hosted open and commercial models. |
+| [Mistral AI](https://docs.mistral.ai/) | `https://api.mistral.ai/v1` | `mistral-large-latest` | Mistral chat completions. |
+| [Kimi](https://platform.kimi.ai/docs/overview) | `https://api.moonshot.ai/v1` | `kimi-k3` | Moonshot AI's OpenAI-compatible Kimi API. |
+| [DeepSeek](https://api-docs.deepseek.com/) | `https://api.deepseek.com` | `deepseek-v4-pro` | OpenAI-compatible chat completions with `thinking` enabled and `reasoning_effort: "high"`. |
+| [Qwen](https://qwen.ai/apiplatform) | `https://dashscope-intl.aliyuncs.com/compatible-mode/v1` | `qwen3.7-max` | DashScope OpenAI-compatible mode with `enable_thinking: true`. |
+| [Perplexity](https://docs.perplexity.ai/) | `https://api.perplexity.ai` | `sonar-pro` | Sonar chat completions plus Batuk API access to Perplexity Search. |
+| [OpenAI-compatible](https://platform.openai.com/docs/api-reference/chat) | `http://localhost:1234/v1` | `local-model` | [LM Studio](https://lmstudio.ai/), [vLLM](https://docs.vllm.ai/), [llama.cpp](https://github.com/ggml-org/llama.cpp), [LiteLLM](https://docs.litellm.ai/), [LocalAI](https://localai.io/), private gateways, or internal model routers. |
 
 ### Model Gateway Providers
 
@@ -220,15 +220,15 @@ The in-app chat UI and Batuk API gateway share the same provider registry. Admin
 | Embedder | Use Case |
 | --- | --- |
 | Local deterministic embeddings | Offline/private RAG indexing without sending document chunks to a hosted provider. |
-| OpenAI embeddings | Higher-quality semantic document retrieval with `text-embedding-3-small`. |
+| [OpenAI embeddings](https://platform.openai.com/docs/guides/embeddings) | Higher-quality semantic document retrieval with `text-embedding-3-small`. |
 
 ### Realtime, Search, and Speech
 
 | Capability | Provider | Notes |
 | --- | --- | --- |
-| Realtime voice | OpenAI Realtime | Browser microphone sessions with ephemeral server-issued credentials. |
-| Hosted web search in chat | OpenAI | Uses OpenAI hosted web search when enabled in chat and supported by the selected model. |
-| Search API gateway | Perplexity | `POST /api/v1/search` lets Batuk API-key clients call Perplexity Search through the same user-scoped access system. |
+| Realtime voice | [OpenAI Realtime](https://platform.openai.com/docs/guides/realtime) | Browser microphone sessions with ephemeral server-issued credentials. |
+| Hosted web search in chat | [OpenAI](https://platform.openai.com/docs/guides/tools-web-search) | Uses OpenAI hosted web search when enabled in chat and supported by the selected model. |
+| Search API gateway | [Perplexity](https://docs.perplexity.ai/) | `POST /api/v1/search` lets Batuk API-key clients call Perplexity Search through the same user-scoped access system. |
 | Browser speech input/output | Browser APIs plus OpenAI Realtime | Voice features stay separate from stored chat/RAG scope. |
 
 ### Vector Databases
@@ -236,8 +236,8 @@ The in-app chat UI and Batuk API gateway share the same provider registry. Admin
 | Vector Store | Use Case |
 | --- | --- |
 | Local JSON vectors | Default local/dev mode with no external service. |
-| ChromaDB | Self-hosted vector search for Docker and enterprise deployments. |
-| Pinecone | Managed vector search where approved network/private connectivity is available. |
+| [ChromaDB](https://www.trychroma.com/) | Self-hosted vector search for Docker and enterprise deployments. |
+| [Pinecone](https://www.pinecone.io/) | Managed vector search where approved network/private connectivity is available. |
 
 ### Document Sources
 
