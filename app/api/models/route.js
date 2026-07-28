@@ -1,6 +1,6 @@
 import { json } from "@/lib/chat-request";
 import { requireServerPermission } from "@/lib/auth-session";
-import { getClaudeModels, getOllamaModels, getOpenAIModels, getOpenRouterModels, getPerplexityModels, getSarvamModels, getTogetherModels, getXAIModels } from "@/lib/model-catalog";
+import { getClaudeModels, getDeepSeekModels, getKimiModels, getMistralModels, getOllamaModels, getOpenAIModels, getOpenRouterModels, getPerplexityModels, getQwenModels, getSarvamModels, getTogetherModels, getXAIModels } from "@/lib/model-catalog";
 
 export async function GET(request) {
   const { response } = await requireServerPermission({ model: ["read"] });
@@ -25,6 +25,22 @@ export async function GET(request) {
 
     if (provider === "perplexity") {
       return json(await getPerplexityModels());
+    }
+
+    if (provider === "mistral") {
+      return json(await getMistralModels(baseUrl));
+    }
+
+    if (provider === "kimi") {
+      return json(await getKimiModels(baseUrl));
+    }
+
+    if (provider === "deepseek") {
+      return json(await getDeepSeekModels(baseUrl));
+    }
+
+    if (provider === "qwen") {
+      return json(await getQwenModels(baseUrl));
     }
 
     if (provider === "anthropic") {

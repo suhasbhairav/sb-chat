@@ -11,7 +11,7 @@ Batuk is structured around product boundaries instead of framework files alone.
 - `app/api/v1/models/route.js`, `app/api/v1/chat/completions/route.js`, and `app/api/v1/search/route.js` expose OpenAI-compatible programmatic access to admin-enabled model routes plus Batuk-key-authenticated Perplexity Search.
 - `app/api/documents/route.js` manages RAG document upload, settings, extraction, chunking, and embeddings.
 - `app/api/documents/[id]/download/route.js` downloads original uploaded documents.
-- `app/api/models/route.js` loads model catalogs for OpenAI, Together AI, Perplexity, Claude, Grok, OpenRouter, Ollama, and custom/manual providers.
+- `app/api/models/route.js` loads model catalogs for OpenAI, Together AI, Mistral AI, Kimi, DeepSeek, Qwen, Perplexity, Claude, Grok, OpenRouter, Ollama, and custom/manual providers.
 - `app/api/realtime/session/route.js` creates ephemeral OpenAI Realtime sessions for browser voice chat.
 - `app/api/token-usage/route.js` exposes accumulated input/output token usage from JSON or SQL-backed product storage.
 - `app/globals.css` owns the current product theme and layout class system.
@@ -51,7 +51,7 @@ Token usage is still tracked for model calls, including temporary chats, in `dat
 - `lib/chat-utils.js` contains client-safe chat helpers.
 - `lib/guardrails.js` contains guardrail prompts, screening rules, and blocked-response shaping.
 - `lib/chat-request.js` validates and normalizes incoming API payloads.
-- `lib/model-clients.js` contains provider clients for Ollama, Claude, Grok, OpenAI, Together AI, Perplexity, OpenRouter, OpenAI web search, Perplexity Search, and OpenAI-compatible APIs.
+- `lib/model-clients.js` contains provider clients for Ollama, Claude, Grok, OpenAI, Together AI, Mistral AI, Kimi, DeepSeek, Qwen, Perplexity, OpenRouter, OpenAI web search, Perplexity Search, and OpenAI-compatible APIs.
 - `lib/model-catalog.js` contains provider model catalog loading and fallbacks.
 - `lib/api-management-store.js` hashes user API keys, exposes safe public key metadata, authenticates API requests, and stores admin-managed public model routes.
 - `lib/api-completions.js` handles the OpenAI-compatible completion flow as a testable unit: API-key auth, route lookup, provider call, usage recording, and response shaping.

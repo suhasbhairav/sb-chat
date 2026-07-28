@@ -1,7 +1,7 @@
 <h1 align="center">Batuk</h1>
 
 <p align="center">
-  <strong>Sovereign AI chat for teams: Ollama, OpenAI, OpenRouter, Claude, Grok, Sarvam AI, and private OpenAI-compatible models in one enterprise workspace.</strong>
+  <strong>Sovereign AI chat for teams: local models, frontier LLMs, document RAG, workspace privacy, and an OpenAI-compatible API gateway in one enterprise workspace.</strong>
 </p>
 
 <p align="center">
@@ -39,13 +39,13 @@
   </a>
 </p>
 
-Batuk is a fully open-source enterprise-native AI platform for teams. Its main purpose is simple: give users one polished chat interface for every model they are allowed to run, from local Ollama models to OpenAI and private OpenAI-compatible gateways, with document RAG, enterprise authentication, admin controls, audit evidence, and deployment-friendly storage.
+Batuk is a fully open-source enterprise-native AI platform for teams. Its main purpose is simple: give users one polished chat interface for every model they are allowed to run, from local Ollama models to OpenAI, Claude, Grok, Sarvam AI, Together, Mistral, Kimi, DeepSeek, Qwen, Perplexity, OpenRouter, and private OpenAI-compatible gateways, with document RAG, enterprise authentication, admin controls, audit evidence, and deployment-friendly storage.
 
 Batuk is local-first by default and enterprise-ready when you need it. Run it on a laptop with JSON files and SQLite, or deploy it in a client environment with Docker, PostgreSQL/MySQL product data, Better Auth enterprise identity, ChromaDB, and private file storage.
 
 ## Why Batuk
 
-- **Chat with any model:** Ollama, OpenAI, OpenRouter, Claude, Grok, Sarvam AI, and custom OpenAI-compatible servers such as LM Studio, vLLM, llama.cpp, LiteLLM, or internal gateways.
+- **Chat with any model:** Ollama, OpenAI, OpenRouter, Claude, Grok, Sarvam AI, Together AI, Mistral AI, Kimi, DeepSeek, Qwen, Perplexity, and custom OpenAI-compatible servers such as LM Studio, vLLM, llama.cpp, LiteLLM, or internal gateways.
 - **Bring your documents:** upload, search, reindex, download, and delete documents with RAG over PDF, TXT, Markdown, JSON, LOG, CSV, XLS, XLSX, and DOCX.
 - **Choose your vector store:** local JSON vectors by default, ChromaDB for self-hosted vector search, or Pinecone for managed vector search.
 - **Built for teams:** Better Auth users, admins, roles, organizations, teams, invitations, SSO, OAuth/OIDC provider support, and SCIM provisioning.
@@ -107,6 +107,10 @@ Batuk is local-first by default and enterprise-ready when you need it. Run it on
 - Admins can see all user API keys, revoke individual keys, or revoke all active API access for a user.
 - Admins manage public API model routes that map external model IDs such as `company/support-large` to the provider/model/base URL configured for Batuk.
 - Admins can expose Together AI models through the same OpenAI-compatible gateway by creating a route with provider `together`, base URL `https://api.together.ai/v1`, and a Together model such as `MiniMaxAI/MiniMax-M3`.
+- Admins can expose Mistral AI models through the same OpenAI-compatible gateway by creating a route with provider `mistral`, base URL `https://api.mistral.ai/v1`, and a model such as `mistral-large-latest`.
+- Admins can expose Kimi models through the same OpenAI-compatible gateway by creating a route with provider `kimi`, base URL `https://api.moonshot.ai/v1`, and a model such as `kimi-k3`.
+- Admins can expose DeepSeek models through the same OpenAI-compatible gateway by creating a route with provider `deepseek`, base URL `https://api.deepseek.com`, and a model such as `deepseek-v4-pro`. Batuk sends DeepSeek thinking mode as `{"thinking":{"type":"enabled"}}` with `reasoning_effort: "high"`.
+- Admins can expose Qwen models through the same OpenAI-compatible gateway by creating a route with provider `qwen`, base URL `https://dashscope-intl.aliyuncs.com/compatible-mode/v1`, and a model such as `qwen3.7-max`. Batuk sends `enable_thinking: true` for Qwen requests.
 - Admins can expose Perplexity Sonar chat models with provider `perplexity`, base URL `https://api.perplexity.ai`, and models such as `sonar-pro`.
 - Raw API keys are never stored. Batuk stores a SHA-256 hash, short preview, owner metadata, status, created/revoked timestamps, and last-used timestamp.
 - API Access is visible to all signed-in users. Workspace Management, Enterprise Management, and Audit and Compliance are admin-only menu entries.
@@ -126,7 +130,7 @@ curl -X POST http://localhost:3000/api/v1/search \
   -d '{"query":["What is Comet Browser?","Perplexity AI","Perplexity Changelog"]}'
 ```
 
-- Server-side provider keys are read from environment variables including `OPENAI_API_KEY`, `OPENROUTER_API_KEY`, `TOGETHER_API_KEY`, `PERPLEXITY_API_KEY`, `ANTHROPIC_API_KEY`, `XAI_API_KEY`, and `SARVAM_API_KEY`.
+- Server-side provider keys are read from environment variables including `OPENAI_API_KEY`, `OPENROUTER_API_KEY`, `TOGETHER_API_KEY`, `MISTRAL_API_KEY`, `MOONSHOT_API_KEY`, `KIMI_API_KEY`, `DEEPSEEK_API_KEY`, `DASHSCOPE_API_KEY`, `QWEN_API_KEY`, `PERPLEXITY_API_KEY`, `ANTHROPIC_API_KEY`, `XAI_API_KEY`, and `SARVAM_API_KEY`.
 - The API gateway records token usage with `source: "api"` for chat completions and `source: "api-search"` for Perplexity Search, including API key ID, user ID/email, provider, and public model ID so chat, API, and search usage can be separated in reporting.
 - The gateway has been smoke tested end-to-end against local Ollama `qwen3:8b` through `POST /api/v1/chat/completions`.
 
@@ -169,17 +173,75 @@ curl -X POST http://localhost:3000/api/v1/search \
 
 MCP integration work is currently in progress. Batuk includes an early MCP dashboard for saving custom Streamable HTTP, SSE, and stdio MCP server records, discovering tools/resources/prompts, selecting or unselecting an active MCP product for chat, and deleting saved MCP connection records. This surface is not yet production-complete: hosted OAuth flows, provider-specific credential UX, deeper tool-calling loops, and a larger verified MCP directory are still being developed.
 
-## Supported Providers
+## Supported LLMs, Embedders, Speech, and Vector Stores
 
-| Provider | Use Case |
+Batuk is designed like an enterprise model control plane: admins decide which model providers are available, users chat inside their personal or shared workspace scope, and programmatic clients call the same approved models through Batuk-issued API keys.
+
+### Large Language Models
+
+| Provider | Default Base URL | Default Model | Notes |
+| --- | --- | --- | --- |
+| Ollama | `http://localhost:11434` | `llama3.1` | Local/private inference through Ollama's chat API. |
+| OpenAI | `https://api.openai.com/v1` | `gpt-5.1-mini` | Chat completions, hosted web search, embeddings, and realtime voice. |
+| OpenRouter | `https://openrouter.ai/api/v1` | `openai/gpt-4o-mini` | Routed access to many model families through an OpenAI-compatible API. |
+| Claude | `https://api.anthropic.com/v1` | `claude-sonnet-5` | Anthropic Messages API with streaming and usage reporting. |
+| Grok | `https://api.x.ai/v1` | `grok-4.5` | xAI Responses API. |
+| Sarvam AI | `https://api.sarvam.ai/v1` | `sarvam-105b` | Indian-language optimized chat models. |
+| Together AI | `https://api.together.ai/v1` | `MiniMaxAI/MiniMax-M3` | OpenAI-compatible inference, including Together-hosted open and commercial models. |
+| Mistral AI | `https://api.mistral.ai/v1` | `mistral-large-latest` | Mistral chat completions. |
+| Kimi | `https://api.moonshot.ai/v1` | `kimi-k3` | Moonshot AI's OpenAI-compatible Kimi API. |
+| DeepSeek | `https://api.deepseek.com` | `deepseek-v4-pro` | OpenAI-compatible chat completions with `thinking` enabled and `reasoning_effort: "high"`. |
+| Qwen | `https://dashscope-intl.aliyuncs.com/compatible-mode/v1` | `qwen3.7-max` | DashScope OpenAI-compatible mode with `enable_thinking: true`. |
+| Perplexity | `https://api.perplexity.ai` | `sonar-pro` | Sonar chat completions plus Batuk API access to Perplexity Search. |
+| OpenAI-compatible | `http://localhost:1234/v1` | `local-model` | LM Studio, vLLM, llama.cpp, LiteLLM, LocalAI, private gateways, or internal model routers. |
+
+### Model Gateway Providers
+
+The in-app chat UI and Batuk API gateway share the same provider registry. Admins can expose an internal provider/model/base URL as a public model ID such as `company/support-large` or `batuk/qwen3.7-max`.
+
+| Provider ID | Required Env Var | Example Admin Route |
+| --- | --- | --- |
+| `ollama` | none | `provider=ollama`, `baseUrl=http://localhost:11434`, `model=qwen3:8b` |
+| `openai` | `OPENAI_API_KEY` | `provider=openai`, `baseUrl=https://api.openai.com/v1`, `model=gpt-5.1-mini` |
+| `openrouter` | `OPENROUTER_API_KEY` | `provider=openrouter`, `baseUrl=https://openrouter.ai/api/v1`, `model=openai/gpt-4o-mini` |
+| `together` | `TOGETHER_API_KEY` | `provider=together`, `baseUrl=https://api.together.ai/v1`, `model=MiniMaxAI/MiniMax-M3` |
+| `mistral` | `MISTRAL_API_KEY` | `provider=mistral`, `baseUrl=https://api.mistral.ai/v1`, `model=mistral-large-latest` |
+| `kimi` | `MOONSHOT_API_KEY` or `KIMI_API_KEY` | `provider=kimi`, `baseUrl=https://api.moonshot.ai/v1`, `model=kimi-k3` |
+| `deepseek` | `DEEPSEEK_API_KEY` | `provider=deepseek`, `baseUrl=https://api.deepseek.com`, `model=deepseek-v4-pro` |
+| `qwen` | `DASHSCOPE_API_KEY` or `QWEN_API_KEY` | `provider=qwen`, `baseUrl=https://dashscope-intl.aliyuncs.com/compatible-mode/v1`, `model=qwen3.7-max` |
+| `perplexity` | `PERPLEXITY_API_KEY` | `provider=perplexity`, `baseUrl=https://api.perplexity.ai`, `model=sonar-pro` |
+| `anthropic` | `ANTHROPIC_API_KEY` | `provider=anthropic`, `baseUrl=https://api.anthropic.com/v1`, `model=claude-sonnet-5` |
+| `xai` | `XAI_API_KEY` | `provider=xai`, `baseUrl=https://api.x.ai/v1`, `model=grok-4.5` |
+| `sarvam` | `SARVAM_API_KEY` or `SARVAMAI_API_KEY` | `provider=sarvam`, `baseUrl=https://api.sarvam.ai/v1`, `model=sarvam-105b` |
+| `custom` | optional | Any OpenAI-compatible `/chat/completions` server. |
+
+### Embeddings
+
+| Embedder | Use Case |
 | --- | --- |
-| Ollama | Local models and private offline inference |
-| OpenAI | Chat, hosted web search, embeddings, and realtime voice |
-| OpenRouter | Routed access to multiple model families |
-| Claude | Anthropic Messages API |
-| Grok | xAI models |
-| Sarvam AI | Indian-language optimized chat models |
-| Custom compatible | LM Studio, vLLM, llama.cpp, LiteLLM, or enterprise gateways |
+| Local deterministic embeddings | Offline/private RAG indexing without sending document chunks to a hosted provider. |
+| OpenAI embeddings | Higher-quality semantic document retrieval with `text-embedding-3-small`. |
+
+### Realtime, Search, and Speech
+
+| Capability | Provider | Notes |
+| --- | --- | --- |
+| Realtime voice | OpenAI Realtime | Browser microphone sessions with ephemeral server-issued credentials. |
+| Hosted web search in chat | OpenAI | Uses OpenAI hosted web search when enabled in chat and supported by the selected model. |
+| Search API gateway | Perplexity | `POST /api/v1/search` lets Batuk API-key clients call Perplexity Search through the same user-scoped access system. |
+| Browser speech input/output | Browser APIs plus OpenAI Realtime | Voice features stay separate from stored chat/RAG scope. |
+
+### Vector Databases
+
+| Vector Store | Use Case |
+| --- | --- |
+| Local JSON vectors | Default local/dev mode with no external service. |
+| ChromaDB | Self-hosted vector search for Docker and enterprise deployments. |
+| Pinecone | Managed vector search where approved network/private connectivity is available. |
+
+### Document Sources
+
+Batuk supports PDF, TXT, Markdown, JSON, LOG, CSV, XLS, XLSX, and DOCX uploads. Document chunks, vectors, memories, and chat context are scoped to the signed-in user by default. Shared workspace RAG is only visible to members of that admin-created workspace.
 
 ## Storage Options
 
