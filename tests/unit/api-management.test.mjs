@@ -16,6 +16,7 @@ const {
   upsertModelRoute,
 } = await import("../../lib/api-management-store.js");
 const { handleChatCompletionRequest } = await import("../../lib/api-completions.js");
+const { handlePerplexitySearchRequest } = await import("../../lib/api-search.js");
 
 describe("API management", () => {
   it("stores only hashed API keys and blocks revoked keys", async () => {
@@ -101,5 +102,88 @@ describe("API management", () => {
     assert.equal(userView.modelRoutes, undefined);
     assert.equal(userView.canManageApi, false);
     assert.equal(userView.keys.every((key) => !key.keyHash && !key.secret), true);
+  });
+
+  it("supports Together AI as an OpenAI-compatible admin route", async () => {
+    const keyResult = await createUserApiKey({
+      userId: "user-c",
+      userEmail: "user-c@example.com",
+      name: "Together client",
+    });
+    const routedStore = await upsertModelRoute({
+      id: "batuk/together-minimax",
+      label: "Together MiniMax",
+      provider: "together",
+      model: "MiniMaxAI/MiniMax-M3",
+      baseUrl: "https://api.together.ai/v1",
+      enabled: true,
+    });
+
+    const calls = [];
+    const response = await handleChatCompletionRequest({
+      authorization: `Bearer ${keyResult.key.secret}`,
+      payload: {
+        model: "batuk/together-minimax",
+        messages: [{ role: "user", content: "Hello" }],
+      },
+      authenticateApiKey,
+      readApiManagementStore: async () => routedStore,
+      resolveServerApiKey: (provider) => provider === "together" ? "together-secret" : "",
+      callModel: async (request) => {
+        calls.push(request);
+        return {
+          message: "Hello from Together.",
+          usage: { inputTokens: 2, outputTokens: 3, totalTokens: 5 },
+        };
+      },
+      recordTokenUsage: async () => {},
+    });
+
+    assert.equal(response.status, 200);
+    assert.equal(response.body.choices[0].message.content, "Hello from Together.");
+    assert.equal(calls[0].provider, "together");
+    assert.equal(calls[0].apiKey, "together-secret");
+    assert.equal(calls[0].baseUrl, "https://api.together.ai/v1");
+    assert.equal(calls[0].model, "MiniMaxAI/MiniMax-M3");
+  });
+
+  it("exposes Perplexity Search through Batuk API keys and records search usage", async () => {
+    const keyResult = await createUserApiKey({
+      userId: "user-d",
+      userEmail: "user-d@example.com",
+      name: "Search client",
+    });
+    const usageEvents = [];
+    const calls = [];
+
+    const response = await handlePerplexitySearchRequest({
+      authorization: `Bearer ${keyResult.key.secret}`,
+      payload: {
+        query: ["What is Comet Browser?", "Perplexity AI", "Perplexity Changelog"],
+      },
+      authenticateApiKey,
+      readApiManagementStore,
+      resolveServerApiKey: (provider) => provider === "perplexity" ? "pplx-secret" : "",
+      callPerplexitySearch: async (request) => {
+        calls.push(request);
+        return {
+          results: [
+            { title: "Comet Browser", url: "https://example.com/comet", snippet: "A Perplexity browser." },
+          ],
+        };
+      },
+      recordTokenUsage: async (event) => {
+        usageEvents.push(event);
+      },
+    });
+
+    assert.equal(response.status, 200);
+    assert.equal(response.body.results[0].title, "Comet Browser");
+    assert.deepEqual(calls[0].query, ["What is Comet Browser?", "Perplexity AI", "Perplexity Changelog"]);
+    assert.equal(calls[0].baseUrl, "https://api.perplexity.ai");
+    assert.equal(calls[0].apiKey, "pplx-secret");
+    assert.equal(usageEvents[0].provider, "perplexity");
+    assert.equal(usageEvents[0].source, "api-search");
+    assert.equal(usageEvents[0].apiModel, "perplexity-search");
   });
 });

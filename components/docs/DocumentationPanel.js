@@ -110,6 +110,8 @@ export function DocumentationPanel({ onClose }) {
   const providers = [
     ["Ollama", t("providers.ollama.docs")],
     ["OpenAI", t("providers.openai.docs")],
+    ["Together AI", "OpenAI-compatible inference through Together's chat completions API."],
+    ["Perplexity", "Sonar chat completions plus Batuk API access to Perplexity Search."],
     ["Claude", t("providers.anthropic.docs")],
     ["Grok", t("providers.xai.docs")],
     ["Sarvam AI", t("providers.sarvam.docs")],

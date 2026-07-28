@@ -187,12 +187,16 @@ export function ApiManagementPanel({ onBackToMenu, onClose }) {
             <section className="settings-card">
               <div className="setting-title">
                 <h3>API endpoint</h3>
-                <p>Use this app as an OpenAI-compatible model gateway.</p>
+                <p>Use this app as an OpenAI-compatible model gateway and Perplexity search gateway.</p>
               </div>
               <pre className="api-code-sample">{`curl -X POST http://localhost:3000/api/v1/chat/completions \\
   -H "Authorization: Bearer batuk_..." \\
   -H "Content-Type: application/json" \\
   -d '{"model":"${management.publicModels[0]?.id || "provider/model"}","messages":[{"role":"user","content":"Hello"}]}'`}</pre>
+              <pre className="api-code-sample">{`curl -X POST http://localhost:3000/api/v1/search \\
+  -H "Authorization: Bearer batuk_..." \\
+  -H "Content-Type: application/json" \\
+  -d '{"query":["What is Comet Browser?","Perplexity AI","Perplexity Changelog"]}'`}</pre>
             </section>
 
             {isAdmin && activeKeysByUser.length > 0 && (

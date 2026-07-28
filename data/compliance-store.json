@@ -183,6 +183,79 @@
   ],
   "auditEvents": [
     {
+      "id": "audit-1785269111930-c927a46bbdd81d24",
+      "createdAt": "2026-07-28T20:05:11.930Z",
+      "category": "data",
+      "action": "chat.delete",
+      "outcome": "success",
+      "actor": {
+        "id": "3c4816f5-3e7e-4d26-a6ce-e827cc3c856e",
+        "emailHash": "f660ab912ec121d1b1e928a0bb4bc61b15f5ad44d5efdc4e1c92a25e99b8e44a",
+        "role": "owner"
+      },
+      "target": {
+        "type": "chat",
+        "id": "1785269072083-02c1a61b1aef"
+      },
+      "ipHash": null,
+      "userAgent": null,
+      "metadata": {},
+      "previousHash": "510f83412167cd772194f14e3f0b818614fb51d156aab9b2366fb2600828640b",
+      "integrityHash": "909ff8cc7b0a0ee3ca3dbfce92ae4d5b81e424ae531a8a58723a6859d9acc44d"
+    },
+    {
+      "id": "audit-1785269109741-dc5292673bea9f47",
+      "createdAt": "2026-07-28T20:05:09.741Z",
+      "category": "data",
+      "action": "chat.upsert",
+      "outcome": "success",
+      "actor": {
+        "id": "3c4816f5-3e7e-4d26-a6ce-e827cc3c856e",
+        "emailHash": "f660ab912ec121d1b1e928a0bb4bc61b15f5ad44d5efdc4e1c92a25e99b8e44a",
+        "role": "owner"
+      },
+      "target": {
+        "type": "chat",
+        "id": "1785269072083-02c1a61b1aef"
+      },
+      "ipHash": null,
+      "userAgent": null,
+      "metadata": {
+        "workspaceId": "workspace-personal",
+        "folderId": null,
+        "provider": "together",
+        "model": "MiniMaxAI/MiniMax-M3"
+      },
+      "previousHash": "5b2dee0cd5120ba26109a2fa7e593713b5b4799dd7958ac4ae36de2804e1ff4f",
+      "integrityHash": "510f83412167cd772194f14e3f0b818614fb51d156aab9b2366fb2600828640b"
+    },
+    {
+      "id": "audit-1785269081514-7d74b3aef3686abb",
+      "createdAt": "2026-07-28T20:04:41.514Z",
+      "category": "data",
+      "action": "chat.upsert",
+      "outcome": "success",
+      "actor": {
+        "id": "3c4816f5-3e7e-4d26-a6ce-e827cc3c856e",
+        "emailHash": "f660ab912ec121d1b1e928a0bb4bc61b15f5ad44d5efdc4e1c92a25e99b8e44a",
+        "role": "owner"
+      },
+      "target": {
+        "type": "chat",
+        "id": "1785269072083-02c1a61b1aef"
+      },
+      "ipHash": null,
+      "userAgent": null,
+      "metadata": {
+        "workspaceId": "workspace-personal",
+        "folderId": null,
+        "provider": "together",
+        "model": "MiniMaxAI/MiniMax-M3"
+      },
+      "previousHash": "0fdcb6df5a77a9117a7ec894a766c05ca8d9aee8a72d09fdc4150b0980d6a070",
+      "integrityHash": "5b2dee0cd5120ba26109a2fa7e593713b5b4799dd7958ac4ae36de2804e1ff4f"
+    },
+    {
       "id": "audit-1785148015327-0fc036370d4427e1",
       "createdAt": "2026-07-27T10:26:55.327Z",
       "category": "admin",

@@ -106,9 +106,11 @@ Batuk is local-first by default and enterprise-ready when you need it. Run it on
 - API keys are user-scoped. A non-admin can only see and revoke their own keys.
 - Admins can see all user API keys, revoke individual keys, or revoke all active API access for a user.
 - Admins manage public API model routes that map external model IDs such as `company/support-large` to the provider/model/base URL configured for Batuk.
+- Admins can expose Together AI models through the same OpenAI-compatible gateway by creating a route with provider `together`, base URL `https://api.together.ai/v1`, and a Together model such as `MiniMaxAI/MiniMax-M3`.
+- Admins can expose Perplexity Sonar chat models with provider `perplexity`, base URL `https://api.perplexity.ai`, and models such as `sonar-pro`.
 - Raw API keys are never stored. Batuk stores a SHA-256 hash, short preview, owner metadata, status, created/revoked timestamps, and last-used timestamp.
 - API Access is visible to all signed-in users. Workspace Management, Enterprise Management, and Audit and Compliance are admin-only menu entries.
-- Programmatic clients use OpenAI-compatible endpoints:
+- Programmatic clients use OpenAI-compatible endpoints plus a Perplexity search gateway:
 
 ```bash
 curl -H "Authorization: Bearer batuk_..." http://localhost:3000/api/v1/models
@@ -117,9 +119,15 @@ curl -X POST http://localhost:3000/api/v1/chat/completions \
   -H "Authorization: Bearer batuk_..." \
   -H "Content-Type: application/json" \
   -d '{"model":"ollama/llama3.1","messages":[{"role":"user","content":"Hello"}]}'
+
+curl -X POST http://localhost:3000/api/v1/search \
+  -H "Authorization: Bearer batuk_..." \
+  -H "Content-Type: application/json" \
+  -d '{"query":["What is Comet Browser?","Perplexity AI","Perplexity Changelog"]}'
 ```
 
-- The API gateway records token usage with `source: "api"`, API key ID, user ID/email, provider, and public model ID so chat and API usage can be separated in reporting.
+- Server-side provider keys are read from environment variables including `OPENAI_API_KEY`, `OPENROUTER_API_KEY`, `TOGETHER_API_KEY`, `PERPLEXITY_API_KEY`, `ANTHROPIC_API_KEY`, `XAI_API_KEY`, and `SARVAM_API_KEY`.
+- The API gateway records token usage with `source: "api"` for chat completions and `source: "api-search"` for Perplexity Search, including API key ID, user ID/email, provider, and public model ID so chat, API, and search usage can be separated in reporting.
 - The gateway has been smoke tested end-to-end against local Ollama `qwen3:8b` through `POST /api/v1/chat/completions`.
 
 ### Token Usage Dashboard

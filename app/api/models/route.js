@@ -1,6 +1,6 @@
 import { json } from "@/lib/chat-request";
 import { requireServerPermission } from "@/lib/auth-session";
-import { getClaudeModels, getOllamaModels, getOpenAIModels, getOpenRouterModels, getSarvamModels, getXAIModels } from "@/lib/model-catalog";
+import { getClaudeModels, getOllamaModels, getOpenAIModels, getOpenRouterModels, getPerplexityModels, getSarvamModels, getTogetherModels, getXAIModels } from "@/lib/model-catalog";
 
 export async function GET(request) {
   const { response } = await requireServerPermission({ model: ["read"] });
@@ -17,6 +17,14 @@ export async function GET(request) {
 
     if (provider === "openrouter") {
       return json(await getOpenRouterModels());
+    }
+
+    if (provider === "together") {
+      return json(await getTogetherModels(baseUrl));
+    }
+
+    if (provider === "perplexity") {
+      return json(await getPerplexityModels());
     }
 
     if (provider === "anthropic") {
