@@ -130,7 +130,7 @@ export function DocumentationPanel({ onClose }) {
     "Analytics and observability: Amplitude, PostHog, Honeycomb, Sentry, Braintrust, Fireflies, Jamie",
     "Developer platforms: GitHub Copilot, Buildkite, Cloudflare, Netlify, Render, Neon, Prisma, Postman, Semgrep",
     "Knowledge and AI platforms: Context7, DeepWiki, Microsoft Learn, Hugging Face, Replicate, Astro Docs",
-    "Creative, media, commerce, and web automation: Canva, Cloudinary, Mobbin, Apify, Browser Use, Lazyweb, Google Maps Grounding Lite, Swiggy, Zomato",
+    "Creative, media, commerce, and web automation: Canva, Cloudinary, Mobbin, Apify, Browser Use, Lazyweb, Google Maps Grounding Lite, Swiggy",
   ];
 
   return (
@@ -699,7 +699,7 @@ messages.unshift({
                   "Click the check icon on the connected product to make it active",
                   "Return to chat and confirm the MCP connected banner is visible",
                   "Ask normal chat questions such as: Using the selected Notion MCP, what tools are available?",
-                  "Current alpha presets include Pine Labs, Notion, Stripe, PayPal, ClickUp, Slack, Gmail, Google Maps Grounding Lite, Monday.com, Atlassian, Linear, Asana, Amplitude, PostHog, Sentry, Neon, Render, Netlify, HubSpot, Swiggy, Zomato, and custom MCP servers",
+                  "Current alpha presets include Pine Labs, Notion, Stripe, PayPal, ClickUp, Slack, Gmail, Google Maps Grounding Lite, Monday.com, Atlassian, Linear, Asana, Amplitude, PostHog, Sentry, Neon, Render, Netlify, HubSpot, Swiggy, and custom MCP servers",
                 ].map((item) => (
                   <li key={item}>
                     <CheckCircle2 size={16} />
