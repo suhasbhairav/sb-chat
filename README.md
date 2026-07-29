@@ -189,6 +189,7 @@ Current MCP preset connectors, all marked **In alpha, PoC stage**, include:
 | Swiggy Food | [Swiggy](https://www.swiggy.com) | [`https://mcp.swiggy.com/food`](https://mcp.swiggy.com/food) |
 | Swiggy Instamart | [Swiggy Instamart](https://www.swiggy.com/instamart) | [`https://mcp.swiggy.com/im`](https://mcp.swiggy.com/im) |
 | Swiggy Dineout | [Swiggy Dineout](https://www.swiggy.com/restaurants) | [`https://mcp.swiggy.com/dineout`](https://mcp.swiggy.com/dineout) |
+| Zomato | [Zomato](https://www.zomato.com) | [`https://mcp-server.zomato.com/mcp`](https://mcp-server.zomato.com/mcp), [manifest](https://github.com/Zomato/mcp-server-manifest) |
 | Amplitude | [Amplitude](https://amplitude.com) | [`https://mcp.amplitude.com/mcp`](https://mcp.amplitude.com/mcp) |
 | Apify | [Apify](https://apify.com) | [`https://mcp.apify.com`](https://mcp.apify.com) |
 | Asana | [Asana](https://asana.com) | [`https://mcp.asana.com/mcp`](https://mcp.asana.com/mcp) |
@@ -271,6 +272,15 @@ Swiggy is also available as first-class remote MCP presets:
 - Food flow: `get_addresses -> search_restaurants -> get_restaurant_menu -> update_food_cart -> get_food_cart -> place_food_order -> track_food_order`.
 - Safety: Batuk marks order, checkout, and reservation tools as high-impact actions. The MCP API refuses those tool calls unless the caller explicitly confirms final cart or booking details with `confirmed: true`.
 - Swiggy Food v1 supports COD and documents a Rs. 1000 cart cap for Builders Club orders.
+
+Zomato is available as a first-class remote MCP preset:
+
+- Zomato MCP URL: `https://mcp-server.zomato.com/mcp`
+- Manifest: [Zomato/mcp-server-manifest](https://github.com/Zomato/mcp-server-manifest)
+- Supported flows: restaurant discovery, menu browsing, cart creation, food ordering, order tracking, and QR-code payment.
+- Access posture: Zomato documents MCP developer access for personal/testing use and asks developers to request access before building integrations.
+- OAuth note: only redirect URIs whitelisted by Zomato can authenticate until the Batuk client callback is approved.
+- Safety: Batuk marks order and payment tools as high-impact actions and requires explicit confirmation before execution.
 
 For production use, register the deployed absolute callback URL in HubSpot, for example `https://your-batuk-domain.com/api/mcp/oauth/callback`. Batuk redacts saved MCP client secrets and tokens before returning MCP integration configs to the browser.
 
