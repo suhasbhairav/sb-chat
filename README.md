@@ -186,6 +186,9 @@ Current MCP preset connectors, all marked **In alpha, PoC stage**, include:
 | Gmail | [Google Workspace](https://workspace.google.com/products/gmail/) | [`https://gmailmcp.googleapis.com/mcp/v1`](https://gmailmcp.googleapis.com/mcp/v1) |
 | Google Maps Grounding Lite | [Google Maps Platform](https://mapsplatform.google.com) | [`https://mapstools.googleapis.com/mcp`](https://mapstools.googleapis.com/mcp) |
 | Monday.com | [Monday.com](https://monday.com) | [`https://mcp.monday.com/sse`](https://mcp.monday.com/sse) |
+| Swiggy Food | [Swiggy](https://www.swiggy.com) | [`https://mcp.swiggy.com/food`](https://mcp.swiggy.com/food) |
+| Swiggy Instamart | [Swiggy Instamart](https://www.swiggy.com/instamart) | [`https://mcp.swiggy.com/im`](https://mcp.swiggy.com/im) |
+| Swiggy Dineout | [Swiggy Dineout](https://www.swiggy.com/restaurants) | [`https://mcp.swiggy.com/dineout`](https://mcp.swiggy.com/dineout) |
 | Amplitude | [Amplitude](https://amplitude.com) | [`https://mcp.amplitude.com/mcp`](https://mcp.amplitude.com/mcp) |
 | Apify | [Apify](https://apify.com) | [`https://mcp.apify.com`](https://mcp.apify.com) |
 | Asana | [Asana](https://asana.com) | [`https://mcp.asana.com/mcp`](https://mcp.asana.com/mcp) |
@@ -234,7 +237,7 @@ Current MCP preset connectors, all marked **In alpha, PoC stage**, include:
 | Semgrep | [Semgrep](https://semgrep.dev) | [`https://mcp.semgrep.ai/mcp`](https://mcp.semgrep.ai/mcp) |
 | Sentry | [Sentry](https://sentry.io) | [`https://mcp.sentry.dev/mcp`](https://mcp.sentry.dev/mcp) |
 
-The same dashboard also includes HubSpot CRM, Swiggy Food, Swiggy Instamart, Swiggy Dineout, GitHub, PostgreSQL, SQLite, Google Drive, Brave Search, browser automation, memory graph, and custom MCP server presets.
+The same dashboard also includes HubSpot CRM, GitHub, PostgreSQL, SQLite, Google Drive, Brave Search, browser automation, memory graph, and custom MCP server presets.
 
 How to chat after connecting an MCP integration:
 
