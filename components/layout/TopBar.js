@@ -96,17 +96,17 @@ export function TopBar({
           <Sparkles size={19} />
         </button>
         <button
-          aria-label="MCP integrations"
+          aria-label="MCP integrations, in alpha PoC stage"
           className={`top-icon ${activeMcpIntegration ? "mcp-active-icon" : ""}`}
-          data-tooltip="MCP integrations"
+          data-tooltip="MCP integrations · In alpha, PoC stage"
           onClick={onOpenMcp}
-          title={activeMcpIntegration ? `MCP: ${activeMcpIntegration.name}` : "MCP integrations"}
+          title={activeMcpIntegration ? `MCP: ${activeMcpIntegration.name} · In alpha, PoC stage` : "MCP integrations · In alpha, PoC stage"}
           type="button"
         >
           <PlugZap size={19} />
         </button>
         {mcpIntegrations.length > 0 && (
-          <label className={`mcp-topbar-select ${activeMcpIntegration ? "active" : ""}`} title={activeMcpIntegration ? `Chatting with ${activeMcpIntegration.name}` : "No MCP selected"}>
+          <label className={`mcp-topbar-select ${activeMcpIntegration ? "active" : ""}`} title={activeMcpIntegration ? `Chatting with ${activeMcpIntegration.name} · In alpha, PoC stage` : "No MCP selected · In alpha, PoC stage"}>
             <PlugZap size={15} />
             <select aria-label="Select MCP product for chat" value={activeMcpIntegrationId || ""} onChange={(event) => onSelectMcp(event.target.value)}>
               <option value="">No MCP</option>

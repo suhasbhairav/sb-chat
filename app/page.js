@@ -212,6 +212,7 @@ function HomeShell({ chat }) {
             onDelete={chat.deleteMcp}
             onSave={chat.saveMcpIntegration}
             onSelectActive={chat.setActiveMcp}
+            onStartOAuth={chat.startMcpOAuth}
           />
         ) : chat.skillsOpen ? (
           <SkillsDashboard onClose={() => chat.setSkillsOpen(false)} />
@@ -239,6 +240,7 @@ function HomeShell({ chat }) {
                 <span>
                   <strong>MCP connected:</strong> {chat.activeMcpIntegration.name}
                   {chat.activeMcpIntegration.status === "connected" ? ` · ${chat.activeMcpIntegration.discovery?.tools?.length || 0} tools discovered` : ""}
+                  {" · In alpha, PoC stage"}
                 </span>
                 <button onClick={() => chat.setActiveMcp("")} type="button">Disconnect</button>
               </div>

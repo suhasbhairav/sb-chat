@@ -169,9 +169,107 @@ curl -X POST http://localhost:3000/api/v1/search \
 - Agent Builder for saved multi-agent workflows.
 - Attach documents to Agent 1, run agents sequentially, inspect the run trace, and send final output back to chat.
 
-### MCP Integrations Status
+### MCP Integrations
 
-MCP integration work is currently in progress. Batuk includes an early MCP dashboard for saving custom Streamable HTTP, SSE, and stdio MCP server records, discovering tools/resources/prompts, selecting or unselecting an active MCP product for chat, and deleting saved MCP connection records. This surface is not yet production-complete: hosted OAuth flows, provider-specific credential UX, deeper tool-calling loops, and a larger verified MCP directory are still being developed.
+Batuk MCP integrations are **in alpha, PoC stage**. The dashboard can save custom Streamable HTTP, SSE, and stdio MCP server records, discover tools/resources/prompts, select or unselect an active MCP product for chat, and delete saved MCP connection records. Treat every MCP connector as experimental until the hosted OAuth flow, provider-specific credential UX, and deeper tool-calling loop are hardened.
+
+Current MCP preset connectors, all marked **In alpha, PoC stage**, include:
+
+| Connector | Company | MCP endpoint |
+| --- | --- | --- |
+| Pine Labs Online Payments | [Pine Labs](https://www.pinelabs.com) | [MCP docs](https://www.pinelabs.com/docs/online-payments/ai/mcp-server) |
+| Notion | [Notion](https://www.notion.com) | [`https://mcp.notion.com/mcp`](https://mcp.notion.com/mcp) |
+| Stripe | [Stripe](https://stripe.com) | [`https://mcp.stripe.com`](https://mcp.stripe.com) |
+| PayPal | [PayPal](https://www.paypal.com) | [`https://mcp.paypal.com/sse`](https://mcp.paypal.com/sse) |
+| ClickUp | [ClickUp](https://clickup.com) | [`https://mcp.clickup.com/mcp`](https://mcp.clickup.com/mcp) |
+| Slack Remote | [Slack](https://slack.com) | [`https://mcp.slack.com/mcp`](https://mcp.slack.com/mcp) |
+| Gmail | [Google Workspace](https://workspace.google.com/products/gmail/) | [`https://gmailmcp.googleapis.com/mcp/v1`](https://gmailmcp.googleapis.com/mcp/v1) |
+| Google Maps Grounding Lite | [Google Maps Platform](https://mapsplatform.google.com) | [`https://mapstools.googleapis.com/mcp`](https://mapstools.googleapis.com/mcp) |
+| Monday.com | [Monday.com](https://monday.com) | [`https://mcp.monday.com/sse`](https://mcp.monday.com/sse) |
+| Amplitude | [Amplitude](https://amplitude.com) | [`https://mcp.amplitude.com/mcp`](https://mcp.amplitude.com/mcp) |
+| Apify | [Apify](https://apify.com) | [`https://mcp.apify.com`](https://mcp.apify.com) |
+| Asana | [Asana](https://asana.com) | [`https://mcp.asana.com/mcp`](https://mcp.asana.com/mcp) |
+| Ashby | [Ashby](https://www.ashbyhq.com) | [`https://mcp.ashbyhq.com/mcp/v1`](https://mcp.ashbyhq.com/mcp/v1) |
+| Astro Docs | [Astro](https://astro.build) | [`https://mcp.docs.astro.build/mcp`](https://mcp.docs.astro.build/mcp) |
+| Atlassian | [Atlassian](https://www.atlassian.com) | [`https://mcp.atlassian.com/v1/sse`](https://mcp.atlassian.com/v1/sse) |
+| Attio | [Attio](https://attio.com) | [`https://mcp.attio.com/mcp`](https://mcp.attio.com/mcp) |
+| Braintrust | [Braintrust](https://www.braintrust.dev) | [`https://api.braintrust.dev/mcp`](https://api.braintrust.dev/mcp) |
+| Browser Use | [Browser Use](https://browser-use.com) | [`https://api.browser-use.com/mcp`](https://api.browser-use.com/mcp) |
+| Buildkite | [Buildkite](https://buildkite.com) | [`https://mcp.buildkite.com/mcp`](https://mcp.buildkite.com/mcp) |
+| Canva | [Canva](https://www.canva.com) | [`https://mcp.canva.com/mcp`](https://mcp.canva.com/mcp) |
+| Close CRM | [Close](https://www.close.com) | [`https://mcp.close.com/mcp`](https://mcp.close.com/mcp) |
+| Coda | [Coda](https://coda.io) | [`https://coda.io/apis/mcp`](https://coda.io/apis/mcp) |
+| Cloudflare Bindings | [Cloudflare](https://www.cloudflare.com) | [`https://bindings.mcp.cloudflare.com/sse`](https://bindings.mcp.cloudflare.com/sse) |
+| Cloudinary Asset Management | [Cloudinary](https://cloudinary.com) | [`https://asset-management.mcp.cloudinary.com/sse`](https://asset-management.mcp.cloudinary.com/sse) |
+| Context7 | [Context7](https://context7.com) | [`https://mcp.context7.com/mcp`](https://mcp.context7.com/mcp) |
+| Debitura | [Debitura](https://www.debitura.com) | [`https://mcp.debitura.com/mcp`](https://mcp.debitura.com/mcp) |
+| DeepWiki | [DeepWiki](https://deepwiki.com) | [`https://mcp.deepwiki.com/mcp`](https://mcp.deepwiki.com/mcp) |
+| Demodesk | [Demodesk](https://demodesk.com) | [`https://demodesk.com/mcp`](https://demodesk.com/mcp) |
+| Fireflies.ai | [Fireflies.ai](https://fireflies.ai) | [`https://api.fireflies.ai/mcp`](https://api.fireflies.ai/mcp) |
+| GitHub Copilot | [GitHub Copilot](https://github.com/features/copilot) | [`https://api.githubcopilot.com/mcp/`](https://api.githubcopilot.com/mcp/) |
+| Honeycomb | [Honeycomb](https://www.honeycomb.io) | [`https://mcp.honeycomb.io/mcp`](https://mcp.honeycomb.io/mcp) |
+| Hugging Face | [Hugging Face](https://huggingface.co) | [`https://hf.co/mcp`](https://hf.co/mcp) |
+| InstantDB | [Instant](https://www.instantdb.com) | [`https://mcp.instantdb.com/mcp`](https://mcp.instantdb.com/mcp) |
+| Intercom | [Intercom](https://www.intercom.com) | [`https://mcp.intercom.com/sse`](https://mcp.intercom.com/sse) |
+| Jamie | [Jamie](https://www.meetjamie.ai) | [`https://mcp.meetjamie.ai/mcp`](https://mcp.meetjamie.ai/mcp) |
+| Lawbster | [Planitprima](https://lawbster.planitprima.com) | [`https://lawbster.planitprima.com/mcp`](https://lawbster.planitprima.com/mcp) |
+| Lazyweb | [Lazyweb](https://www.lazyweb.com) | [`https://www.lazyweb.com/mcp`](https://www.lazyweb.com/mcp) |
+| Linear | [Linear](https://linear.app) | [`https://mcp.linear.app/sse`](https://mcp.linear.app/sse) |
+| Microsoft Learn | [Microsoft Learn](https://learn.microsoft.com) | [`https://learn.microsoft.com/api/mcp`](https://learn.microsoft.com/api/mcp) |
+| Mobbin | [Mobbin](https://mobbin.com) | [`https://api.mobbin.com/mcp`](https://api.mobbin.com/mcp) |
+| Modjo | [Modjo](https://www.modjo.ai) | [`https://api.mcp.modjo.ai/v1/mcp`](https://api.mcp.modjo.ai/v1/mcp) |
+| Neon | [Neon](https://neon.com) | [`https://mcp.neon.tech/mcp`](https://mcp.neon.tech/mcp) |
+| Netlify | [Netlify](https://www.netlify.com) | [`https://netlify-mcp.netlify.app/mcp`](https://netlify-mcp.netlify.app/mcp) |
+| PagerDuty | [PagerDuty](https://www.pagerduty.com) | [`https://mcp.pagerduty.com/sse`](https://mcp.pagerduty.com/sse) |
+| Pipedream | [Pipedream](https://pipedream.com) | `https://mcp.pipedream.net/<uuid>/<app>` |
+| Pipedrive | [Pipedrive](https://www.pipedrive.com) | [`https://mcp.pipedrive.ai/mcp`](https://mcp.pipedrive.ai/mcp) |
+| Plaid | [Plaid](https://plaid.com) | [`https://api.dashboard.plaid.com/mcp/sse`](https://api.dashboard.plaid.com/mcp/sse) |
+| PostHog | [PostHog](https://posthog.com) | [`https://mcp.posthog.com/sse`](https://mcp.posthog.com/sse) |
+| Postman | [Postman](https://www.postman.com) | [`https://mcp.postman.com/minimal`](https://mcp.postman.com/minimal) |
+| Prisma | [Prisma](https://www.prisma.io) | [`https://mcp.prisma.io/mcp`](https://mcp.prisma.io/mcp) |
+| Ramp | [Ramp](https://ramp.com) | [`https://ramp-mcp-remote.ramp.com/mcp`](https://ramp-mcp-remote.ramp.com/mcp) |
+| Render | [Render](https://render.com) | [`https://mcp.render.com/mcp`](https://mcp.render.com/mcp) |
+| Replicate | [Replicate](https://replicate.com) | [`https://mcp.replicate.com/sse`](https://mcp.replicate.com/sse) |
+| Sanity | [Sanity](https://www.sanity.io) | [`https://mcp.sanity.io`](https://mcp.sanity.io) |
+| Semgrep | [Semgrep](https://semgrep.dev) | [`https://mcp.semgrep.ai/mcp`](https://mcp.semgrep.ai/mcp) |
+| Sentry | [Sentry](https://sentry.io) | [`https://mcp.sentry.dev/mcp`](https://mcp.sentry.dev/mcp) |
+
+The same dashboard also includes HubSpot CRM, Swiggy Food, Swiggy Instamart, Swiggy Dineout, GitHub, PostgreSQL, SQLite, Google Drive, Brave Search, browser automation, memory graph, and custom MCP server presets.
+
+How to chat after connecting an MCP integration:
+
+1. Open the MCP dashboard from the top bar plug icon.
+2. Pick a connector and click **Connect**.
+3. Click **Discover** so Batuk can list tools, resources, and prompts.
+4. Click the check icon on the connected product to make it active.
+5. Return to chat and confirm the banner says `MCP connected: <product name> · In alpha, PoC stage`.
+6. Ask questions in normal chat, for example: `Using the selected Notion MCP, what tools are available?`
+
+MCP chat is currently context-first. Batuk can show the selected product, inject discovered MCP capabilities and readable resources into chat context, and let you select/unselect the active MCP product. Full automatic MCP tool execution inside normal chat is still being built; use dashboard discovery/tool-call flows where available for live actions.
+
+HubSpot CRM is available as a first-class remote MCP preset:
+
+- HubSpot MCP URL: `https://mcp.hubspot.com/`
+- Transport: Streamable HTTP
+- Auth: OAuth with PKCE through a HubSpot MCP Auth App
+- Batuk callback URL: `/api/mcp/oauth/callback`
+- Setup path in HubSpot: Development -> MCP Auth Apps -> Create MCP auth app
+- Supported HubSpot data follows HubSpot user permissions, including CRM records, activities, content, campaigns, marketing events, and marketing email data.
+- HubSpot Sensitive Data restrictions are respected by HubSpot's MCP server; activity objects can be blocked when Sensitive Data is enabled.
+
+Swiggy is also available as first-class remote MCP presets:
+
+- Swiggy Food MCP URL: `https://mcp.swiggy.com/food`
+- Swiggy Instamart MCP URL: `https://mcp.swiggy.com/im`
+- Swiggy Dineout MCP URL: `https://mcp.swiggy.com/dineout`
+- Auth: OAuth 2.1 with PKCE and Dynamic Client Registration
+- Local callback URL: `http://localhost:3000/api/mcp/oauth/callback`
+- Production access requires Swiggy Builders Club approval and exact HTTPS redirect URI registration.
+- Food flow: `get_addresses -> search_restaurants -> get_restaurant_menu -> update_food_cart -> get_food_cart -> place_food_order -> track_food_order`.
+- Safety: Batuk marks order, checkout, and reservation tools as high-impact actions. The MCP API refuses those tool calls unless the caller explicitly confirms final cart or booking details with `confirmed: true`.
+- Swiggy Food v1 supports COD and documents a Rs. 1000 cart cap for Builders Club orders.
+
+For production use, register the deployed absolute callback URL in HubSpot, for example `https://your-batuk-domain.com/api/mcp/oauth/callback`. Batuk redacts saved MCP client secrets and tokens before returning MCP integration configs to the browser.
 
 ## Supported LLMs, Embedders, Speech, and Vector Stores
 

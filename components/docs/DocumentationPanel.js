@@ -14,6 +14,7 @@ import {
   LockKeyhole,
   Mic2,
   Moon,
+  PlugZap,
   Radio,
   Search,
   ShieldCheck,
@@ -121,6 +122,15 @@ export function DocumentationPanel({ onClose }) {
     ["Sarvam AI", t("providers.sarvam.docs")],
     ["OpenRouter", t("providers.openrouter.docs")],
     ["Custom", t("providers.custom.docs")],
+  ];
+  const mcpDirectoryGroups = [
+    "Revenue and CRM: HubSpot, Salesforce-style custom MCP, Close, Attio, Pipedrive, Intercom, Modjo, Demodesk",
+    "Work management: Notion, Asana, ClickUp, Monday.com, Linear, Atlassian, Coda, Slack, Gmail",
+    "Payments and finance: Stripe, PayPal, Pine Labs, Ramp, Plaid, Debitura",
+    "Analytics and observability: Amplitude, PostHog, Honeycomb, Sentry, Braintrust, Fireflies, Jamie",
+    "Developer platforms: GitHub Copilot, Buildkite, Cloudflare, Netlify, Render, Neon, Prisma, Postman, Semgrep",
+    "Knowledge and AI platforms: Context7, DeepWiki, Microsoft Learn, Hugging Face, Replicate, Astro Docs",
+    "Creative, media, and web automation: Canva, Cloudinary, Mobbin, Apify, Browser Use, Lazyweb, Google Maps Grounding Lite",
   ];
 
   return (
@@ -673,9 +683,81 @@ messages.unshift({
             </div>
           </section>
 
+          <section className="docs-split">
+            <div className="docs-copy-block">
+              <span>MCP integrations</span>
+              <h2>How to chat after connecting an MCP product.</h2>
+              <p>
+                MCP integrations are in alpha, PoC stage. After connecting a server, select it as the active MCP product
+                before returning to chat. The chat screen confirms the active product with an MCP connected banner.
+              </p>
+              <ul>
+                {[
+                  "Open the MCP dashboard from the top bar plug icon",
+                  "Pick a connector and click Connect",
+                  "Click Discover so Batuk can list MCP tools, resources, and prompts",
+                  "Click the check icon on the connected product to make it active",
+                  "Return to chat and confirm the MCP connected banner is visible",
+                  "Ask normal chat questions such as: Using the selected Notion MCP, what tools are available?",
+                  "Current alpha presets include Pine Labs, Notion, Stripe, PayPal, ClickUp, Slack, Gmail, Google Maps Grounding Lite, Monday.com, Atlassian, Linear, Asana, Amplitude, PostHog, Sentry, Neon, Render, Netlify, HubSpot, Swiggy, and custom MCP servers",
+                ].map((item) => (
+                  <li key={item}>
+                    <CheckCircle2 size={16} />
+                    {item}
+                  </li>
+                ))}
+              </ul>
+              <p>
+                MCP chat is currently context-first: Batuk injects discovered capabilities and readable resources into
+                chat context. Full automatic MCP tool execution inside normal chat is still being built.
+              </p>
+              <p>
+                Enterprise operators should treat MCP as an integration control plane: verify each provider&apos;s OAuth
+                scopes, tenant restrictions, audit expectations, and write-action approvals before using production data.
+              </p>
+            </div>
+            <div className="docs-code-card">
+              <div className="code-dots" aria-hidden="true">
+                <span />
+                <span />
+                <span />
+              </div>
+              <pre>
+                <code>{`MCP chat flow:
+1. Connect
+2. Discover
+3. Select active product
+4. Return to chat
+5. Confirm banner:
+   MCP connected: Notion
+   In alpha, PoC stage
+
+Example prompt:
+"Using the selected Notion MCP,
+what tools are available?"`}</code>
+              </pre>
+            </div>
+          </section>
+
+          <section className="docs-section">
+            <div className="docs-section-title">
+              <span>MCP directory</span>
+              <h2>Enterprise connector coverage in alpha, PoC stage.</h2>
+            </div>
+            <div className="docs-card-grid">
+              {mcpDirectoryGroups.map((item) => (
+                <article className="docs-card" key={item}>
+                  <PlugZap size={20} />
+                  <h3>{item.split(":")[0]}</h3>
+                  <p>{item.split(":").slice(1).join(":").trim()}</p>
+                </article>
+              ))}
+            </div>
+          </section>
+
           <section className="docs-band">
             <div>
-              <BookOpen size={21} />
+              <PlugZap size={21} />
               <h2>{t("docs.productSystems")}</h2>
             </div>
             <div className="docs-feature-cloud">

@@ -597,6 +597,15 @@ export function useChatController() {
     return data;
   }
 
+  async function startMcpOAuth(integrationId) {
+    const response = await fetch("/api/mcp", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ action: "startOAuth", integrationId }),
+    });
+    return readApiJson(response, "Could not start MCP OAuth.");
+  }
+
   async function deleteMcp(integrationId) {
     const response = await fetch("/api/mcp", {
       method: "POST",
@@ -1455,6 +1464,7 @@ export function useChatController() {
     saveMcpIntegration,
     setActiveMcp,
     discoverMcp,
+    startMcpOAuth,
     deleteMcp,
     updateMemory,
     toggleVoiceChat: realtime.toggleVoiceChat,

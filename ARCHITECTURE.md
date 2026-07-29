@@ -13,6 +13,8 @@ Batuk is structured around product boundaries instead of framework files alone.
 - `app/api/documents/[id]/download/route.js` downloads original uploaded documents.
 - `app/api/models/route.js` loads model catalogs for OpenAI, Together AI, Mistral AI, Kimi, DeepSeek, Qwen, Perplexity, Claude, Grok, OpenRouter, Ollama, and custom/manual providers.
 - `app/api/realtime/session/route.js` creates ephemeral OpenAI Realtime sessions for browser voice chat.
+- `app/api/mcp/route.js` manages MCP catalog entries, saved integrations, OAuth start, discovery, tool calls, and resource reads.
+- `app/api/mcp/oauth/callback/route.js` completes OAuth/PKCE callbacks for remote MCP servers such as HubSpot.
 - `app/api/token-usage/route.js` exposes accumulated input/output token usage from JSON or SQL-backed product storage.
 - `app/globals.css` owns the current product theme and layout class system.
 
@@ -56,6 +58,7 @@ Token usage is still tracked for model calls, including temporary chats, in `dat
 - `lib/api-management-store.js` hashes user API keys, exposes safe public key metadata, authenticates API requests, and stores admin-managed public model routes.
 - `lib/api-completions.js` handles the OpenAI-compatible completion flow as a testable unit: API-key auth, route lookup, provider call, usage recording, and response shaping.
 - `lib/api-search.js` handles Batuk-key-authenticated Perplexity Search requests and records them separately from chat completions.
+- `lib/mcp-catalog.js`, `lib/mcp-store.js`, `lib/mcp-client.js`, and `lib/mcp-oauth.js` define MCP presets, redact saved secrets for browser responses, persist remote MCP OAuth tokens/verifiers, support static OAuth clients such as HubSpot plus Dynamic Client Registration flows such as Swiggy, and connect Streamable HTTP/SSE/stdio MCP servers.
 - `lib/rag-store.js`, `lib/rag-processing.js`, and `lib/rag-embeddings.js` contain document persistence, extraction/chunking, embeddings, and retrieval.
 - `lib/token-usage-store.js` records provider-reported input/output token usage and aggregates usage by channel, user, chat, API key, provider, model, day, month, and year.
 
