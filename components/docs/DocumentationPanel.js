@@ -46,7 +46,7 @@ export function DocumentationPanel({ onClose }) {
     {
       icon: FileText,
       title: "Document Chat and RAG",
-      copy: "Upload private personal documents or shared workspace documents, index with local or OpenAI embeddings, store vectors in JSON, ChromaDB, or Pinecone, and cite document sources.",
+      copy: "Upload private personal documents or shared workspace documents, index with local or OpenAI embeddings, store vectors in JSON, ChromaDB, Pinecone, or Supabase, and cite document sources.",
     },
     {
       icon: UsersRound,
@@ -170,7 +170,7 @@ export function DocumentationPanel({ onClose }) {
             </div>
             <div>
               <strong>RAG</strong>
-              <span>JSON, ChromaDB, Pinecone</span>
+              <span>JSON, ChromaDB, Pinecone, Supabase</span>
             </div>
             <div>
               <strong>Auth</strong>
@@ -301,7 +301,7 @@ Custom -> LM Studio, vLLM, LiteLLM, gateways`}</code>
                   "Workspace members are added by email; Batuk resolves the email to an existing Better Auth user and stores the user ID for access checks",
                   "Deleting personal chats affects only the signed-in user's personal workspace",
                   "Shared workspace chats can be deleted by admins and by users who belong to that workspace",
-                  "ChromaDB and Pinecone vectors include scope metadata and are filtered by scope before retrieved document context is added to chat",
+                  "ChromaDB, Pinecone, and Supabase vectors include scope metadata and are filtered by scope before retrieved document context is added to chat",
                 ].map((item) => (
                   <li key={item}>
                     <CheckCircle2 size={16} />
@@ -542,11 +542,11 @@ await requireServerSession();`}</code>
           <section className="docs-split">
             <div className="docs-copy-block">
               <span>Document Chat</span>
-              <h2>Use scoped JSON, ChromaDB, or Pinecone for document vectors.</h2>
+              <h2>Use scoped JSON, ChromaDB, Pinecone, or Supabase for document vectors.</h2>
               <p>
                 The Documents panel stores uploaded originals locally, then extracts text, chunks content, creates local
                 or OpenAI embeddings, and writes vectors to the selected store. Personal uploads are visible only to the
-                signed-in user. Shared workspace uploads are visible only to admins and workspace members. Pinecone can be
+                signed-in user. Shared workspace uploads are visible only to admins and workspace members. Pinecone and Supabase can be
                 configured with an API key, index, namespace, cloud, and region while keeping download and delete behavior
                 identical to ChromaDB.
               </p>
@@ -554,10 +554,10 @@ await requireServerSession();`}</code>
                 {[
                   "Pinecone can be configured from environment or the Documents panel",
                   "Default Pinecone index and namespace are configurable per deployment",
-                  "Personal and workspace RAG stores are separated in local JSON and filtered in ChromaDB/Pinecone by scope metadata",
+                  "Personal and workspace RAG stores are separated in local JSON and filtered in ChromaDB/Pinecone/Supabase by scope metadata",
                   "Local embeddings use 384 dimensions; OpenAI text-embedding-3-small uses 1536",
                   "If an existing Pinecone index has the wrong dimension, Batuk creates a sibling index such as sb-chat-documents-1536d",
-                  "Delete removes remote vectors when applicable; download always returns the locally stored original file",
+                  "Delete removes remote vectors and Supabase Storage objects when applicable; download always returns the original file",
                 ].map((item) => (
                   <li key={item}>
                     <CheckCircle2 size={16} />

@@ -333,7 +333,13 @@ function HomeShell({ chat }) {
         />
       )}
 
-      {chat.appMenuOpen && <AppMenuPanel canManageAdmin={chat.canManageSharedWorkspaces} onClose={() => chat.setAppMenuOpen(false)} onOpen={openMenuItem} />}
+      {chat.appMenuOpen && (
+        <AppMenuPanel
+          canManageAdmin={chat.canManageSharedWorkspaces}
+          onClose={() => chat.setAppMenuOpen(false)}
+          onOpen={openMenuItem}
+        />
+      )}
       {chat.apiManagementOpen && (
         <ApiManagementPanel
           onClose={() => chat.setApiManagementOpen(false)}

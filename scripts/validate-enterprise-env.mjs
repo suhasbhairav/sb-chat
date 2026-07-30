@@ -59,6 +59,24 @@ function requireAny(keys, message) {
   throw new Error(message);
 }
 
+function assertPositiveInteger(key) {
+  const value = process.env[key];
+  if (isBlank(value)) return;
+  const parsed = Number.parseInt(String(value), 10);
+  if (!Number.isFinite(parsed) || parsed <= 0 || String(parsed) !== String(value).trim()) {
+    throw new Error(`${key} must be a positive integer.`);
+  }
+}
+
+function assertNonNegativeInteger(key) {
+  const value = process.env[key];
+  if (isBlank(value)) return;
+  const parsed = Number.parseInt(String(value), 10);
+  if (!Number.isFinite(parsed) || parsed < 0 || String(parsed) !== String(value).trim()) {
+    throw new Error(`${key} must be a non-negative integer.`);
+  }
+}
+
 function validateAuthDatabase() {
   const provider = normalizeProvider(process.env.BETTER_AUTH_DATABASE_PROVIDER, "sqlite");
 
@@ -133,6 +151,40 @@ function validateSecurity() {
   }
 }
 
+function validateRagStorage() {
+  const vectorProvider = normalizeProvider(process.env.BATUK_VECTOR_STORE_PROVIDER, "json");
+  const fileProvider = normalizeProvider(process.env.BATUK_DOCUMENT_FILE_STORAGE_PROVIDER, "local");
+
+  if (vectorProvider === "qdrant") {
+    requireAny(["QDRANT_URL"], "Qdrant Cloud RAG needs QDRANT_URL.");
+    requireAny(["QDRANT_API_KEY"], "Qdrant Cloud RAG needs QDRANT_API_KEY.");
+  }
+
+  if (vectorProvider === "supabase" || fileProvider === "supabase") {
+    requireAny(["SUPABASE_URL", "NEXT_PUBLIC_SUPABASE_URL"], "Supabase RAG needs SUPABASE_URL.");
+    requireAny(["SUPABASE_SERVICE_ROLE_KEY"], "Supabase RAG needs SUPABASE_SERVICE_ROLE_KEY for server-side storage and vector writes.");
+  }
+}
+
+function validateModelQueue() {
+  assertPositiveInteger("BATUK_MODEL_QUEUE_CONCURRENCY");
+  assertNonNegativeInteger("BATUK_MODEL_QUEUE_RATE_LIMIT_RETRIES");
+  assertPositiveInteger("BATUK_MODEL_QUEUE_RATE_LIMIT_BASE_DELAY_MS");
+  assertPositiveInteger("BATUK_MODEL_QUEUE_RATE_LIMIT_MAX_DELAY_MS");
+}
+
+function validateEmbeddings() {
+  const provider = normalizeProvider(process.env.BATUK_EMBEDDING_PROVIDER, "local");
+  const supported = new Set(["local", "openai", "llamaindex-openai", "llamaindex-ollama"]);
+  if (!supported.has(provider)) {
+    throw new Error("BATUK_EMBEDDING_PROVIDER must be one of: local, openai, llamaindex-openai, llamaindex-ollama.");
+  }
+
+  if ((provider === "openai" || provider === "llamaindex-openai") && isBlank(process.env.OPENAI_API_KEY)) {
+    throw new Error("OpenAI embeddings need OPENAI_API_KEY.");
+  }
+}
+
 await loadEnvFile(process.env.BATUK_ENV_FILE);
 await loadEnvFile(".env.enterprise");
 await loadEnvFile(".env");
@@ -143,6 +195,9 @@ for (const key of jsonKeys) {
 
 validateAuthDatabase();
 validateProductDataStore();
+validateRagStorage();
+validateModelQueue();
+validateEmbeddings();
 validateSecurity();
 
 console.log("Enterprise environment configuration is valid.");

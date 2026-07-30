@@ -15,10 +15,27 @@ const DEFAULT_DOCUMENT_SETTINGS = {
   pineconeNamespace: "documents",
   pineconeCloud: "aws",
   pineconeRegion: "us-east-1",
+  qdrantUrl: "",
+  qdrantApiKey: "",
+  qdrantCollection: "batuk_documents",
+  supabaseBucket: "batuk-documents",
+  supabaseChunksTable: "batuk_document_chunks",
+  supabaseMatchFunction: "match_batuk_document_chunks",
   chunkSize: 1800,
   chunkOverlap: 220,
   topK: 6,
 };
+
+function defaultEmbeddingModel(provider) {
+  if (provider === "openai") return "text-embedding-3-small";
+  if (provider === "llamaindex-openai") return "text-embedding-ada-002";
+  if (provider === "llamaindex-ollama") return "nomic-embed-text";
+  return "local-hash-v1";
+}
+
+function needsOpenAIEmbeddingKey(provider) {
+  return provider === "openai" || provider === "llamaindex-openai";
+}
 
 function formatBytes(bytes, locale) {
   const value = Number(bytes || 0);
@@ -199,14 +216,19 @@ export function DocumentsPanel({ apiKey, documentChatEnabled, openAIBaseUrl, sel
                 saveSettings({
                   ...settings,
                   embeddingProvider: event.target.value,
-                  embeddingModel: event.target.value === "openai" ? "text-embedding-3-small" : "local-hash-v1",
+                  embeddingModel: defaultEmbeddingModel(event.target.value),
                 })
               }
               value={settings.embeddingProvider}
             >
               <option value="local">{t("documents.localEmbeddings")}</option>
               <option value="openai">{t("documents.openAIEmbeddings")}</option>
+              <option value="llamaindex-openai">{t("documents.llamaIndexOpenAIEmbeddings")}</option>
+              <option value="llamaindex-ollama">{t("documents.llamaIndexOllamaEmbeddings")}</option>
             </select>
+            {needsOpenAIEmbeddingKey(settings.embeddingProvider) && (
+              <p className="settings-hint">{t("documents.embeddingOpenAIKeyHint")}</p>
+            )}
 
             <label className="field-label" htmlFor="embeddingModel">{t("documents.embeddingModel")}</label>
             <input
@@ -232,6 +254,8 @@ export function DocumentsPanel({ apiKey, documentChatEnabled, openAIBaseUrl, sel
               <option value="json">{t("documents.jsonVectorStore")}</option>
               <option value="chroma">{t("documents.chromaVectorStore")}</option>
               <option value="pinecone">{t("documents.pineconeVectorStore")}</option>
+              <option value="qdrant">{t("documents.qdrantVectorStore")}</option>
+              <option value="supabase">{t("documents.supabaseVectorStore")}</option>
             </select>
 
             {(settings.vectorStoreProvider || "json") === "chroma" && (
@@ -311,6 +335,71 @@ export function DocumentsPanel({ apiKey, documentChatEnabled, openAIBaseUrl, sel
 
             {(settings.vectorStoreProvider || "json") === "json" && (
               <p className="settings-hint">{t("documents.localVectorStoreHint")}</p>
+            )}
+
+            {(settings.vectorStoreProvider || "json") === "qdrant" && (
+              <>
+                <p className="settings-hint">{t("documents.qdrantVectorStoreHint")}</p>
+                <label className="field-label" htmlFor="qdrantUrl">{t("documents.qdrantUrl")}</label>
+                <input
+                  id="qdrantUrl"
+                  className="field"
+                  onChange={(event) => saveSettings({ ...settings, qdrantUrl: event.target.value })}
+                  placeholder="https://xyz-example.eu-central.aws.cloud.qdrant.io"
+                  value={settings.qdrantUrl || ""}
+                />
+
+                <label className="field-label" htmlFor="qdrantApiKey">{t("documents.qdrantApiKey")}</label>
+                <input
+                  id="qdrantApiKey"
+                  className="field"
+                  onChange={(event) => saveSettings({ ...settings, qdrantApiKey: event.target.value })}
+                  placeholder={t("documents.qdrantApiKeyPlaceholder")}
+                  type="password"
+                  value={settings.qdrantApiKey || ""}
+                />
+
+                <label className="field-label" htmlFor="qdrantCollection">{t("documents.qdrantCollection")}</label>
+                <input
+                  id="qdrantCollection"
+                  className="field"
+                  onChange={(event) => saveSettings({ ...settings, qdrantCollection: event.target.value })}
+                  placeholder="batuk_documents"
+                  value={settings.qdrantCollection || ""}
+                />
+              </>
+            )}
+
+            {(settings.vectorStoreProvider || "json") === "supabase" && (
+              <>
+                <p className="settings-hint">{t("documents.supabaseVectorStoreHint")}</p>
+                <label className="field-label" htmlFor="supabaseBucket">{t("documents.supabaseBucket")}</label>
+                <input
+                  id="supabaseBucket"
+                  className="field"
+                  onChange={(event) => saveSettings({ ...settings, supabaseBucket: event.target.value })}
+                  placeholder="batuk-documents"
+                  value={settings.supabaseBucket || ""}
+                />
+
+                <label className="field-label" htmlFor="supabaseChunksTable">{t("documents.supabaseChunksTable")}</label>
+                <input
+                  id="supabaseChunksTable"
+                  className="field"
+                  onChange={(event) => saveSettings({ ...settings, supabaseChunksTable: event.target.value })}
+                  placeholder="batuk_document_chunks"
+                  value={settings.supabaseChunksTable || ""}
+                />
+
+                <label className="field-label" htmlFor="supabaseMatchFunction">{t("documents.supabaseMatchFunction")}</label>
+                <input
+                  id="supabaseMatchFunction"
+                  className="field"
+                  onChange={(event) => saveSettings({ ...settings, supabaseMatchFunction: event.target.value })}
+                  placeholder="match_batuk_document_chunks"
+                  value={settings.supabaseMatchFunction || ""}
+                />
+              </>
             )}
 
             <div className="rag-setting-grid">

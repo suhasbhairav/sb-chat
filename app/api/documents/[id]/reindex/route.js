@@ -1,6 +1,6 @@
 import { json, resolveServerApiKey } from "@/lib/chat-request";
 import { requireServerPermission } from "@/lib/auth-session";
-import { createEmbeddings } from "@/lib/rag-embeddings";
+import { createEmbeddings, normalizeEmbeddingSettings } from "@/lib/rag-embeddings";
 import { deleteChromaDocument, normalizeChromaCollectionName, normalizeChromaUrl, upsertChromaChunks } from "@/lib/rag-chroma";
 import {
   deletePineconeDocument,
@@ -10,8 +10,10 @@ import {
   normalizePineconeRegion,
   upsertPineconeChunks,
 } from "@/lib/rag-pinecone";
+import { deleteQdrantDocument, normalizeQdrantCollectionName, normalizeQdrantUrl, upsertQdrantChunks } from "@/lib/rag-qdrant";
+import { deleteSupabaseDocument, normalizeSupabaseBucket, normalizeSupabaseChunksTable, normalizeSupabaseMatchFunction, upsertSupabaseChunks } from "@/lib/rag-supabase";
 import { chunkDocumentText, extractDocumentText } from "@/lib/rag-processing";
-import { getDocumentFilePath, readDocumentStore, summarizeDocuments, writeDocumentStore } from "@/lib/rag-store";
+import { cleanupTemporaryDocumentFile, materializeDocumentFile, readDocumentStore, summarizeDocuments, writeDocumentStore } from "@/lib/rag-store";
 import { recordAuditEvent } from "@/lib/compliance-store";
 import { withProductDataScope } from "@/lib/product-data-store";
 import { resolveDocumentProductDataScope } from "@/lib/workspace-access";
@@ -59,11 +61,15 @@ export async function POST(request, { params }) {
     }
 
     const requestedVectorStoreProvider = payload.vectorStoreProvider || store.settings.vectorStoreProvider;
-    const vectorStoreProvider = ["chroma", "pinecone"].includes(requestedVectorStoreProvider) ? requestedVectorStoreProvider : "json";
-    const settings = {
+    const vectorStoreProvider = ["chroma", "pinecone", "qdrant", "supabase"].includes(requestedVectorStoreProvider) ? requestedVectorStoreProvider : "json";
+    const embeddingSettings = normalizeEmbeddingSettings({
       ...store.settings,
       embeddingProvider: payload.embeddingProvider || store.settings.embeddingProvider,
       embeddingModel: payload.embeddingModel || store.settings.embeddingModel,
+    });
+    const settings = {
+      ...store.settings,
+      ...embeddingSettings,
       vectorStoreProvider,
       chromaUrl: normalizeChromaUrl(payload.chromaUrl || store.settings.chromaUrl),
       chromaCollection: normalizeChromaCollectionName(payload.chromaCollection || store.settings.chromaCollection),
@@ -72,12 +78,18 @@ export async function POST(request, { params }) {
       pineconeNamespace: normalizePineconeNamespace(payload.pineconeNamespace || store.settings.pineconeNamespace),
       pineconeCloud: normalizePineconeCloud(payload.pineconeCloud || store.settings.pineconeCloud),
       pineconeRegion: normalizePineconeRegion(payload.pineconeRegion || store.settings.pineconeRegion),
+      qdrantUrl: normalizeQdrantUrl(payload.qdrantUrl || store.settings.qdrantUrl),
+      qdrantApiKey: String(payload.qdrantApiKey || store.settings.qdrantApiKey || ""),
+      qdrantCollection: normalizeQdrantCollectionName(payload.qdrantCollection || store.settings.qdrantCollection),
+      supabaseBucket: normalizeSupabaseBucket(payload.supabaseBucket || store.settings.supabaseBucket),
+      supabaseChunksTable: normalizeSupabaseChunksTable(payload.supabaseChunksTable || store.settings.supabaseChunksTable),
+      supabaseMatchFunction: normalizeSupabaseMatchFunction(payload.supabaseMatchFunction || store.settings.supabaseMatchFunction),
       scopeType: activeScope.scopeType,
       organizationId: activeScope.organizationId,
       userId: activeScope.userId,
       workspaceId: activeScope.workspaceId,
     };
-    const filePath = getDocumentFilePath(document);
+    const filePath = await materializeDocumentFile(document);
     const text = await extractDocumentText(filePath, document.name);
 
     if (!text) {
@@ -119,6 +131,19 @@ export async function POST(request, { params }) {
         pineconeNamespace: pineconeTarget.namespace,
       };
     }
+    if (settings.vectorStoreProvider === "qdrant") {
+      const qdrantTarget = await upsertQdrantChunks(indexedChunks, settings);
+      resolvedSettings = {
+        ...settings,
+        qdrantCollection: qdrantTarget.collectionName,
+      };
+    }
+    if (settings.vectorStoreProvider === "supabase") {
+      await upsertSupabaseChunks(indexedChunks, {
+        ...settings,
+        supabaseStoragePath: document.storagePath,
+      });
+    }
     const oldChromaSettings = {
       ...store.settings,
       chromaUrl: document.chromaUrl || store.settings.chromaUrl,
@@ -130,17 +155,41 @@ export async function POST(request, { params }) {
       pineconeNamespace: document.pineconeNamespace || store.settings.pineconeNamespace,
       pineconeApiKey: settings.pineconeApiKey,
     };
+    const oldQdrantSettings = {
+      ...store.settings,
+      qdrantUrl: document.qdrantUrl || store.settings.qdrantUrl,
+      qdrantCollection: document.qdrantCollection || store.settings.qdrantCollection,
+      qdrantApiKey: settings.qdrantApiKey,
+    };
+    const oldSupabaseSettings = {
+      ...store.settings,
+      supabaseBucket: document.supabaseBucket || store.settings.supabaseBucket,
+      supabaseChunksTable: document.supabaseChunksTable || store.settings.supabaseChunksTable,
+      supabaseMatchFunction: document.supabaseMatchFunction || store.settings.supabaseMatchFunction,
+    };
     const chromaLocationChanged =
       oldChromaSettings.chromaUrl !== resolvedSettings.chromaUrl || oldChromaSettings.chromaCollection !== resolvedSettings.chromaCollection;
     const pineconeLocationChanged =
       oldPineconeSettings.pineconeIndex !== resolvedSettings.pineconeIndex ||
       oldPineconeSettings.pineconeNamespace !== resolvedSettings.pineconeNamespace;
+    const supabaseLocationChanged =
+      oldSupabaseSettings.supabaseChunksTable !== resolvedSettings.supabaseChunksTable ||
+      oldSupabaseSettings.supabaseMatchFunction !== resolvedSettings.supabaseMatchFunction;
+    const qdrantLocationChanged =
+      oldQdrantSettings.qdrantUrl !== resolvedSettings.qdrantUrl ||
+      oldQdrantSettings.qdrantCollection !== resolvedSettings.qdrantCollection;
 
     if (document.vectorStoreProvider === "chroma" && (resolvedSettings.vectorStoreProvider !== "chroma" || chromaLocationChanged)) {
       await deleteChromaDocument(document.id, oldChromaSettings).catch(() => {});
     }
     if (document.vectorStoreProvider === "pinecone" && (resolvedSettings.vectorStoreProvider !== "pinecone" || pineconeLocationChanged)) {
       await deletePineconeDocument(document.id, oldPineconeSettings).catch(() => {});
+    }
+    if (document.vectorStoreProvider === "qdrant" && (resolvedSettings.vectorStoreProvider !== "qdrant" || qdrantLocationChanged)) {
+      await deleteQdrantDocument(document.id, oldQdrantSettings).catch(() => {});
+    }
+    if (document.vectorStoreProvider === "supabase" && (resolvedSettings.vectorStoreProvider !== "supabase" || supabaseLocationChanged)) {
+      await deleteSupabaseDocument(document.id, oldSupabaseSettings).catch(() => {});
     }
     const nextDocument = {
       ...document,
@@ -155,6 +204,11 @@ export async function POST(request, { params }) {
       chromaCollection: resolvedSettings.vectorStoreProvider === "chroma" ? resolvedSettings.chromaCollection : null,
       pineconeIndex: resolvedSettings.vectorStoreProvider === "pinecone" ? resolvedSettings.pineconeIndex : null,
       pineconeNamespace: resolvedSettings.vectorStoreProvider === "pinecone" ? resolvedSettings.pineconeNamespace : null,
+      qdrantUrl: resolvedSettings.vectorStoreProvider === "qdrant" ? resolvedSettings.qdrantUrl : null,
+      qdrantCollection: resolvedSettings.vectorStoreProvider === "qdrant" ? resolvedSettings.qdrantCollection : null,
+      supabaseBucket: resolvedSettings.vectorStoreProvider === "supabase" ? resolvedSettings.supabaseBucket : null,
+      supabaseChunksTable: resolvedSettings.vectorStoreProvider === "supabase" ? resolvedSettings.supabaseChunksTable : null,
+      supabaseMatchFunction: resolvedSettings.vectorStoreProvider === "supabase" ? resolvedSettings.supabaseMatchFunction : null,
       reindexedAt: createdAt,
     };
     const nextStore = {
@@ -168,6 +222,7 @@ export async function POST(request, { params }) {
     };
 
     await withProductDataScope(activeScope, () => writeDocumentStore(nextStore));
+    await cleanupTemporaryDocumentFile(filePath).catch(() => {});
     await recordAuditEvent({
       category: "document",
       action: "document.reindex",

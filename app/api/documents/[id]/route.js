@@ -2,6 +2,8 @@ import { json } from "@/lib/chat-request";
 import { requireServerPermission } from "@/lib/auth-session";
 import { deleteChromaDocument } from "@/lib/rag-chroma";
 import { deletePineconeDocument } from "@/lib/rag-pinecone";
+import { deleteQdrantDocument } from "@/lib/rag-qdrant";
+import { deleteSupabaseDocument } from "@/lib/rag-supabase";
 import { deleteDocument, readDocumentStore, summarizeDocuments } from "@/lib/rag-store";
 import { recordAuditEvent } from "@/lib/compliance-store";
 import { withProductDataScope } from "@/lib/product-data-store";
@@ -31,6 +33,21 @@ export async function DELETE(request, { params }) {
       ...currentStore.settings,
       pineconeIndex: document?.pineconeIndex || currentStore.settings.pineconeIndex,
       pineconeNamespace: document?.pineconeNamespace || currentStore.settings.pineconeNamespace,
+    }).catch(() => {});
+  }
+  if (document?.vectorStoreProvider === "qdrant" || currentStore.settings.vectorStoreProvider === "qdrant") {
+    await deleteQdrantDocument(id, {
+      ...currentStore.settings,
+      qdrantUrl: document?.qdrantUrl || currentStore.settings.qdrantUrl,
+      qdrantCollection: document?.qdrantCollection || currentStore.settings.qdrantCollection,
+    }).catch(() => {});
+  }
+  if (document?.vectorStoreProvider === "supabase" || currentStore.settings.vectorStoreProvider === "supabase") {
+    await deleteSupabaseDocument(id, {
+      ...currentStore.settings,
+      supabaseBucket: document?.supabaseBucket || currentStore.settings.supabaseBucket,
+      supabaseChunksTable: document?.supabaseChunksTable || currentStore.settings.supabaseChunksTable,
+      supabaseMatchFunction: document?.supabaseMatchFunction || currentStore.settings.supabaseMatchFunction,
     }).catch(() => {});
   }
 

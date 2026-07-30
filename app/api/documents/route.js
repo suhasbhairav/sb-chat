@@ -1,7 +1,7 @@
 import { json, resolveServerApiKey } from "@/lib/chat-request";
 import { requireServerPermission } from "@/lib/auth-session";
 import { makeId } from "@/lib/chat-utils";
-import { createEmbeddings } from "@/lib/rag-embeddings";
+import { createEmbeddings, normalizeEmbeddingSettings } from "@/lib/rag-embeddings";
 import { normalizeChromaCollectionName, normalizeChromaUrl, upsertChromaChunks } from "@/lib/rag-chroma";
 import {
   normalizePineconeCloud,
@@ -10,8 +10,10 @@ import {
   normalizePineconeRegion,
   upsertPineconeChunks,
 } from "@/lib/rag-pinecone";
+import { normalizeQdrantCollectionName, normalizeQdrantUrl, upsertQdrantChunks } from "@/lib/rag-qdrant";
+import { normalizeSupabaseBucket, normalizeSupabaseChunksTable, normalizeSupabaseMatchFunction, upsertSupabaseChunks } from "@/lib/rag-supabase";
 import { chunkDocumentText, extractDocumentText } from "@/lib/rag-processing";
-import { readDocumentStore, saveUploadedDocumentFile, summarizeDocuments, writeDocumentStore } from "@/lib/rag-store";
+import { cleanupTemporaryDocumentFile, readDocumentStore, saveUploadedDocumentFileForScope, summarizeDocuments, writeDocumentStore } from "@/lib/rag-store";
 import { recordAuditEvent } from "@/lib/compliance-store";
 import { withProductDataScope } from "@/lib/product-data-store";
 import { resolveDocumentProductDataScope } from "@/lib/workspace-access";
@@ -19,11 +21,10 @@ import { resolveDocumentProductDataScope } from "@/lib/workspace-access";
 export const runtime = "nodejs";
 
 function normalizeSettings(settings = {}) {
-  const embeddingProvider = settings.embeddingProvider === "openai" ? "openai" : "local";
-  const vectorStoreProvider = ["chroma", "pinecone"].includes(settings.vectorStoreProvider) ? settings.vectorStoreProvider : "json";
+  const embeddingSettings = normalizeEmbeddingSettings(settings);
+  const vectorStoreProvider = ["chroma", "pinecone", "qdrant", "supabase"].includes(settings.vectorStoreProvider) ? settings.vectorStoreProvider : "json";
   return {
-    embeddingProvider,
-    embeddingModel: embeddingProvider === "openai" ? settings.embeddingModel || "text-embedding-3-small" : "local-hash-v1",
+    ...embeddingSettings,
     vectorStoreProvider,
     chromaUrl: normalizeChromaUrl(settings.chromaUrl),
     chromaCollection: normalizeChromaCollectionName(settings.chromaCollection),
@@ -32,6 +33,12 @@ function normalizeSettings(settings = {}) {
     pineconeNamespace: normalizePineconeNamespace(settings.pineconeNamespace),
     pineconeCloud: normalizePineconeCloud(settings.pineconeCloud),
     pineconeRegion: normalizePineconeRegion(settings.pineconeRegion),
+    qdrantUrl: normalizeQdrantUrl(settings.qdrantUrl),
+    qdrantApiKey: String(settings.qdrantApiKey || ""),
+    qdrantCollection: normalizeQdrantCollectionName(settings.qdrantCollection),
+    supabaseBucket: normalizeSupabaseBucket(settings.supabaseBucket),
+    supabaseChunksTable: normalizeSupabaseChunksTable(settings.supabaseChunksTable),
+    supabaseMatchFunction: normalizeSupabaseMatchFunction(settings.supabaseMatchFunction),
     chunkSize: Math.min(6000, Math.max(600, Number(settings.chunkSize || 1800))),
     chunkOverlap: Math.min(1200, Math.max(0, Number(settings.chunkOverlap || 220))),
     topK: Math.min(12, Math.max(1, Number(settings.topK || 6))),
@@ -98,6 +105,12 @@ export async function POST(request) {
       pineconeCloud: formData.get("pineconeCloud"),
       pineconeRegion: formData.get("pineconeRegion"),
       pineconeApiKey: formData.get("pineconeApiKey"),
+      qdrantUrl: formData.get("qdrantUrl"),
+      qdrantApiKey: formData.get("qdrantApiKey"),
+      qdrantCollection: formData.get("qdrantCollection"),
+      supabaseBucket: formData.get("supabaseBucket"),
+      supabaseChunksTable: formData.get("supabaseChunksTable"),
+      supabaseMatchFunction: formData.get("supabaseMatchFunction"),
       openAIBaseUrl: formData.get("openAIBaseUrl"),
     });
     Object.assign(settings, {
@@ -118,11 +131,14 @@ export async function POST(request) {
     for (const file of files) {
       const id = makeId();
       const createdAt = new Date().toISOString();
-      const saved = await saveUploadedDocumentFile(file);
+      const saved = await saveUploadedDocumentFileForScope(file, { documentId: id, scope, settings });
       const baseDocument = {
         id,
         name: file.name,
         storedName: saved.storedName,
+        fileStorageProvider: saved.fileStorageProvider,
+        storageBucket: saved.storageBucket || null,
+        storagePath: saved.storagePath || null,
         type: file.type || "application/octet-stream",
         size: saved.size,
         status: "indexing",
@@ -134,6 +150,11 @@ export async function POST(request) {
         chromaCollection: settings.vectorStoreProvider === "chroma" ? settings.chromaCollection : null,
         pineconeIndex: settings.vectorStoreProvider === "pinecone" ? settings.pineconeIndex : null,
         pineconeNamespace: settings.vectorStoreProvider === "pinecone" ? settings.pineconeNamespace : null,
+        qdrantUrl: settings.vectorStoreProvider === "qdrant" ? settings.qdrantUrl : null,
+        qdrantCollection: settings.vectorStoreProvider === "qdrant" ? settings.qdrantCollection : null,
+        supabaseBucket: settings.vectorStoreProvider === "supabase" ? settings.supabaseBucket : null,
+        supabaseChunksTable: settings.vectorStoreProvider === "supabase" ? settings.supabaseChunksTable : null,
+        supabaseMatchFunction: settings.vectorStoreProvider === "supabase" ? settings.supabaseMatchFunction : null,
         createdAt,
       };
 
@@ -177,6 +198,19 @@ export async function POST(request) {
             pineconeNamespace: pineconeTarget.namespace,
           };
         }
+        if (settings.vectorStoreProvider === "qdrant") {
+          const qdrantTarget = await upsertQdrantChunks(indexedChunks, settings);
+          resolvedSettings = {
+            ...settings,
+            qdrantCollection: qdrantTarget.collectionName,
+          };
+        }
+        if (settings.vectorStoreProvider === "supabase") {
+          await upsertSupabaseChunks(indexedChunks, {
+            ...settings,
+            supabaseStoragePath: saved.storagePath,
+          });
+        }
         const document = {
           ...baseDocument,
           status: "ready",
@@ -185,6 +219,11 @@ export async function POST(request) {
           vectorStoreProvider: resolvedSettings.vectorStoreProvider,
           pineconeIndex: resolvedSettings.vectorStoreProvider === "pinecone" ? resolvedSettings.pineconeIndex : null,
           pineconeNamespace: resolvedSettings.vectorStoreProvider === "pinecone" ? resolvedSettings.pineconeNamespace : null,
+          qdrantUrl: resolvedSettings.vectorStoreProvider === "qdrant" ? resolvedSettings.qdrantUrl : null,
+          qdrantCollection: resolvedSettings.vectorStoreProvider === "qdrant" ? resolvedSettings.qdrantCollection : null,
+          supabaseBucket: resolvedSettings.vectorStoreProvider === "supabase" ? resolvedSettings.supabaseBucket : null,
+          supabaseChunksTable: resolvedSettings.vectorStoreProvider === "supabase" ? resolvedSettings.supabaseChunksTable : null,
+          supabaseMatchFunction: resolvedSettings.vectorStoreProvider === "supabase" ? resolvedSettings.supabaseMatchFunction : null,
         };
 
         store = {
@@ -198,6 +237,7 @@ export async function POST(request) {
         };
         uploaded.push(document);
       } catch (error) {
+        await cleanupTemporaryDocumentFile(saved).catch(() => {});
         const failedDocument = {
           ...baseDocument,
           status: "failed",
@@ -210,6 +250,7 @@ export async function POST(request) {
         };
         uploaded.push(failedDocument);
       }
+      await cleanupTemporaryDocumentFile(saved).catch(() => {});
     }
 
     await withProductDataScope(scope, () => writeDocumentStore(store));

@@ -1,7 +1,6 @@
-import { readFile } from "node:fs/promises";
 import { json } from "@/lib/chat-request";
 import { requireServerPermission } from "@/lib/auth-session";
-import { getDocumentFilePath, readDocumentStore } from "@/lib/rag-store";
+import { readDocumentFile, readDocumentStore } from "@/lib/rag-store";
 import { recordAuditEvent } from "@/lib/compliance-store";
 import { withProductDataScope } from "@/lib/product-data-store";
 import { resolveDocumentProductDataScope } from "@/lib/workspace-access";
@@ -22,7 +21,7 @@ export async function GET(request, { params }) {
     return json({ error: "Document not found." }, 404);
   }
 
-  const file = await readFile(getDocumentFilePath(document));
+  const file = await readDocumentFile(document);
   await recordAuditEvent({
     category: "document",
     action: "document.download",

@@ -183,6 +183,156 @@
   ],
   "auditEvents": [
     {
+      "id": "audit-1785423029096-04daac6527200799",
+      "createdAt": "2026-07-30T14:50:29.096Z",
+      "category": "document",
+      "action": "document.settings.update",
+      "outcome": "success",
+      "actor": {
+        "id": "3c4816f5-3e7e-4d26-a6ce-e827cc3c856e",
+        "emailHash": "f660ab912ec121d1b1e928a0bb4bc61b15f5ad44d5efdc4e1c92a25e99b8e44a",
+        "role": "owner"
+      },
+      "target": null,
+      "ipHash": null,
+      "userAgent": null,
+      "metadata": {
+        "embeddingProvider": "llamaindex-ollama",
+        "vectorStoreProvider": "supabase",
+        "chromaCollection": "sb_chat_documents",
+        "pineconeIndex": "sb-chat-documents"
+      },
+      "previousHash": "590346b37d1226dda34d926bf665740cac031f137c15138097dcff6f88a54752",
+      "integrityHash": "c6dd992ff04108ddf422d103181199b095722ca3e26902ce1321de69b13157fd"
+    },
+    {
+      "id": "audit-1785423024760-26d1438c1f6a840d",
+      "createdAt": "2026-07-30T14:50:24.760Z",
+      "category": "document",
+      "action": "document.settings.update",
+      "outcome": "success",
+      "actor": {
+        "id": "3c4816f5-3e7e-4d26-a6ce-e827cc3c856e",
+        "emailHash": "f660ab912ec121d1b1e928a0bb4bc61b15f5ad44d5efdc4e1c92a25e99b8e44a",
+        "role": "owner"
+      },
+      "target": null,
+      "ipHash": null,
+      "userAgent": null,
+      "metadata": {
+        "embeddingProvider": "llamaindex-ollama",
+        "vectorStoreProvider": "json",
+        "chromaCollection": "sb_chat_documents",
+        "pineconeIndex": "sb-chat-documents"
+      },
+      "previousHash": "a17400612ae180b37cc1422eceec8329305862de21503500f0523ae726c45924",
+      "integrityHash": "590346b37d1226dda34d926bf665740cac031f137c15138097dcff6f88a54752"
+    },
+    {
+      "id": "audit-1785420451679-dfbef0a8ea1ec60e",
+      "createdAt": "2026-07-30T14:07:31.679Z",
+      "category": "data",
+      "action": "chat.upsert",
+      "outcome": "success",
+      "actor": {
+        "id": "3c4816f5-3e7e-4d26-a6ce-e827cc3c856e",
+        "emailHash": "f660ab912ec121d1b1e928a0bb4bc61b15f5ad44d5efdc4e1c92a25e99b8e44a",
+        "role": "owner"
+      },
+      "target": {
+        "type": "chat",
+        "id": "1785420437876-deafa4fdff6688"
+      },
+      "ipHash": null,
+      "userAgent": null,
+      "metadata": {
+        "workspaceId": "workspace-personal",
+        "folderId": null,
+        "provider": "ollama",
+        "model": "qwen3:8b"
+      },
+      "previousHash": "e9543f7962bc046a34e8b4f75e8dc4a4b5d156e48587f2fe1379c761c95442bf",
+      "integrityHash": "a17400612ae180b37cc1422eceec8329305862de21503500f0523ae726c45924"
+    },
+    {
+      "id": "audit-1785417273165-1b366cae9b4eef73",
+      "createdAt": "2026-07-30T13:14:33.165Z",
+      "category": "data",
+      "action": "chat.upsert",
+      "outcome": "success",
+      "actor": {
+        "id": "3c4816f5-3e7e-4d26-a6ce-e827cc3c856e",
+        "emailHash": "f660ab912ec121d1b1e928a0bb4bc61b15f5ad44d5efdc4e1c92a25e99b8e44a",
+        "role": "owner"
+      },
+      "target": {
+        "type": "chat",
+        "id": "1785417260312-dd127152c94388"
+      },
+      "ipHash": null,
+      "userAgent": null,
+      "metadata": {
+        "workspaceId": "workspace-personal",
+        "folderId": null,
+        "provider": "ollama",
+        "model": "qwen3:8b"
+      },
+      "previousHash": "f9a1dcf5d6e888b686fdb7673e80dcc2f620a014778c715afe652b344296f675",
+      "integrityHash": "e9543f7962bc046a34e8b4f75e8dc4a4b5d156e48587f2fe1379c761c95442bf"
+    },
+    {
+      "id": "audit-1785415700036-6f145679da427ff5",
+      "createdAt": "2026-07-30T12:48:20.036Z",
+      "category": "data",
+      "action": "chat.upsert",
+      "outcome": "success",
+      "actor": {
+        "id": "3c4816f5-3e7e-4d26-a6ce-e827cc3c856e",
+        "emailHash": "f660ab912ec121d1b1e928a0bb4bc61b15f5ad44d5efdc4e1c92a25e99b8e44a",
+        "role": "owner"
+      },
+      "target": {
+        "type": "chat",
+        "id": "1785415565962-75d6c1aaab0ef"
+      },
+      "ipHash": null,
+      "userAgent": null,
+      "metadata": {
+        "workspaceId": "workspace-personal",
+        "folderId": null,
+        "provider": "ollama",
+        "model": "qwen3:8b"
+      },
+      "previousHash": "fd4f17e0795e8659a474405c7a31f71c48edec23bc950e59c6d73a6236e30f41",
+      "integrityHash": "f9a1dcf5d6e888b686fdb7673e80dcc2f620a014778c715afe652b344296f675"
+    },
+    {
+      "id": "audit-1785415591644-3d02214e493aecaa",
+      "createdAt": "2026-07-30T12:46:31.644Z",
+      "category": "data",
+      "action": "chat.upsert",
+      "outcome": "success",
+      "actor": {
+        "id": "3c4816f5-3e7e-4d26-a6ce-e827cc3c856e",
+        "emailHash": "f660ab912ec121d1b1e928a0bb4bc61b15f5ad44d5efdc4e1c92a25e99b8e44a",
+        "role": "owner"
+      },
+      "target": {
+        "type": "chat",
+        "id": "1785415565962-75d6c1aaab0ef"
+      },
+      "ipHash": null,
+      "userAgent": null,
+      "metadata": {
+        "workspaceId": "workspace-personal",
+        "folderId": null,
+        "provider": "ollama",
+        "model": "qwen3:8b"
+      },
+      "previousHash": "909ff8cc7b0a0ee3ca3dbfce92ae4d5b81e424ae531a8a58723a6859d9acc44d",
+      "integrityHash": "fd4f17e0795e8659a474405c7a31f71c48edec23bc950e59c6d73a6236e30f41"
+    },
+    {
       "id": "audit-1785269111930-c927a46bbdd81d24",
       "createdAt": "2026-07-28T20:05:11.930Z",
       "category": "data",

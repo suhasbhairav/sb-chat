@@ -1,0 +1,22 @@
+{
+  "documents": [],
+  "chunks": [],
+  "settings": {
+    "embeddingProvider": "llamaindex-ollama",
+    "embeddingModel": "nomic-embed-text",
+    "vectorStoreProvider": "supabase",
+    "chromaUrl": "http://localhost:8000",
+    "chromaCollection": "sb_chat_documents",
+    "pineconeApiKey": "pcsk_7V4rw2_CqqxgZAdoi8CdMC6sK4DVbqnx284RHdRtudpggunopxgqL5ZhG7Sr3aZ5FoARAW",
+    "pineconeIndex": "sb-chat-documents",
+    "pineconeNamespace": "documents",
+    "pineconeCloud": "aws",
+    "pineconeRegion": "us-east-1",
+    "supabaseBucket": "batuk-documents",
+    "supabaseChunksTable": "batuk_document_chunks",
+    "supabaseMatchFunction": "match_batuk_document_chunks",
+    "chunkSize": 1800,
+    "chunkOverlap": 220,
+    "topK": 6
+  }
+}

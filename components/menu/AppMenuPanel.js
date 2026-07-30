@@ -33,7 +33,7 @@ export function AppMenuPanel({ canManageAdmin = false, onClose, onOpen }) {
             const Icon = item.icon;
             return (
               <button key={item.id} onClick={() => onOpen(item.id)} type="button">
-                <span>
+                <span className="app-menu-icon">
                   <Icon size={20} />
                 </span>
                 <strong>{item.label}</strong>

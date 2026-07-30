@@ -4,6 +4,7 @@ import { requireServerPermission } from "@/lib/auth-session";
 import { buildSafeMessages, screenMessages } from "@/lib/guardrails";
 import { normalizeTemperatureForModel } from "@/lib/model-compatibility";
 import { callModel } from "@/lib/model-clients";
+import { enqueueModelRequest, isRateLimitError, modelQueueOptionsFromEnv, rateLimitDelayMs, sleep } from "@/lib/request-queue";
 import { extractDocumentText } from "@/lib/rag-processing";
 import { saveUploadedDocumentFile } from "@/lib/rag-store";
 import { recordTokenUsage } from "@/lib/token-usage-store";
@@ -47,6 +48,23 @@ async function extractAttachedDocuments(files) {
   }
 
   return sections.join("\n\n---\n\n").slice(0, MAX_DOCUMENT_CONTEXT);
+}
+
+async function callModelWithRateLimitRetry(modelRequest) {
+  const queueOptions = modelQueueOptionsFromEnv();
+
+  for (let attempt = 0; attempt <= queueOptions.rateLimitRetries; attempt += 1) {
+    try {
+      return await callModel(modelRequest);
+    } catch (error) {
+      if (!isRateLimitError(error) || attempt >= queueOptions.rateLimitRetries) {
+        throw error;
+      }
+      await sleep(rateLimitDelayMs(error, attempt + 1, queueOptions));
+    }
+  }
+
+  throw new Error("Model request failed after rate-limit retries.");
 }
 
 export async function POST(request) {
@@ -104,14 +122,15 @@ export async function POST(request) {
         throw new Error(`Guardrails blocked ${agent.name}: ${screened.reason}`);
       }
 
-      const result = await callModel({
+      const ticket = enqueueModelRequest(() => callModelWithRateLimitRetry({
         provider,
         baseUrl,
         model,
         apiKey,
         temperature,
         messages: buildSafeMessages(rawMessages, guardrails),
-      });
+      }));
+      const result = await ticket.promise;
       const output = result.message || "";
       const usage = result.usage || {};
 

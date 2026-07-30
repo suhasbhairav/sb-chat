@@ -1107,7 +1107,7 @@ button:disabled {
 
 .app-menu-list button {
   display: grid;
-  grid-template-columns: 38px minmax(0, 1fr);
+  grid-template-columns: 38px minmax(0, 1fr) auto;
   align-items: center;
   gap: 12px;
   min-height: 52px;
@@ -1124,7 +1124,7 @@ button:disabled {
   border-color: var(--accent);
 }
 
-.app-menu-list button span {
+.app-menu-list button .app-menu-icon {
   display: grid;
   width: 34px;
   height: 34px;
@@ -6254,7 +6254,7 @@ button:disabled {
     min-height: 300px;
   }
 
-  .not-found-core {
+.not-found-core {
     width: 122px;
   }
 

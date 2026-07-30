@@ -22,7 +22,7 @@
 ![React](https://img.shields.io/badge/React-19-149eca?style=for-the-badge&logo=react&logoColor=white)
 ![Ollama](https://img.shields.io/badge/Ollama-Local_AI-111111?style=for-the-badge)
 ![OpenAI](https://img.shields.io/badge/OpenAI-Compatible-10a37f?style=for-the-badge&logo=openai&logoColor=white)
-![RAG](https://img.shields.io/badge/RAG-JSON_ChromaDB_Pinecone-10a37f?style=for-the-badge)
+![RAG](https://img.shields.io/badge/RAG-JSON_ChromaDB_Pinecone_Supabase-10a37f?style=for-the-badge)
 ![Better Auth](https://img.shields.io/badge/Better_Auth-Enterprise_Identity-111111?style=for-the-badge)
 ![Docker](https://img.shields.io/badge/Docker-Air_Gapped_Ready-2496ed?style=for-the-badge&logo=docker&logoColor=white)
 ![License](https://img.shields.io/badge/License-MIT-f59e0b?style=for-the-badge)
@@ -47,7 +47,7 @@ Batuk is local-first by default and enterprise-ready when you need it. Run it on
 
 - **Chat with any model:** Ollama, OpenAI, OpenRouter, Claude, Grok, Sarvam AI, Together AI, Mistral AI, Kimi, DeepSeek, Qwen, Perplexity, and custom OpenAI-compatible servers such as LM Studio, vLLM, llama.cpp, LiteLLM, or internal gateways.
 - **Bring your documents:** upload, search, reindex, download, and delete documents with RAG over PDF, TXT, Markdown, JSON, LOG, CSV, XLS, XLSX, and DOCX.
-- **Choose your vector store:** local JSON vectors by default, ChromaDB for self-hosted vector search, or Pinecone for managed vector search.
+- **Choose your vector store:** local JSON vectors by default, ChromaDB for self-hosted vector search, Pinecone or Qdrant Cloud for managed vector search, or Supabase Storage plus Postgres/pgvector.
 - **Built for teams:** Better Auth users, admins, roles, organizations, teams, invitations, SSO, OAuth/OIDC provider support, and SCIM provisioning.
 - **Enterprise operations:** GDPR request workflows, audit trail, CSV evidence export, ISO 27001/SOC 2 control register, token usage, and organization-scoped storage.
 - **Internal model API gateway:** users can generate personal API keys and call admin-enabled models through OpenAI-compatible endpoints.
@@ -72,12 +72,12 @@ Batuk is local-first by default and enterprise-ready when you need it. Run it on
 - Upload documents from the Documents workspace.
 - Extract text, chunk content, embed chunks, and retrieve relevant context during chat.
 - Use local deterministic embeddings for offline/private indexing or OpenAI embeddings for higher-quality semantic search.
-- Store vectors in local JSON, ChromaDB, or Pinecone.
+- Store vectors in local JSON, ChromaDB, Pinecone, Qdrant Cloud, or Supabase Postgres/pgvector.
 - Personal document uploads and memories are private to the signed-in user, even when the user belongs to an organization.
 - Shared workspace RAG is available only inside an admin-created shared workspace and only to admins or users added to that workspace.
-- ChromaDB and Pinecone chunks carry scope metadata so retrieval filters by personal or workspace scope before context reaches the model.
+- ChromaDB, Pinecone, Qdrant Cloud, and Supabase chunks carry scope metadata so retrieval filters by organization, user, and personal/shared workspace scope before context reaches the model.
 - Download always returns the original uploaded file.
-- Delete removes local metadata, source files, chunk records, and remote vectors when ChromaDB or Pinecone is used.
+- Delete removes local metadata, source files or Supabase Storage objects, chunk records, and remote vectors when ChromaDB, Pinecone, Qdrant Cloud, or Supabase is used.
 - Pinecone index dimension handling supports both local 384-dimensional embeddings and 1536-dimensional OpenAI embeddings.
 
 ### Enterprise Identity
@@ -131,6 +131,7 @@ curl -X POST http://localhost:3000/api/v1/search \
 ```
 
 - Server-side provider keys are read from environment variables including `OPENAI_API_KEY`, `OPENROUTER_API_KEY`, `TOGETHER_API_KEY`, `MISTRAL_API_KEY`, `MOONSHOT_API_KEY`, `KIMI_API_KEY`, `DEEPSEEK_API_KEY`, `DASHSCOPE_API_KEY`, `QWEN_API_KEY`, `PERPLEXITY_API_KEY`, `ANTHROPIC_API_KEY`, `XAI_API_KEY`, and `SARVAM_API_KEY`.
+- Chat UI model calls pass through an in-process request queue before hitting upstream providers. Tune `BATUK_MODEL_QUEUE_CONCURRENCY`, `BATUK_MODEL_QUEUE_RATE_LIMIT_RETRIES`, `BATUK_MODEL_QUEUE_RATE_LIMIT_BASE_DELAY_MS`, and `BATUK_MODEL_QUEUE_RATE_LIMIT_MAX_DELAY_MS` to match your model gateway or provider limits.
 - The API gateway records token usage with `source: "api"` for chat completions and `source: "api-search"` for Perplexity Search, including API key ID, user ID/email, provider, and public model ID so chat, API, and search usage can be separated in reporting.
 - The gateway has been smoke tested end-to-end against local Ollama `qwen3:8b` through `POST /api/v1/chat/completions`.
 
@@ -316,12 +317,22 @@ The in-app chat UI and Batuk API gateway share the same provider registry. Admin
 | `sarvam` | `SARVAM_API_KEY` or `SARVAMAI_API_KEY` | `provider=sarvam`, `baseUrl=https://api.sarvam.ai/v1`, `model=sarvam-105b` |
 | `custom` | optional | Any OpenAI-compatible `/chat/completions` server. |
 
+### Model Request Queue
+
+Batuk queues chat UI requests before calling the selected model provider. The queue drains at `BATUK_MODEL_QUEUE_CONCURRENCY` concurrent model streams and removes each item after it finishes or fails. If an upstream provider still returns a rate-limit error before any text is streamed, Batuk backs off and retries using the configured retry settings.
+
+For multi-process or multi-server deployments, put Batuk behind a shared provider gateway such as LiteLLM, vLLM, or your internal router when you need one global queue across every replica. The built-in queue is per Node.js process.
+
 ### Embeddings
 
 | Embedder | Use Case |
 | --- | --- |
 | Local deterministic embeddings | Offline/private RAG indexing without sending document chunks to a hosted provider. |
 | [OpenAI embeddings](https://platform.openai.com/docs/guides/embeddings) | Higher-quality semantic document retrieval with `text-embedding-3-small`. |
+| LlamaIndex OpenAI embeddings | Uses `@llamaindex/openai` and `Settings.embedModel = new OpenAIEmbedding(...)`; default model is `text-embedding-ada-002`. |
+| LlamaIndex Ollama embeddings | Uses `@llamaindex/ollama` and `Settings.embedModel = new OllamaEmbedding(...)`; default model is `nomic-embed-text` at `OLLAMA_BASE_URL`. |
+
+Set `BATUK_EMBEDDING_PROVIDER` and `BATUK_EMBEDDING_MODEL` to choose server defaults. Supported providers are `local`, `openai`, `llamaindex-openai`, and `llamaindex-ollama`.
 
 ### Realtime, Search, and Speech
 
@@ -340,6 +351,8 @@ The in-app chat UI and Batuk API gateway share the same provider registry. Admin
 | Local JSON vectors | Default local/dev mode with no external service. |
 | [ChromaDB](https://www.trychroma.com/) | Self-hosted vector search for Docker and enterprise deployments. |
 | [Pinecone](https://www.pinecone.io/) | Managed vector search where approved network/private connectivity is available. |
+| [Qdrant Cloud](https://qdrant.tech/documentation/cloud-quickstart/) | Managed vector search using `@qdrant/js-client-rest`, `QDRANT_URL`, `QDRANT_API_KEY`, and a named collection. |
+| [Supabase](https://supabase.com/) | Stores original files in Supabase Storage and embeddings in Postgres/pgvector with organization/user/workspace scope filters. |
 
 ### Document Sources
 
@@ -353,7 +366,7 @@ Batuk supports PDF, TXT, Markdown, JSON, LOG, CSV, XLS, XLSX, and DOCX uploads. 
 | Product data | Local JSON | SQLite, MySQL, PostgreSQL |
 | Documents | Local file storage | Configurable local/container path |
 | Branding logos | `public/branding` | Configurable local/container path |
-| Vectors | Local JSON | ChromaDB, Pinecone |
+| Vectors | Local JSON | ChromaDB, Pinecone, Qdrant Cloud, Supabase pgvector |
 
 Product data includes chats, workspaces, folders, documents metadata/chunks, memories, API management records, skills, MCP integration records, agents, workflows, token usage, branding, compliance records, GDPR requests, and audit trails. Personal product data is scoped to the signed-in user by default. Shared workspace data is scoped explicitly to the workspace and is only loaded after membership or admin access checks pass. Local JSON mode uses scoped files under `data/scoped-chat` and `data/scoped-documents`; SQL mode stores each domain by scope in `batuk_app_state`, with schema initialization files also exposing first-class scope columns, API key/model route tables, and token usage dimensions for enterprise deployments.
 
@@ -366,7 +379,7 @@ npm run dev
 
 Open `http://localhost:3000`, create an account, choose a provider/model in Settings, and start chatting.
 
-For local Ollama usage, run Ollama separately and select the Ollama provider in Batuk.
+For local non-Docker Ollama usage, run Ollama separately and select the Ollama provider in Batuk.
 
 ```bash
 ollama pull llama3.1
@@ -393,13 +406,16 @@ cp .env.enterprise.example .env.enterprise
 docker compose up --build
 ```
 
-PostgreSQL, MySQL, and ChromaDB are available behind Compose profiles so operators can enable one stack at a time:
+PostgreSQL, MySQL, ChromaDB, and Ollama are available behind Compose profiles so operators can enable one stack at a time:
 
 ```bash
 docker compose --profile postgres up --build
 docker compose --profile mysql up --build
 docker compose --profile postgres --profile chroma up --build
+docker compose --profile ollama up --build
 ```
+
+The Ollama profile starts an `ollama/ollama` container, stores models in the `batuk_ollama` Docker volume, and runs a one-shot pull job for `OLLAMA_DEFAULT_MODEL`. The default is `gemma3:1b` so a direct Docker user gets a small local model without extra setup. To use another model, set `OLLAMA_DEFAULT_MODEL=llama3.2:1b` or another Ollama tag before starting Compose. Keep `OLLAMA_BASE_URL=http://ollama:11434` for Compose-managed Ollama; use `http://host.docker.internal:11434` only when Batuk should connect to an Ollama server running on the host machine.
 
 Container startup validates the enterprise environment, runs Better Auth migrations when applicable, runs product-data migrations when SQL product storage is enabled, and starts the Next.js server.
 

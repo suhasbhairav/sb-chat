@@ -18,6 +18,8 @@ import { resolvePersonalProductDataScope, resolveWorkspaceProductDataScope, with
 import { deleteDocument, readDocumentStore } from "@/lib/rag-store";
 import { deleteChromaDocument } from "@/lib/rag-chroma";
 import { deletePineconeDocument } from "@/lib/rag-pinecone";
+import { deleteQdrantDocument } from "@/lib/rag-qdrant";
+import { deleteSupabaseDocument } from "@/lib/rag-supabase";
 
 async function listAuthUsers() {
   const result = await auth.api.listUsers({
@@ -145,6 +147,21 @@ async function cleanupWorkspaceRag(session, workspaceId) {
           ...store.settings,
           pineconeIndex: document.pineconeIndex || store.settings.pineconeIndex,
           pineconeNamespace: document.pineconeNamespace || store.settings.pineconeNamespace,
+        });
+      }
+      if (document.vectorStoreProvider === "qdrant" || store.settings.vectorStoreProvider === "qdrant") {
+        await deleteQdrantDocument(document.id, {
+          ...store.settings,
+          qdrantUrl: document.qdrantUrl || store.settings.qdrantUrl,
+          qdrantCollection: document.qdrantCollection || store.settings.qdrantCollection,
+        });
+      }
+      if (document.vectorStoreProvider === "supabase" || store.settings.vectorStoreProvider === "supabase") {
+        await deleteSupabaseDocument(document.id, {
+          ...store.settings,
+          supabaseBucket: document.supabaseBucket || store.settings.supabaseBucket,
+          supabaseChunksTable: document.supabaseChunksTable || store.settings.supabaseChunksTable,
+          supabaseMatchFunction: document.supabaseMatchFunction || store.settings.supabaseMatchFunction,
         });
       }
     }),

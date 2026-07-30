@@ -1,5 +1,6 @@
 import { blockedGuardrailResponse } from "@/lib/guardrails";
 import { streamModel } from "@/lib/model-clients";
+import { enqueueModelRequest, isRateLimitError, modelQueueOptionsFromEnv, rateLimitDelayMs, sleep } from "@/lib/request-queue";
 import { json, prepareChatRequest, validateChatPayload } from "@/lib/chat-request";
 import { appendDocumentSources, retrieveDocumentContext } from "@/lib/rag-embeddings";
 import { recordTokenUsage } from "@/lib/token-usage-store";
@@ -26,6 +27,31 @@ function ndjsonHeaders() {
     "Cache-Control": "no-cache, no-transform",
     "Content-Type": "application/x-ndjson; charset=utf-8",
   };
+}
+
+async function streamModelWithRateLimitRetry(modelRequest, onToken, onRetry) {
+  const queueOptions = modelQueueOptionsFromEnv();
+  let emittedToken = false;
+
+  for (let attempt = 0; attempt <= queueOptions.rateLimitRetries; attempt += 1) {
+    emittedToken = false;
+    try {
+      return await streamModel(modelRequest, (token) => {
+        emittedToken = true;
+        onToken(token);
+      });
+    } catch (error) {
+      if (emittedToken || !isRateLimitError(error) || attempt >= queueOptions.rateLimitRetries) {
+        throw error;
+      }
+
+      const delayMs = rateLimitDelayMs(error, attempt + 1, queueOptions);
+      onRetry?.({ attempt: attempt + 1, retriesRemaining: queueOptions.rateLimitRetries - attempt, delayMs });
+      await sleep(delayMs);
+    }
+  }
+
+  throw new Error("Model request failed after rate-limit retries.");
 }
 
 async function readSelectedMcpResourceContext(integration) {
@@ -75,7 +101,6 @@ export async function POST(request) {
     const activeMcpIntegration = payload.mcpIntegrationId ? await getActiveMcpIntegration(payload.mcpIntegrationId) : null;
     const mcpContext = formatMcpContextForPrompt(activeMcpIntegration);
     const mcpResourceContext = await readSelectedMcpResourceContext(activeMcpIntegration).catch(() => "");
-
     if (mcpContext) {
       modelRequest = {
         ...modelRequest,
@@ -170,36 +195,53 @@ export async function POST(request) {
     const stream = new ReadableStream({
       async start(controller) {
         try {
-          const result = await streamModel(modelRequest, (token) => {
-            controller.enqueue(encodeEvent({ type: "token", token }));
-          });
-          const usage = result.usage || { inputTokens: 0, outputTokens: 0, totalTokens: 0, source: "provider" };
-          const finalMessage = appendDocumentSources(result.message || "The model returned an empty response.", documentSources);
+          const ticket = enqueueModelRequest(
+            async () => {
+              const result = await streamModelWithRateLimitRetry(
+                modelRequest,
+                (token) => {
+                  controller.enqueue(encodeEvent({ type: "token", token }));
+                },
+                (retry) => {
+                  controller.enqueue(encodeEvent({ type: "queue", phase: "rate-limit-retry", ...retry }));
+                },
+              );
+              const usage = result.usage || { inputTokens: 0, outputTokens: 0, totalTokens: 0, source: "provider" };
+              const finalMessage = appendDocumentSources(result.message || "The model returned an empty response.", documentSources);
 
-          if (usage.totalTokens > 0 || usage.inputTokens > 0 || usage.outputTokens > 0) {
-            await recordTokenUsage({
-              userId: session.user.id,
-              userEmail: session.user.email,
-              chatId: payload.chatId,
-              workspaceId: payload.workspaceId,
-              folderId: payload.folderId,
-              provider: modelRequest.provider,
-              model: modelRequest.model,
-              temporary: Boolean(payload.temporary),
-              ...usage,
-              source: "chat",
-            });
-          }
+              if (usage.totalTokens > 0 || usage.inputTokens > 0 || usage.outputTokens > 0) {
+                await recordTokenUsage({
+                  userId: session.user.id,
+                  userEmail: session.user.email,
+                  chatId: payload.chatId,
+                  workspaceId: payload.workspaceId,
+                  folderId: payload.folderId,
+                  provider: modelRequest.provider,
+                  model: modelRequest.model,
+                  temporary: Boolean(payload.temporary),
+                  ...usage,
+                  source: "chat",
+                });
+              }
 
-          controller.enqueue(
-            encodeEvent({
-              type: "done",
-              message: finalMessage,
-              usage,
-              guardrails: { blocked: false, reason: null },
-              documents: documentSources,
-            }),
+              controller.enqueue(
+                encodeEvent({
+                  type: "done",
+                  message: finalMessage,
+                  usage,
+                  guardrails: { blocked: false, reason: null },
+                  documents: documentSources,
+                }),
+              );
+            },
+            {
+              onQueued: (queue) => {
+                controller.enqueue(encodeEvent({ type: "queue", phase: "queued", ...queue }));
+              },
+            },
           );
+
+          await ticket.promise;
         } catch (error) {
           controller.enqueue(encodeEvent({ type: "error", error: error.message || "Unexpected chat server error." }));
         } finally {

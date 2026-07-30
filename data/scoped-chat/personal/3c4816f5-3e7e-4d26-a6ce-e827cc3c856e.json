@@ -31,5 +31,81 @@
       "updatedAt": "2026-07-26T18:14:27.620Z"
     }
   ],
-  "chats": []
+  "chats": [
+    {
+      "id": "1785420437876-deafa4fdff6688",
+      "workspaceId": "workspace-personal",
+      "folderId": null,
+      "title": "Show me a code snippet of a websit",
+      "messages": [
+        {
+          "role": "user",
+          "content": "Show me a code snippet of a website's sticky header in Next.js.",
+          "id": "1785420437876-deafa4fdff6688-0-user-Show me a code snippet o"
+        },
+        {
+          "role": "assistant",
+          "content": "Here's a Next.js code snippet for a sticky header using Tailwind CSS:\n\n```jsx\n// components/Header.js\nimport Link from 'next/link';\n\nexport default function Header() {\n  return (\n    <header className=\"sticky top-0 z-10 bg-white shadow-md\">\n      <div className=\"container mx-auto px-4 py-3 flex justify-between items-center\">\n        <Link href=\"/\" className=\"text-xl font-bold text-indigo-600\">\n          MySite\n        </Link>\n        <nav>\n          <ul className=\"space-x-4\">\n            <li><Link href=\"/\" className=\"hover:text-indigo-500\">Home</Link></li>\n            <li><Link href=\"/about\" className=\"hover:text-indigo-500\">About</Link></li>\n          </ul>\n        </nav>\n      </div>\n    </header>\n  );\n}\n```\n\nKey features:\n- `sticky top-0` keeps the header fixed at the top\n- `z-10` ensures it stays above other content\n- `shadow-md` adds a subtle visual separation\n- Uses Next.js Link component for proper routing\n\nFor plain CSS, replace `className=\"sticky top-0 z-10 bg-white shadow-md\"` with:\n```css\nposition: sticky;\ntop: 0;\nz-index: 10;\nbackground-color: white;\nbox-shadow: 0 2px 4px rgba(0,0,0,0.1);\n```",
+          "id": "1785420437876-deafa4fdff6688-1-assistant-Here's a Next.js code sn"
+        }
+      ],
+      "provider": "ollama",
+      "model": "qwen3:8b",
+      "baseUrl": "http://localhost:11434",
+      "guardrails": true,
+      "temperature": 0.7,
+      "createdAt": "2026-07-30T14:07:31.674Z",
+      "updatedAt": "2026-07-30T14:07:31.674Z"
+    },
+    {
+      "id": "1785417260312-dd127152c94388",
+      "workspaceId": "workspace-personal",
+      "folderId": null,
+      "title": "Help me study vocabulary for a col",
+      "messages": [
+        {
+          "role": "user",
+          "content": "Help me study vocabulary for a college entrance exam.",
+          "id": "1785417260312-dd127152c94388-0-user-Help me study vocabulary"
+        },
+        {
+          "role": "assistant",
+          "content": "Here are 5 vocabulary study tips for college entrance exams:  \n1. **Spaced repetition**: Review words at increasing intervals (e.g., 1 day, 3 days, 1 week).  \n2. **Context clues**: Guess meanings from sentence context before checking definitions.  \n3. **Visualize**: Draw or imagine scenarios tied to words (e.g., \"serendipity\" = finding something by chance).  \n4. **Use in sentences**: Write original sentences to reinforce meaning and spelling.  \n5. **Group words**: Link related terms (e.g., \"ambiguous,\" \"equivocal,\" \"vague\").  \n\n**Study plan chart**:  \n```chart\n{\"type\":\"bar\",\"title\":\"Weekly Study Goals\",\"xLabel\":\"Days\",\"yLabel\":\"Words\",\"data\":[{\"label\":\"Mon\",\"value\":20},{\"label\":\"Tue\",\"value\":15},{\"label\":\"Wed\",\"value\":25},{\"label\":\"Thu\",\"value\":18},{\"label\":\"Fri\",\"value\":22}]}\n```  \nTrack progress and adjust as needed! Let me know if you want a custom word list.",
+          "id": "1785417260312-dd127152c94388-1-assistant-Here are 5 vocabulary st"
+        }
+      ],
+      "provider": "ollama",
+      "model": "qwen3:8b",
+      "baseUrl": "http://localhost:11434",
+      "guardrails": true,
+      "temperature": 0.7,
+      "createdAt": "2026-07-30T13:14:33.161Z",
+      "updatedAt": "2026-07-30T13:14:33.161Z"
+    },
+    {
+      "id": "1785415565962-75d6c1aaab0ef",
+      "workspaceId": "workspace-personal",
+      "folderId": null,
+      "title": "Show me a code snippet of a websit",
+      "messages": [
+        {
+          "role": "user",
+          "content": "Show me a code snippet of a website's sticky header in Next.js.",
+          "id": "1785415565962-75d6c1aaab0ef-0-user-Show me a code snippet o"
+        },
+        {
+          "role": "assistant",
+          "content": "Here's a sticky header implementation in Next.js using React and CSS:\n\n```jsx\n// components/StickyHeader.js\nimport Link from 'next/link';\n\nexport default function StickyHeader() {\n  return (\n    <header style={{ \n      position: 'sticky', \n      top: 0, \n      zIndex: 10, \n      backgroundColor: '#fff', \n      boxShadow: '0 2px 4px rgba(0,0,0,0.1)', \n      padding: '1rem 2rem',\n      transition: 'box-shadow 0.3s'\n    }}>\n      <div style={{ maxWidth: '1200px', margin: '0 auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>\n        <h1 style={{ margin: 0 }}>MySite</h1>\n        <nav>\n          <Link href=\"/\" style={{ margin: '0 1rem', textDecoration: 'none', color: '#333' }}>Home</Link>\n          <Link href=\"/about\" style={{ margin: '0 1rem', textDecoration: 'none', color: '#333' }}>About</Link>\n        </nav>\n      </div>\n    </header>\n  );\n}\n```\n\n```jsx\n// pages/_app.js\nimport '../styles/global.css';\nimport StickyHeader from '../components/StickyHeader';\n\nexport default function App({ Component, pageProps }) {\n  return (\n    <>\n      <StickyHeader />\n      <Component {...pageProps} />\n    </>\n  );\n}\n```\n\n```css\n/* styles/global.css */\nbody {\n  margin: 0;\n  padding: 0;\n  minHeight: 100vh;\n  display: flex;\n  flexDirection: column;\n}\n\nmain {\n  flex: 1;\n  padding: 2rem;\n}\n```\n\nThis implementation:\n1. Uses `position: sticky` with `top: 0` to keep the header fixed at the top\n2. Adds a `zIndex: 10` to ensure it stays above other content\n3. Includes a subtle shadow for visual separation\n4. Creates a responsive layout with proper spacing\n5. Works with Next.js routing via the `Link` component\n\nThe header will remain visible as users scroll down the page while maintaining visual hierarchy with the rest of the content.",
+          "id": "1785415565962-75d6c1aaab0ef-1-assistant-Here's a sticky header i"
+        }
+      ],
+      "provider": "ollama",
+      "model": "qwen3:8b",
+      "baseUrl": "http://localhost:11434",
+      "guardrails": true,
+      "temperature": 0.7,
+      "createdAt": "2026-07-30T12:46:31.641Z",
+      "updatedAt": "2026-07-30T12:48:20.019Z"
+    }
+  ]
 }

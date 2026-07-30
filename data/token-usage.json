@@ -1,10 +1,83 @@
 {
   "version": 1,
   "totals": {
-    "inputTokens": 0,
-    "outputTokens": 0,
-    "totalTokens": 0,
-    "requests": 0
+    "inputTokens": 3137,
+    "outputTokens": 3432,
+    "totalTokens": 6569,
+    "requests": 4
   },
-  "events": []
+  "events": [
+    {
+      "id": "usage-1785420451652-3161691b848e68",
+      "userId": "3c4816f5-3e7e-4d26-a6ce-e827cc3c856e",
+      "chatId": "1785420437876-deafa4fdff6688",
+      "workspaceId": "workspace-personal",
+      "folderId": null,
+      "userEmail": "test@test.com",
+      "apiKeyId": null,
+      "apiModel": null,
+      "provider": "ollama",
+      "model": "qwen3:8b",
+      "inputTokens": 709,
+      "outputTokens": 628,
+      "totalTokens": 1337,
+      "source": "chat",
+      "temporary": false,
+      "createdAt": "2026-07-30T14:07:31.652Z"
+    },
+    {
+      "id": "usage-1785417273065-16cb0e5a2a8e4",
+      "userId": "3c4816f5-3e7e-4d26-a6ce-e827cc3c856e",
+      "chatId": "1785417260312-dd127152c94388",
+      "workspaceId": "workspace-personal",
+      "folderId": null,
+      "userEmail": "test@test.com",
+      "apiKeyId": null,
+      "apiModel": null,
+      "provider": "ollama",
+      "model": "qwen3:8b",
+      "inputTokens": 704,
+      "outputTokens": 483,
+      "totalTokens": 1187,
+      "source": "chat",
+      "temporary": false,
+      "createdAt": "2026-07-30T13:14:33.065Z"
+    },
+    {
+      "id": "usage-1785415699996-51e1ea8a4ae8e8",
+      "userId": "3c4816f5-3e7e-4d26-a6ce-e827cc3c856e",
+      "chatId": "1785415565962-75d6c1aaab0ef",
+      "workspaceId": "workspace-personal",
+      "folderId": null,
+      "userEmail": "test@test.com",
+      "apiKeyId": null,
+      "apiModel": null,
+      "provider": "ollama",
+      "model": "qwen3:8b",
+      "inputTokens": 709,
+      "outputTokens": 1127,
+      "totalTokens": 1836,
+      "source": "chat",
+      "temporary": false,
+      "createdAt": "2026-07-30T12:48:19.996Z"
+    },
+    {
+      "id": "usage-1785415591626-da2895c7be2ec8",
+      "userId": "3c4816f5-3e7e-4d26-a6ce-e827cc3c856e",
+      "chatId": "1785415565962-75d6c1aaab0ef",
+      "workspaceId": "workspace-personal",
+      "folderId": null,
+      "userEmail": "test@test.com",
+      "apiKeyId": null,
+      "apiModel": null,
+      "provider": "ollama",
+      "model": "qwen3:8b",
+      "inputTokens": 1015,
+      "outputTokens": 1194,
+      "totalTokens": 2209,
+      "source": "chat",
+      "temporary": false,
+      "createdAt": "2026-07-30T12:46:31.626Z"
+    }
+  ]
 }
