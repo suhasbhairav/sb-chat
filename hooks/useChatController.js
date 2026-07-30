@@ -199,8 +199,8 @@ export function useChatController() {
     [activeMcpIntegrationId, mcpIntegrations],
   );
   const resolvedRealtimeModel = useMemo(
-    () => resolveRealtimeModel({ modelCatalog, realtimeModel, selectedModel: model }),
-    [model, modelCatalog, realtimeModel],
+    () => resolveRealtimeModel({ modelCatalog, provider, realtimeModel, selectedModel: model }),
+    [model, modelCatalog, provider, realtimeModel],
   );
   const realtime = useRealtimeVoice({
     apiKey,

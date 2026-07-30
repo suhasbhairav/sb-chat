@@ -1,9 +1,10 @@
 import { json } from "@/lib/chat-request";
 import { requireServerPermission } from "@/lib/auth-session";
 import { resolveServerApiKey } from "@/lib/chat-request";
-import { DEFAULT_REALTIME_MODEL, DEFAULT_TRANSCRIPTION_MODEL } from "@/lib/voice-models";
+import { DEFAULT_REALTIME_MODEL, DEFAULT_TRANSCRIPTION_MODEL, DEFAULT_XAI_REALTIME_MODEL } from "@/lib/voice-models";
 
-const REALTIME_SESSION_URL = "https://api.openai.com/v1/realtime/client_secrets";
+const OPENAI_REALTIME_SESSION_URL = "https://api.openai.com/v1/realtime/client_secrets";
+const XAI_REALTIME_SESSION_URL = "https://api.x.ai/v1/realtime/client_secrets";
 
 export async function POST(request) {
   try {
@@ -11,14 +12,34 @@ export async function POST(request) {
     if (authResponse) return authResponse;
 
     const payload = await request.json();
-    const apiKey = resolveServerApiKey("openai", payload.apiKey);
-    const model = String(payload.model || DEFAULT_REALTIME_MODEL).trim();
+    const provider = String(payload.provider || "openai").trim();
+    const apiKey = resolveServerApiKey(provider === "xai" ? "xai" : "openai", payload.apiKey);
+    const model = String(payload.model || (provider === "xai" ? DEFAULT_XAI_REALTIME_MODEL : DEFAULT_REALTIME_MODEL)).trim();
 
     if (!apiKey) {
-      return json({ error: "OpenAI API key is required for voice chat." }, 400);
+      return json({ error: `${provider === "xai" ? "xAI" : "OpenAI"} API key is required for voice chat.` }, 400);
     }
 
-    const response = await fetch(REALTIME_SESSION_URL, {
+    if (provider === "xai") {
+      const response = await fetch(XAI_REALTIME_SESSION_URL, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${apiKey}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ expires_after: { seconds: 300 } }),
+      });
+
+      const data = await response.json().catch(() => ({}));
+
+      if (!response.ok) {
+        return json({ error: data.error?.message || `xAI realtime session failed with status ${response.status}.` }, response.status);
+      }
+
+      return json({ ...data, provider: "xai", model });
+    }
+
+    const response = await fetch(OPENAI_REALTIME_SESSION_URL, {
       method: "POST",
       headers: {
         Authorization: `Bearer ${apiKey}`,

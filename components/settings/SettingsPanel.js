@@ -3,7 +3,7 @@ import { ArrowLeft, Brain, KeyRound, Mic, Moon, Plus, RefreshCw, ShieldCheck, Sh
 import { useI18n } from "@/components/i18n/I18nProvider";
 import { LOCALE_OPTIONS } from "@/lib/i18n";
 import { PROVIDERS } from "@/lib/providers";
-import { AUTO_REALTIME_MODEL } from "@/lib/voice-models";
+import { AUTO_REALTIME_MODEL, DEFAULT_XAI_REALTIME_MODEL, isRealtimeModel } from "@/lib/voice-models";
 
 export function SettingsPanel({
   baseUrl,
@@ -49,10 +49,12 @@ export function SettingsPanel({
   const [newMemory, setNewMemory] = useState("");
   const [editingMemoryId, setEditingMemoryId] = useState(null);
   const [editingMemoryContent, setEditingMemoryContent] = useState("");
-  const realtimeModels = modelCatalog.filter((item) => item.id.includes("realtime"));
+  const realtimeModels = modelCatalog.filter((item) => isRealtimeModel(item.id));
   const selectableRealtimeModels = realtimeModels.length
     ? realtimeModels
-    : [
+    : provider === "xai"
+      ? [{ id: DEFAULT_XAI_REALTIME_MODEL, name: "grok-voice-latest" }]
+      : [
         { id: "gpt-realtime-2.1", name: "gpt-realtime-2.1" },
         { id: "gpt-realtime-2.1-mini", name: "gpt-realtime-2.1-mini" },
       ];

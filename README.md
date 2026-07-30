@@ -64,7 +64,7 @@ Batuk is local-first by default and enterprise-ready when you need it. Run it on
 - Personal workspaces, shared workspaces, folders, search, import, export, and copy actions.
 - A Workspace tools menu with separate pages for Provider settings, API access, Workspace management, Chat history and data, Token usage, Enterprise management, and Audit and compliance.
 - Web search through OpenAI hosted search when enabled.
-- OpenAI Realtime voice sessions with browser microphone input.
+- OpenAI Realtime and Grok Voice sessions with browser microphone input.
 - Guardrails for safer request screening and system behavior.
 
 ### Document Chat and RAG
@@ -286,7 +286,7 @@ Batuk is designed like an enterprise model control plane: admins decide which mo
 | [OpenAI](https://platform.openai.com/docs) | `https://api.openai.com/v1` | `gpt-5.1-mini` | Chat completions, hosted web search, embeddings, and realtime voice. |
 | [OpenRouter](https://openrouter.ai/) | `https://openrouter.ai/api/v1` | `openai/gpt-4o-mini` | Routed access to many model families through an OpenAI-compatible API. |
 | [Claude](https://docs.anthropic.com/) | `https://api.anthropic.com/v1` | `claude-sonnet-5` | Anthropic Messages API with streaming and usage reporting. |
-| [Grok](https://docs.x.ai/) | `https://api.x.ai/v1` | `grok-4.5` | xAI Responses API. |
+| [Grok](https://docs.x.ai/) | `https://api.x.ai/v1` | `grok-4.5` | xAI Responses API plus Grok Voice realtime speech-to-speech. |
 | [Sarvam AI](https://docs.sarvam.ai/) | `https://api.sarvam.ai/v1` | `sarvam-105b` | Indian-language optimized chat models. |
 | [Together AI](https://docs.together.ai/) | `https://api.together.ai/v1` | `MiniMaxAI/MiniMax-M3` | OpenAI-compatible inference, including Together-hosted open and commercial models. |
 | [Mistral AI](https://docs.mistral.ai/) | `https://api.mistral.ai/v1` | `mistral-large-latest` | Mistral chat completions. |
@@ -328,9 +328,10 @@ The in-app chat UI and Batuk API gateway share the same provider registry. Admin
 | Capability | Provider | Notes |
 | --- | --- | --- |
 | Realtime voice | [OpenAI Realtime](https://platform.openai.com/docs/guides/realtime) | Browser microphone sessions with ephemeral server-issued credentials. |
+| Grok voice chat | [xAI Grok Voice](https://docs.x.ai/developers/model-capabilities/audio/speech-to-speech) | Uses `XAI_API_KEY` server-side to mint ephemeral browser WebSocket credentials for `grok-voice-latest`. |
 | Hosted web search in chat | [OpenAI](https://platform.openai.com/docs/guides/tools-web-search) | Uses OpenAI hosted web search when enabled in chat and supported by the selected model. |
 | Search API gateway | [Perplexity](https://docs.perplexity.ai/) | `POST /api/v1/search` lets Batuk API-key clients call Perplexity Search through the same user-scoped access system. |
-| Browser speech input/output | Browser APIs plus OpenAI Realtime | Voice features stay separate from stored chat/RAG scope. |
+| Browser speech input/output | Browser APIs plus OpenAI Realtime or Grok Voice | Voice features stay separate from stored chat/RAG scope. |
 
 ### Vector Databases
 
@@ -427,6 +428,8 @@ Batuk can be configured from the UI for local evaluation and from environment fi
 - `.env.enterprise.example` for deployment settings, identity integrations, SQL stores, vector stores, file paths, and startup behavior.
 - `docker-compose.yml` for profile-based PostgreSQL, MySQL, and ChromaDB deployment.
 - `database/*/001_enterprise_data.sql` for product data schema initialization.
+
+For Grok text and voice chat, set `XAI_API_KEY` in the server environment or paste an xAI key into Settings during local evaluation. Select provider `Grok`, leave Realtime model on `Auto` to use `grok-voice-latest`, then click the microphone button in the composer or Settings. Batuk exchanges the server key for a short-lived xAI realtime client secret before the browser opens the Grok Voice WebSocket.
 
 After changing auth database settings, run:
 
