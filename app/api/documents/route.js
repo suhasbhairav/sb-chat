@@ -14,11 +14,16 @@ import { normalizeQdrantCollectionName, normalizeQdrantUrl, upsertQdrantChunks }
 import { normalizeSupabaseBucket, normalizeSupabaseChunksTable, normalizeSupabaseMatchFunction, upsertSupabaseChunks } from "@/lib/rag-supabase";
 import { chunkDocumentText, extractDocumentText } from "@/lib/rag-processing";
 import { cleanupTemporaryDocumentFile, readDocumentStore, saveUploadedDocumentFileForScope, summarizeDocuments, writeDocumentStore } from "@/lib/rag-store";
+import { isAdvancedPythonBackendEnabled, processAdvancedRagDocument } from "@/lib/advanced-python-backend";
 import { recordAuditEvent } from "@/lib/compliance-store";
 import { withProductDataScope } from "@/lib/product-data-store";
 import { resolveDocumentProductDataScope } from "@/lib/workspace-access";
 
 export const runtime = "nodejs";
+
+function formBoolean(value) {
+  return value === true || value === "true" || value === "on" || value === "1";
+}
 
 function normalizeSettings(settings = {}) {
   const embeddingSettings = normalizeEmbeddingSettings(settings);
@@ -39,6 +44,11 @@ function normalizeSettings(settings = {}) {
     supabaseBucket: normalizeSupabaseBucket(settings.supabaseBucket),
     supabaseChunksTable: normalizeSupabaseChunksTable(settings.supabaseChunksTable),
     supabaseMatchFunction: normalizeSupabaseMatchFunction(settings.supabaseMatchFunction),
+    advancedRagEnabled: formBoolean(settings.advancedRagEnabled),
+    advancedExtractionStrategy: String(settings.advancedExtractionStrategy || "hi_res"),
+    advancedExtractionLanguages: String(settings.advancedExtractionLanguages || "eng"),
+    graphRagEnabled: formBoolean(settings.graphRagEnabled),
+    piiDetectionEnabled: formBoolean(settings.piiDetectionEnabled),
     chunkSize: Math.min(6000, Math.max(600, Number(settings.chunkSize || 1800))),
     chunkOverlap: Math.min(1200, Math.max(0, Number(settings.chunkOverlap || 220))),
     topK: Math.min(12, Math.max(1, Number(settings.topK || 6))),
@@ -111,6 +121,11 @@ export async function POST(request) {
       supabaseBucket: formData.get("supabaseBucket"),
       supabaseChunksTable: formData.get("supabaseChunksTable"),
       supabaseMatchFunction: formData.get("supabaseMatchFunction"),
+      advancedRagEnabled: formData.get("advancedRagEnabled"),
+      advancedExtractionStrategy: formData.get("advancedExtractionStrategy"),
+      advancedExtractionLanguages: formData.get("advancedExtractionLanguages"),
+      graphRagEnabled: formData.get("graphRagEnabled"),
+      piiDetectionEnabled: formData.get("piiDetectionEnabled"),
       openAIBaseUrl: formData.get("openAIBaseUrl"),
     });
     Object.assign(settings, {
@@ -155,16 +170,40 @@ export async function POST(request) {
         supabaseBucket: settings.vectorStoreProvider === "supabase" ? settings.supabaseBucket : null,
         supabaseChunksTable: settings.vectorStoreProvider === "supabase" ? settings.supabaseChunksTable : null,
         supabaseMatchFunction: settings.vectorStoreProvider === "supabase" ? settings.supabaseMatchFunction : null,
+        advancedRagEnabled: settings.advancedRagEnabled,
+        graphRagEnabled: settings.graphRagEnabled,
+        piiDetectionEnabled: settings.piiDetectionEnabled,
         createdAt,
       };
 
       try {
-        const text = await extractDocumentText(saved.filePath, file.name);
+        const advancedResult = isAdvancedPythonBackendEnabled(settings)
+          ? await processAdvancedRagDocument({
+              filePath: saved.filePath,
+              fileName: file.name,
+              documentId: id,
+              scope,
+              settings,
+              provider: formData.get("provider") || null,
+              selectedModel: formData.get("selectedModel") || null,
+            })
+          : null;
+        const text = advancedResult?.text || await extractDocumentText(saved.filePath, file.name);
         if (!text) {
           throw new Error("No extractable text found in this document.");
         }
 
-        const chunks = chunkDocumentText(text, settings);
+        const chunks = advancedResult?.chunks?.length
+          ? advancedResult.chunks.map((chunk) => ({
+              id: makeId(),
+              content: chunk.content,
+              pageStart: chunk.pageStart ?? null,
+              pageEnd: chunk.pageEnd ?? null,
+              elementType: chunk.elementType || null,
+              sourceElementIds: chunk.sourceElementIds || [],
+              metadata: chunk.metadata || {},
+            }))
+          : chunkDocumentText(text, settings);
         const embeddings = await createEmbeddings(
           chunks.map((chunk) => chunk.content),
           {
@@ -184,6 +223,11 @@ export async function POST(request) {
           organizationId: scope.organizationId,
           userId: scope.userId,
           workspaceId: scope.workspaceId,
+          pageStart: chunk.pageStart ?? null,
+          pageEnd: chunk.pageEnd ?? null,
+          elementType: chunk.elementType || null,
+          sourceElementIds: chunk.sourceElementIds || [],
+          metadata: chunk.metadata || {},
           createdAt,
         }));
         if (settings.vectorStoreProvider === "chroma") {
@@ -224,6 +268,17 @@ export async function POST(request) {
           supabaseBucket: resolvedSettings.vectorStoreProvider === "supabase" ? resolvedSettings.supabaseBucket : null,
           supabaseChunksTable: resolvedSettings.vectorStoreProvider === "supabase" ? resolvedSettings.supabaseChunksTable : null,
           supabaseMatchFunction: resolvedSettings.vectorStoreProvider === "supabase" ? resolvedSettings.supabaseMatchFunction : null,
+          extractionEngine: advancedResult?.engine || "javascript",
+          structuredElementCount: advancedResult?.elements?.length || 0,
+          graphRagEnabled: Boolean(settings.graphRagEnabled),
+          graphEntityCount: advancedResult?.graph?.entities?.length || 0,
+          graphRelationshipCount: advancedResult?.graph?.relationships?.length || 0,
+          graphCommunityCount: advancedResult?.graph?.communities?.length || 0,
+          graphNeo4j: advancedResult?.graph?.neo4j || null,
+          piiDetectionEnabled: Boolean(settings.piiDetectionEnabled),
+          piiRisk: advancedResult?.guardrails?.risk || null,
+          piiFindingCount: advancedResult?.guardrails?.findings?.length || 0,
+          documentStructure: advancedResult?.document?.structure || null,
         };
 
         store = {

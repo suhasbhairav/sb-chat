@@ -1,5 +1,6 @@
 import { json, resolveServerApiKey } from "@/lib/chat-request";
 import { requireServerPermission } from "@/lib/auth-session";
+import { makeId } from "@/lib/chat-utils";
 import { createEmbeddings, normalizeEmbeddingSettings } from "@/lib/rag-embeddings";
 import { deleteChromaDocument, normalizeChromaCollectionName, normalizeChromaUrl, upsertChromaChunks } from "@/lib/rag-chroma";
 import {
@@ -14,11 +15,16 @@ import { deleteQdrantDocument, normalizeQdrantCollectionName, normalizeQdrantUrl
 import { deleteSupabaseDocument, normalizeSupabaseBucket, normalizeSupabaseChunksTable, normalizeSupabaseMatchFunction, upsertSupabaseChunks } from "@/lib/rag-supabase";
 import { chunkDocumentText, extractDocumentText } from "@/lib/rag-processing";
 import { cleanupTemporaryDocumentFile, materializeDocumentFile, readDocumentStore, summarizeDocuments, writeDocumentStore } from "@/lib/rag-store";
+import { isAdvancedPythonBackendEnabled, processAdvancedRagDocument } from "@/lib/advanced-python-backend";
 import { recordAuditEvent } from "@/lib/compliance-store";
 import { withProductDataScope } from "@/lib/product-data-store";
 import { resolveDocumentProductDataScope } from "@/lib/workspace-access";
 
 export const runtime = "nodejs";
+
+function payloadBoolean(value) {
+  return value === true || value === "true" || value === "on" || value === "1";
+}
 
 async function markDocumentReindexFailed(documentId, error, scope) {
   const store = await withProductDataScope(scope, () => readDocumentStore());
@@ -84,19 +90,45 @@ export async function POST(request, { params }) {
       supabaseBucket: normalizeSupabaseBucket(payload.supabaseBucket || store.settings.supabaseBucket),
       supabaseChunksTable: normalizeSupabaseChunksTable(payload.supabaseChunksTable || store.settings.supabaseChunksTable),
       supabaseMatchFunction: normalizeSupabaseMatchFunction(payload.supabaseMatchFunction || store.settings.supabaseMatchFunction),
+      advancedRagEnabled: payload.advancedRagEnabled === undefined ? Boolean(store.settings.advancedRagEnabled) : payloadBoolean(payload.advancedRagEnabled),
+      advancedExtractionStrategy: String(payload.advancedExtractionStrategy || store.settings.advancedExtractionStrategy || "hi_res"),
+      advancedExtractionLanguages: String(payload.advancedExtractionLanguages || store.settings.advancedExtractionLanguages || "eng"),
+      graphRagEnabled: payload.graphRagEnabled === undefined ? Boolean(store.settings.graphRagEnabled) : payloadBoolean(payload.graphRagEnabled),
+      piiDetectionEnabled: payload.piiDetectionEnabled === undefined ? Boolean(store.settings.piiDetectionEnabled) : payloadBoolean(payload.piiDetectionEnabled),
       scopeType: activeScope.scopeType,
       organizationId: activeScope.organizationId,
       userId: activeScope.userId,
       workspaceId: activeScope.workspaceId,
     };
     const filePath = await materializeDocumentFile(document);
-    const text = await extractDocumentText(filePath, document.name);
+    const advancedResult = isAdvancedPythonBackendEnabled(settings)
+      ? await processAdvancedRagDocument({
+          filePath,
+          fileName: document.name,
+          documentId: document.id,
+          scope: activeScope,
+          settings,
+          provider: payload.provider || null,
+          selectedModel: payload.selectedModel || null,
+        })
+      : null;
+    const text = advancedResult?.text || await extractDocumentText(filePath, document.name);
 
     if (!text) {
       throw new Error("No extractable text found in this document.");
     }
 
-    const chunks = chunkDocumentText(text, settings);
+    const chunks = advancedResult?.chunks?.length
+      ? advancedResult.chunks.map((chunk) => ({
+          id: makeId(),
+          content: chunk.content,
+          pageStart: chunk.pageStart ?? null,
+          pageEnd: chunk.pageEnd ?? null,
+          elementType: chunk.elementType || null,
+          sourceElementIds: chunk.sourceElementIds || [],
+          metadata: chunk.metadata || {},
+        }))
+      : chunkDocumentText(text, settings);
     const embeddings = await createEmbeddings(
       chunks.map((chunk) => chunk.content),
       {
@@ -117,6 +149,11 @@ export async function POST(request, { params }) {
       organizationId: activeScope.organizationId,
       userId: activeScope.userId,
       workspaceId: activeScope.workspaceId,
+      pageStart: chunk.pageStart ?? null,
+      pageEnd: chunk.pageEnd ?? null,
+      elementType: chunk.elementType || null,
+      sourceElementIds: chunk.sourceElementIds || [],
+      metadata: chunk.metadata || {},
       createdAt,
     }));
     if (settings.vectorStoreProvider === "chroma") {
@@ -209,6 +246,18 @@ export async function POST(request, { params }) {
       supabaseBucket: resolvedSettings.vectorStoreProvider === "supabase" ? resolvedSettings.supabaseBucket : null,
       supabaseChunksTable: resolvedSettings.vectorStoreProvider === "supabase" ? resolvedSettings.supabaseChunksTable : null,
       supabaseMatchFunction: resolvedSettings.vectorStoreProvider === "supabase" ? resolvedSettings.supabaseMatchFunction : null,
+      advancedRagEnabled: Boolean(settings.advancedRagEnabled),
+      extractionEngine: advancedResult?.engine || "javascript",
+      structuredElementCount: advancedResult?.elements?.length || 0,
+      graphRagEnabled: Boolean(settings.graphRagEnabled),
+      graphEntityCount: advancedResult?.graph?.entities?.length || 0,
+      graphRelationshipCount: advancedResult?.graph?.relationships?.length || 0,
+      graphCommunityCount: advancedResult?.graph?.communities?.length || 0,
+      graphNeo4j: advancedResult?.graph?.neo4j || null,
+      piiDetectionEnabled: Boolean(settings.piiDetectionEnabled),
+      piiRisk: advancedResult?.guardrails?.risk || null,
+      piiFindingCount: advancedResult?.guardrails?.findings?.length || 0,
+      documentStructure: advancedResult?.document?.structure || null,
       reindexedAt: createdAt,
     };
     const nextStore = {

@@ -2744,6 +2744,17 @@ button:disabled {
   background: color-mix(in srgb, var(--accent) 16%, var(--composer));
 }
 
+.rag-toggle-stack {
+  display: grid;
+  gap: 10px;
+  margin: 12px 0 14px;
+}
+
+.rag-toggle-stack .doc-mode-button {
+  justify-content: flex-start;
+  width: 100%;
+}
+
 .documents-content {
   display: grid;
   grid-template-columns: 300px 1fr;

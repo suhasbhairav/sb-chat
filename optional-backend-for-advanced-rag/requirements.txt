@@ -1,0 +1,16 @@
+fastapi==0.115.6
+uvicorn[standard]==0.34.0
+gunicorn==23.0.0
+python-multipart==0.0.20
+pydantic==2.10.4
+unstructured[all-docs]==0.16.11
+neo4j==5.27.0
+networkx==3.4.2
+python-louvain==0.16
+gliner==0.2.15
+transformers==4.48.0
+torch==2.5.1
+spacy==3.8.3
+langdetect==1.0.9
+detect-secrets==1.5.0
+regex==2024.11.6

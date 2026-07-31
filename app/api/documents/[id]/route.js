@@ -5,6 +5,7 @@ import { deletePineconeDocument } from "@/lib/rag-pinecone";
 import { deleteQdrantDocument } from "@/lib/rag-qdrant";
 import { deleteSupabaseDocument } from "@/lib/rag-supabase";
 import { deleteDocument, readDocumentStore, summarizeDocuments } from "@/lib/rag-store";
+import { deleteAdvancedGraphDocument, isAdvancedPythonBackendEnabled } from "@/lib/advanced-python-backend";
 import { recordAuditEvent } from "@/lib/compliance-store";
 import { withProductDataScope } from "@/lib/product-data-store";
 import { resolveDocumentProductDataScope } from "@/lib/workspace-access";
@@ -49,6 +50,9 @@ export async function DELETE(request, { params }) {
       supabaseChunksTable: document?.supabaseChunksTable || currentStore.settings.supabaseChunksTable,
       supabaseMatchFunction: document?.supabaseMatchFunction || currentStore.settings.supabaseMatchFunction,
     }).catch(() => {});
+  }
+  if (document?.graphRagEnabled && isAdvancedPythonBackendEnabled(currentStore.settings)) {
+    await deleteAdvancedGraphDocument(id).catch(() => {});
   }
 
   const store = await withProductDataScope(scope, () => deleteDocument(id));

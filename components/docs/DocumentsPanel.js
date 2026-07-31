@@ -21,6 +21,11 @@ const DEFAULT_DOCUMENT_SETTINGS = {
   supabaseBucket: "batuk-documents",
   supabaseChunksTable: "batuk_document_chunks",
   supabaseMatchFunction: "match_batuk_document_chunks",
+  advancedRagEnabled: false,
+  advancedExtractionStrategy: "hi_res",
+  advancedExtractionLanguages: "eng",
+  graphRagEnabled: false,
+  piiDetectionEnabled: false,
   chunkSize: 1800,
   chunkOverlap: 220,
   topK: 6,
@@ -228,6 +233,65 @@ export function DocumentsPanel({ apiKey, documentChatEnabled, openAIBaseUrl, sel
             </select>
             {needsOpenAIEmbeddingKey(settings.embeddingProvider) && (
               <p className="settings-hint">{t("documents.embeddingOpenAIKeyHint")}</p>
+            )}
+
+            <div className="setting-title rag-subtitle">
+              <h3>{t("documents.advancedRag")}</h3>
+              <p>{t("documents.advancedRagCopy")}</p>
+            </div>
+
+            <div className="rag-toggle-stack">
+              <button
+                className={`doc-mode-button ${settings.advancedRagEnabled ? "active" : ""}`}
+                onClick={() => saveSettings({ ...settings, advancedRagEnabled: !settings.advancedRagEnabled })}
+                type="button"
+              >
+                <FileText size={17} />
+                {settings.advancedRagEnabled ? t("documents.advancedRagOn") : t("documents.advancedRagOff")}
+              </button>
+              <button
+                className={`doc-mode-button ${settings.graphRagEnabled ? "active" : ""}`}
+                onClick={() => saveSettings({ ...settings, graphRagEnabled: !settings.graphRagEnabled, advancedRagEnabled: settings.graphRagEnabled ? settings.advancedRagEnabled : true })}
+                type="button"
+              >
+                <SparklesIcon />
+                {settings.graphRagEnabled ? t("documents.graphRagOn") : t("documents.graphRagOff")}
+              </button>
+              <button
+                className={`doc-mode-button ${settings.piiDetectionEnabled ? "active" : ""}`}
+                onClick={() => saveSettings({ ...settings, piiDetectionEnabled: !settings.piiDetectionEnabled, advancedRagEnabled: settings.piiDetectionEnabled ? settings.advancedRagEnabled : true })}
+                type="button"
+              >
+                <Search size={17} />
+                {settings.piiDetectionEnabled ? t("documents.piiOn") : t("documents.piiOff")}
+              </button>
+            </div>
+
+            {settings.advancedRagEnabled && (
+              <>
+                <label className="field-label" htmlFor="advancedExtractionStrategy">{t("documents.advancedExtractionStrategy")}</label>
+                <select
+                  id="advancedExtractionStrategy"
+                  className="field select-field"
+                  onChange={(event) => saveSettings({ ...settings, advancedExtractionStrategy: event.target.value })}
+                  value={settings.advancedExtractionStrategy || "hi_res"}
+                >
+                  <option value="hi_res">hi_res</option>
+                  <option value="ocr_only">ocr_only</option>
+                  <option value="fast">fast</option>
+                  <option value="auto">auto</option>
+                </select>
+
+                <label className="field-label" htmlFor="advancedExtractionLanguages">{t("documents.advancedExtractionLanguages")}</label>
+                <input
+                  id="advancedExtractionLanguages"
+                  className="field"
+                  onChange={(event) => saveSettings({ ...settings, advancedExtractionLanguages: event.target.value })}
+                  placeholder="eng,deu"
+                  value={settings.advancedExtractionLanguages || "eng"}
+                />
+                <p className="settings-hint">{t("documents.advancedRagHint")}</p>
+              </>
             )}
 
             <label className="field-label" htmlFor="embeddingModel">{t("documents.embeddingModel")}</label>
@@ -468,6 +532,9 @@ export function DocumentsPanel({ apiKey, documentChatEnabled, openAIBaseUrl, sel
                         <span>
                           {formatBytes(document.size, locale)} · {document.chunkCount || 0} {t("documents.chunks")} · {document.embeddingProvider}
                           {" "}· {document.vectorStoreProvider || settings.vectorStoreProvider || "json"}
+                          {document.extractionEngine ? ` · ${document.extractionEngine}` : ""}
+                          {document.graphRagEnabled ? ` · graph ${document.graphEntityCount || 0}/${document.graphRelationshipCount || 0}` : ""}
+                          {document.piiDetectionEnabled ? ` · PII ${document.piiRisk || "scanned"}` : ""}
                           {document.status === "failed" ? ` · ${document.error}` : ""}
                         </span>
                       </div>
@@ -493,5 +560,14 @@ export function DocumentsPanel({ apiKey, documentChatEnabled, openAIBaseUrl, sel
         </div>
       </section>
     </div>
+  );
+}
+
+function SparklesIcon() {
+  return (
+    <svg aria-hidden="true" fill="none" height="17" viewBox="0 0 24 24" width="17">
+      <path d="M12 3l1.6 5.1L19 10l-5.4 1.9L12 17l-1.6-5.1L5 10l5.4-1.9L12 3z" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" />
+      <path d="M19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8L19 15z" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" />
+    </svg>
   );
 }

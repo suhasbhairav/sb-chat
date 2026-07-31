@@ -419,6 +419,96 @@ docker compose --profile ollama up --build
 
 The Ollama profile starts an `ollama/ollama` container, stores models in the `batuk_ollama` Docker volume, and runs a one-shot pull job for `OLLAMA_DEFAULT_MODEL`. The default is `gemma3:1b` so a direct Docker user gets a small local model without extra setup. To use another model, set `OLLAMA_DEFAULT_MODEL=llama3.2:1b` or another Ollama tag before starting Compose. Keep `OLLAMA_BASE_URL=http://ollama:11434` for Compose-managed Ollama; use `http://host.docker.internal:11434` only when Batuk should connect to an Ollama server running on the host machine.
 
+### Optional Python backend for Advanced RAG, Graph RAG, and local ML guardrails
+
+Batuk can run without Python. For teams that need more serious document intelligence, enable the optional FastAPI backend in `optional-backend-for-advanced-rag`. The service is private to the Docker network by default: the browser talks to Next.js, and Next.js calls FastAPI with `BATUK_PYTHON_INTERNAL_SECRET`.
+
+Enable it with:
+
+```bash
+docker compose --profile advanced-rag up --build
+```
+
+Enable local Neo4j graph persistence as well:
+
+```bash
+docker compose --profile advanced-rag --profile neo4j up --build
+```
+
+Advanced RAG adds:
+
+- Unstructured-powered extraction for complex PDFs, tables, scanned documents, multi-column reports, headers, footers, page-level citations, figures, financial documents, and scientific documents.
+- Structure-preserving document output: document, page, section, paragraph, table, figure, and metadata elements.
+- Graph RAG ingestion: full-document LLM extraction when an OpenAI-compatible graph extraction endpoint is configured, local heuristic extraction as a fallback, entity extraction, relationship extraction, duplicate entity canonicalization, graph construction, community detection, visualization data, and optional Neo4j node/edge writes.
+- Local guardrails: GLiNER-backed PII detection when the model is available, secret pattern detection, language identification, sensitivity classification, and DLP-style findings.
+
+Use the Documents panel to enable **Advanced RAG**, **Graph RAG**, and **PII scan** before uploading. Existing vector storage still applies: Batuk embeds the advanced chunks and stores them in local JSON, ChromaDB, Pinecone, Qdrant Cloud, or Supabase according to the selected settings.
+
+The advanced pipeline preserves more than plain text. A processed document can carry:
+
+```text
+Document
+├── Page
+├── Section / title
+├── Paragraph
+├── Table
+├── Figure / image-like element
+├── Chunk with pageStart/pageEnd and sourceElementIds
+├── PII / sensitivity findings
+└── Graph evidence
+    ├── Entities
+    ├── Relationships
+    ├── Communities
+    └── Neo4j document/entity links
+```
+
+| Advanced capability | What Batuk does |
+| --- | --- |
+| Complex PDF extraction | Uses Unstructured with configurable strategies such as `hi_res`, `ocr_only`, `fast`, and `auto`. |
+| Page-level citations | Advanced chunks retain page and element metadata; chat sources cite pages when available instead of only chunk numbers. |
+| Tables and multi-column reports | Extraction keeps table-like and section-like elements so retrieval has better source context. |
+| Graph RAG | Batuk can create entities, relationships, communities, graph visualization data, and optional Neo4j persistence during upload or reindex. |
+| LLM graph extraction | Set `BATUK_GRAPH_RAG_LLM_ENDPOINT`, `BATUK_GRAPH_RAG_LLM_API_KEY`, and `BATUK_GRAPH_RAG_LLM_MODEL` to use a selected OpenAI-compatible model for graph extraction over the full extracted text. |
+| Local ML guardrails | GLiNER can scan documents for PII; regex-based secret detection, language detection, and sensitivity classification are included. |
+| Deletion cleanup | Deleting a document removes normal chunks/vectors and also asks the Python backend to delete its Neo4j document graph when Graph RAG was enabled. |
+
+To run the Python backend separately from Docker:
+
+```bash
+cd optional-backend-for-advanced-rag
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+uvicorn app.main:app --host 0.0.0.0 --port 8000
+```
+
+Then point the Next.js app at it:
+
+```env
+BATUK_ADVANCED_RAG_ENABLED=true
+BATUK_PYTHON_API_URL=http://localhost:8000
+BATUK_PYTHON_INTERNAL_SECRET=change_me
+```
+
+For separate Neo4j:
+
+```env
+NEO4J_URI=neo4j://localhost:7687
+NEO4J_USERNAME=neo4j
+NEO4J_PASSWORD=change_me
+NEO4J_DATABASE=neo4j
+```
+
+For LLM-based Graph RAG extraction:
+
+```env
+BATUK_GRAPH_RAG_LLM_ENDPOINT=https://api.openai.com/v1
+BATUK_GRAPH_RAG_LLM_API_KEY=
+BATUK_GRAPH_RAG_LLM_MODEL=gpt-4o-mini
+```
+
+When running FastAPI separately, keep it on the same machine or make sure it can read the same uploaded document paths as the Next.js process. In Docker Compose this is handled by mounting the shared `batuk_data` volume into both containers.
+
 Container startup validates the enterprise environment, runs Better Auth migrations when applicable, runs product-data migrations when SQL product storage is enabled, and starts the Next.js server.
 
 For fully offline installs, mirror the base images and service images used by `docker-compose.yml` into the enterprise registry. Pinecone support is included, but Pinecone itself requires approved network/private-connectivity access.
@@ -444,7 +534,8 @@ The README includes one-click buttons for Render and Railway.
 Batuk can be configured from the UI for local evaluation and from environment files for repeatable enterprise deployment. The focused README intentionally avoids long credential blocks; use these files as the source of truth:
 
 - `.env.enterprise.example` for deployment settings, identity integrations, SQL stores, vector stores, file paths, and startup behavior.
-- `docker-compose.yml` for profile-based PostgreSQL, MySQL, and ChromaDB deployment.
+- `docker-compose.yml` for profile-based PostgreSQL, MySQL, ChromaDB, Ollama, Advanced RAG FastAPI, and Neo4j deployment.
+- `optional-backend-for-advanced-rag/README.md` for running the Python backend separately or as a Docker profile.
 - `database/*/001_enterprise_data.sql` for product data schema initialization.
 
 For Grok text and voice chat, set `XAI_API_KEY` in the server environment or paste an xAI key into Settings during local evaluation. Select provider `Grok`, leave Realtime model on `Auto` to use `grok-voice-latest`, then click the microphone button in the composer or Settings. Batuk exchanges the server key for a short-lived xAI realtime client secret before the browser opens the Grok Voice WebSocket.

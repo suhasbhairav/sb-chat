@@ -9,6 +9,9 @@ services:
       - ${BATUK_ENV_FILE:-.env.enterprise}
     environment:
       OLLAMA_BASE_URL: ${OLLAMA_BASE_URL:-http://ollama:11434}
+      BATUK_ADVANCED_RAG_ENABLED: ${BATUK_ADVANCED_RAG_ENABLED:-false}
+      BATUK_PYTHON_API_URL: ${BATUK_PYTHON_API_URL:-http://advanced-rag:8000}
+      BATUK_PYTHON_INTERNAL_SECRET: ${BATUK_PYTHON_INTERNAL_SECRET:-change_me}
     ports:
       - "${BATUK_HTTP_PORT:-3000}:3000"
     volumes:
@@ -27,6 +30,56 @@ services:
       ollama:
         condition: service_started
         required: false
+      advanced-rag:
+        condition: service_started
+        required: false
+
+  advanced-rag:
+    build:
+      context: ./optional-backend-for-advanced-rag
+      dockerfile: Dockerfile
+    image: batuk/advanced-rag-python:enterprise
+    profiles: ["advanced-rag"]
+    restart: unless-stopped
+    environment:
+      BATUK_PYTHON_INTERNAL_SECRET: ${BATUK_PYTHON_INTERNAL_SECRET:-change_me}
+      BATUK_GLINER_MODEL: ${BATUK_GLINER_MODEL:-urchade/gliner_multi_pii-v1}
+      NEO4J_URI: ${NEO4J_URI:-}
+      NEO4J_USERNAME: ${NEO4J_USERNAME:-neo4j}
+      NEO4J_PASSWORD: ${NEO4J_PASSWORD:-}
+      NEO4J_DATABASE: ${NEO4J_DATABASE:-neo4j}
+      BATUK_GRAPH_RAG_LLM_ENDPOINT: ${BATUK_GRAPH_RAG_LLM_ENDPOINT:-}
+      BATUK_GRAPH_RAG_LLM_API_KEY: ${BATUK_GRAPH_RAG_LLM_API_KEY:-}
+      BATUK_GRAPH_RAG_LLM_MODEL: ${BATUK_GRAPH_RAG_LLM_MODEL:-}
+    ports:
+      - "${BATUK_ADVANCED_RAG_PORT:-8001}:8000"
+    volumes:
+      - batuk_data:/app/data
+      - batuk_hf_models:/models/huggingface
+    depends_on:
+      neo4j:
+        condition: service_healthy
+        required: false
+
+  neo4j:
+    image: neo4j:5-community
+    profiles: ["neo4j"]
+    restart: unless-stopped
+    environment:
+      NEO4J_AUTH: ${NEO4J_AUTH:-neo4j/change_me}
+      NEO4J_dbms_security_procedures_unrestricted: gds.*,apoc.*
+      NEO4J_dbms_security_procedures_allowlist: gds.*,apoc.*
+    ports:
+      - "${BATUK_NEO4J_HTTP_PORT:-7474}:7474"
+      - "${BATUK_NEO4J_BOLT_PORT:-7687}:7687"
+    volumes:
+      - batuk_neo4j_data:/data
+      - batuk_neo4j_logs:/logs
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:7474 >/dev/null 2>&1 || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 30
 
   postgres:
     image: postgres:16-bookworm
@@ -109,3 +162,6 @@ volumes:
   batuk_mysql:
   batuk_chroma:
   batuk_ollama:
+  batuk_hf_models:
+  batuk_neo4j_data:
+  batuk_neo4j_logs:
