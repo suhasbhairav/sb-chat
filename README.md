@@ -285,6 +285,7 @@ Batuk is designed like an enterprise model control plane: admins decide which mo
 | --- | --- | --- | --- |
 | [Ollama](https://ollama.com/) | `http://localhost:11434` | `llama3.1` | Local/private inference through Ollama's chat API. |
 | [OpenAI](https://platform.openai.com/docs) | `https://api.openai.com/v1` | `gpt-5.1-mini` | Chat completions, hosted web search, embeddings, and realtime voice. |
+| [AWS Bedrock](https://aws.amazon.com/bedrock/model-choice/) | `us-east-1` | `amazon.nova-lite-v1:0` | Converse API access to Bedrock model choice across Amazon, Anthropic, DeepSeek, Meta, Mistral, OpenAI, Qwen, and other providers using AWS IAM credentials. |
 | [OpenRouter](https://openrouter.ai/) | `https://openrouter.ai/api/v1` | `openai/gpt-4o-mini` | Routed access to many model families through an OpenAI-compatible API. |
 | [Claude](https://docs.anthropic.com/) | `https://api.anthropic.com/v1` | `claude-sonnet-5` | Anthropic Messages API with streaming and usage reporting. |
 | [Grok](https://docs.x.ai/) | `https://api.x.ai/v1` | `grok-4.5` | xAI Responses API plus Grok Voice realtime speech-to-speech. |
@@ -305,6 +306,7 @@ The in-app chat UI and Batuk API gateway share the same provider registry. Admin
 | --- | --- | --- |
 | `ollama` | none | `provider=ollama`, `baseUrl=http://localhost:11434`, `model=qwen3:8b` |
 | `openai` | `OPENAI_API_KEY` | `provider=openai`, `baseUrl=https://api.openai.com/v1`, `model=gpt-5.1-mini` |
+| `bedrock` | AWS credentials plus `AWS_BEDROCK_REGION` or `AWS_REGION` | `provider=bedrock`, `baseUrl=us-east-1`, `model=amazon.nova-lite-v1:0` |
 | `openrouter` | `OPENROUTER_API_KEY` | `provider=openrouter`, `baseUrl=https://openrouter.ai/api/v1`, `model=openai/gpt-4o-mini` |
 | `together` | `TOGETHER_API_KEY` | `provider=together`, `baseUrl=https://api.together.ai/v1`, `model=MiniMaxAI/MiniMax-M3` |
 | `mistral` | `MISTRAL_API_KEY` | `provider=mistral`, `baseUrl=https://api.mistral.ai/v1`, `model=mistral-large-latest` |

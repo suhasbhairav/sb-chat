@@ -185,6 +185,16 @@ function validateEmbeddings() {
   }
 }
 
+function validateBedrock() {
+  const enabled =
+    normalizeProvider(process.env.BATUK_DEFAULT_MODEL_PROVIDER, "") === "bedrock" ||
+    normalizeProvider(process.env.BATUK_MODEL_PROVIDER, "") === "bedrock" ||
+    normalizeProvider(process.env.BATUK_ENABLE_BEDROCK, "false") === "true";
+  if (!enabled) return;
+
+  requireAny(["AWS_BEDROCK_REGION", "AWS_REGION", "AWS_DEFAULT_REGION"], "AWS Bedrock needs AWS_BEDROCK_REGION or AWS_REGION.");
+}
+
 await loadEnvFile(process.env.BATUK_ENV_FILE);
 await loadEnvFile(".env.enterprise");
 await loadEnvFile(".env");
@@ -198,6 +208,7 @@ validateProductDataStore();
 validateRagStorage();
 validateModelQueue();
 validateEmbeddings();
+validateBedrock();
 validateSecurity();
 
 console.log("Enterprise environment configuration is valid.");
