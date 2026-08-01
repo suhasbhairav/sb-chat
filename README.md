@@ -111,6 +111,7 @@ Batuk is local-first by default and enterprise-ready when you need it. Run it on
 - Admins can expose Kimi models through the same OpenAI-compatible gateway by creating a route with provider `kimi`, base URL `https://api.moonshot.ai/v1`, and a model such as `kimi-k3`.
 - Admins can expose DeepSeek models through the same OpenAI-compatible gateway by creating a route with provider `deepseek`, base URL `https://api.deepseek.com`, and a model such as `deepseek-v4-pro`. Batuk sends DeepSeek thinking mode as `{"thinking":{"type":"enabled"}}` with `reasoning_effort: "high"`.
 - Admins can expose Qwen models through the same OpenAI-compatible gateway by creating a route with provider `qwen`, base URL `https://dashscope-intl.aliyuncs.com/compatible-mode/v1`, and a model such as `qwen3.7-max`. Batuk sends `enable_thinking: true` for Qwen requests.
+- Admins can expose EdenAI models through the same OpenAI-compatible gateway by creating a route with provider `edenai`, base URL `https://api.edenai.run/v3`, and a model such as `openai/gpt-4`.
 - Admins can expose Perplexity Sonar chat models with provider `perplexity`, base URL `https://api.perplexity.ai`, and models such as `sonar-pro`.
 - Raw API keys are never stored. Batuk stores a SHA-256 hash, short preview, owner metadata, status, created/revoked timestamps, and last-used timestamp.
 - API Access is visible to all signed-in users. Workspace Management, Enterprise Management, and Audit and Compliance are admin-only menu entries.
@@ -130,7 +131,7 @@ curl -X POST http://localhost:3000/api/v1/search \
   -d '{"query":["What is Comet Browser?","Perplexity AI","Perplexity Changelog"]}'
 ```
 
-- Server-side provider keys are read from environment variables including `OPENAI_API_KEY`, `OPENROUTER_API_KEY`, `TOGETHER_API_KEY`, `MISTRAL_API_KEY`, `MOONSHOT_API_KEY`, `KIMI_API_KEY`, `DEEPSEEK_API_KEY`, `DASHSCOPE_API_KEY`, `QWEN_API_KEY`, `PERPLEXITY_API_KEY`, `ANTHROPIC_API_KEY`, `XAI_API_KEY`, and `SARVAM_API_KEY`.
+- Server-side provider keys are read from environment variables including `OPENAI_API_KEY`, `OPENROUTER_API_KEY`, `TOGETHER_API_KEY`, `MISTRAL_API_KEY`, `MOONSHOT_API_KEY`, `KIMI_API_KEY`, `DEEPSEEK_API_KEY`, `DASHSCOPE_API_KEY`, `QWEN_API_KEY`, `EDENAI_API_KEY`, `PERPLEXITY_API_KEY`, `ANTHROPIC_API_KEY`, `XAI_API_KEY`, and `SARVAM_API_KEY`.
 - Chat UI model calls pass through an in-process request queue before hitting upstream providers. Tune `BATUK_MODEL_QUEUE_CONCURRENCY`, `BATUK_MODEL_QUEUE_RATE_LIMIT_RETRIES`, `BATUK_MODEL_QUEUE_RATE_LIMIT_BASE_DELAY_MS`, and `BATUK_MODEL_QUEUE_RATE_LIMIT_MAX_DELAY_MS` to match your model gateway or provider limits.
 - The API gateway records token usage with `source: "api"` for chat completions and `source: "api-search"` for Perplexity Search, including API key ID, user ID/email, provider, and public model ID so chat, API, and search usage can be separated in reporting.
 - The gateway has been smoke tested end-to-end against local Ollama `qwen3:8b` through `POST /api/v1/chat/completions`.
@@ -295,6 +296,7 @@ Batuk is designed like an enterprise model control plane: admins decide which mo
 | [Kimi](https://platform.kimi.ai/docs/overview) | `https://api.moonshot.ai/v1` | `kimi-k3` | Moonshot AI's OpenAI-compatible Kimi API. |
 | [DeepSeek](https://api-docs.deepseek.com/) | `https://api.deepseek.com` | `deepseek-v4-pro` | OpenAI-compatible chat completions with `thinking` enabled and `reasoning_effort: "high"`. |
 | [Qwen](https://qwen.ai/apiplatform) | `https://dashscope-intl.aliyuncs.com/compatible-mode/v1` | `qwen3.7-max` | DashScope OpenAI-compatible mode with `enable_thinking: true`. |
+| [EdenAI](https://www.edenai.co/docs/v3/quickstart/first-llm-call) | `https://api.edenai.run/v3` | `openai/gpt-4` | EdenAI unified chat completions across supported model providers. |
 | [Perplexity](https://docs.perplexity.ai/) | `https://api.perplexity.ai` | `sonar-pro` | Sonar chat completions plus Batuk API access to Perplexity Search. |
 | [OpenAI-compatible](https://platform.openai.com/docs/api-reference/chat) | `http://localhost:1234/v1` | `local-model` | [LM Studio](https://lmstudio.ai/), [vLLM](https://docs.vllm.ai/), [llama.cpp](https://github.com/ggml-org/llama.cpp), [LiteLLM](https://docs.litellm.ai/), [LocalAI](https://localai.io/), private gateways, or internal model routers. |
 
@@ -313,6 +315,7 @@ The in-app chat UI and Batuk API gateway share the same provider registry. Admin
 | `kimi` | `MOONSHOT_API_KEY` or `KIMI_API_KEY` | `provider=kimi`, `baseUrl=https://api.moonshot.ai/v1`, `model=kimi-k3` |
 | `deepseek` | `DEEPSEEK_API_KEY` | `provider=deepseek`, `baseUrl=https://api.deepseek.com`, `model=deepseek-v4-pro` |
 | `qwen` | `DASHSCOPE_API_KEY` or `QWEN_API_KEY` | `provider=qwen`, `baseUrl=https://dashscope-intl.aliyuncs.com/compatible-mode/v1`, `model=qwen3.7-max` |
+| `edenai` | `EDENAI_API_KEY` or `EDEN_AI_API_KEY` | `provider=edenai`, `baseUrl=https://api.edenai.run/v3`, `model=openai/gpt-4` |
 | `perplexity` | `PERPLEXITY_API_KEY` | `provider=perplexity`, `baseUrl=https://api.perplexity.ai`, `model=sonar-pro` |
 | `anthropic` | `ANTHROPIC_API_KEY` | `provider=anthropic`, `baseUrl=https://api.anthropic.com/v1`, `model=claude-sonnet-5` |
 | `xai` | `XAI_API_KEY` | `provider=xai`, `baseUrl=https://api.x.ai/v1`, `model=grok-4.5` |

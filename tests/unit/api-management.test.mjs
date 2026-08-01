@@ -385,6 +385,81 @@ describe("API management", () => {
     }
   });
 
+  it("supports EdenAI as an OpenAI-compatible admin route", async () => {
+    const keyResult = await createUserApiKey({
+      userId: "user-edenai",
+      userEmail: "user-edenai@example.com",
+      name: "EdenAI client",
+    });
+    const routedStore = await upsertModelRoute({
+      id: "batuk/edenai-gpt-4",
+      label: "EdenAI GPT-4",
+      provider: "edenai",
+      model: "openai/gpt-4",
+      baseUrl: "https://api.edenai.run/v3",
+      enabled: true,
+    });
+
+    const calls = [];
+    const response = await handleChatCompletionRequest({
+      authorization: `Bearer ${keyResult.key.secret}`,
+      payload: {
+        model: "batuk/edenai-gpt-4",
+        messages: [{ role: "user", content: "Hello!" }],
+      },
+      authenticateApiKey,
+      readApiManagementStore: async () => routedStore,
+      resolveServerApiKey: (provider) => provider === "edenai" ? "edenai-secret" : "",
+      callModel: async (request) => {
+        calls.push(request);
+        return {
+          message: "Hello from EdenAI.",
+          usage: { inputTokens: 3, outputTokens: 4, totalTokens: 7 },
+        };
+      },
+      recordTokenUsage: async () => {},
+    });
+
+    assert.equal(response.status, 200);
+    assert.equal(response.body.choices[0].message.content, "Hello from EdenAI.");
+    assert.equal(calls[0].provider, "edenai");
+    assert.equal(calls[0].apiKey, "edenai-secret");
+    assert.equal(calls[0].baseUrl, "https://api.edenai.run/v3");
+    assert.equal(calls[0].model, "openai/gpt-4");
+  });
+
+  it("calls EdenAI v3 chat completions with Bearer auth", async () => {
+    const originalFetch = globalThis.fetch;
+    const requests = [];
+    globalThis.fetch = async (url, options) => {
+      requests.push({ url, options });
+      return Response.json({
+        choices: [{ message: { content: "EdenAI response." } }],
+        usage: { prompt_tokens: 2, completion_tokens: 3, total_tokens: 5 },
+      });
+    };
+
+    try {
+      const response = await callModel({
+        provider: "edenai",
+        baseUrl: "https://api.edenai.run/v3",
+        apiKey: "edenai-secret",
+        model: "openai/gpt-4",
+        temperature: 0.7,
+        messages: [{ role: "user", content: "Hello!" }],
+      });
+
+      const body = JSON.parse(requests[0].options.body);
+      assert.equal(requests[0].url, "https://api.edenai.run/v3/chat/completions");
+      assert.equal(requests[0].options.headers.Authorization, "Bearer edenai-secret");
+      assert.equal(body.model, "openai/gpt-4");
+      assert.deepEqual(body.messages, [{ role: "user", content: "Hello!" }]);
+      assert.equal(response.message, "EdenAI response.");
+    } finally {
+      globalThis.fetch = originalFetch;
+    }
+  });
+
   it("exposes Perplexity Search through Batuk API keys and records search usage", async () => {
     const keyResult = await createUserApiKey({
       userId: "user-d",
