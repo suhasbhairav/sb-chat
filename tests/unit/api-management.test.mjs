@@ -460,6 +460,81 @@ describe("API management", () => {
     }
   });
 
+  it("supports DeepInfra as an OpenAI-compatible admin route", async () => {
+    const keyResult = await createUserApiKey({
+      userId: "user-deepinfra",
+      userEmail: "user-deepinfra@example.com",
+      name: "DeepInfra client",
+    });
+    const routedStore = await upsertModelRoute({
+      id: "batuk/deepinfra-deepseek-v3",
+      label: "DeepInfra DeepSeek V3",
+      provider: "deepinfra",
+      model: "deepseek-ai/DeepSeek-V3",
+      baseUrl: "https://api.deepinfra.com/v1/openai",
+      enabled: true,
+    });
+
+    const calls = [];
+    const response = await handleChatCompletionRequest({
+      authorization: `Bearer ${keyResult.key.secret}`,
+      payload: {
+        model: "batuk/deepinfra-deepseek-v3",
+        messages: [{ role: "user", content: "Hello!" }],
+      },
+      authenticateApiKey,
+      readApiManagementStore: async () => routedStore,
+      resolveServerApiKey: (provider) => provider === "deepinfra" ? "deepinfra-secret" : "",
+      callModel: async (request) => {
+        calls.push(request);
+        return {
+          message: "Hello from DeepInfra.",
+          usage: { inputTokens: 3, outputTokens: 4, totalTokens: 7 },
+        };
+      },
+      recordTokenUsage: async () => {},
+    });
+
+    assert.equal(response.status, 200);
+    assert.equal(response.body.choices[0].message.content, "Hello from DeepInfra.");
+    assert.equal(calls[0].provider, "deepinfra");
+    assert.equal(calls[0].apiKey, "deepinfra-secret");
+    assert.equal(calls[0].baseUrl, "https://api.deepinfra.com/v1/openai");
+    assert.equal(calls[0].model, "deepseek-ai/DeepSeek-V3");
+  });
+
+  it("calls DeepInfra OpenAI-compatible chat completions with Bearer auth", async () => {
+    const originalFetch = globalThis.fetch;
+    const requests = [];
+    globalThis.fetch = async (url, options) => {
+      requests.push({ url, options });
+      return Response.json({
+        choices: [{ message: { content: "DeepInfra response." } }],
+        usage: { prompt_tokens: 2, completion_tokens: 3, total_tokens: 5 },
+      });
+    };
+
+    try {
+      const response = await callModel({
+        provider: "deepinfra",
+        baseUrl: "https://api.deepinfra.com/v1/openai",
+        apiKey: "deepinfra-secret",
+        model: "deepseek-ai/DeepSeek-V3",
+        temperature: 0.7,
+        messages: [{ role: "user", content: "Hello!" }],
+      });
+
+      const body = JSON.parse(requests[0].options.body);
+      assert.equal(requests[0].url, "https://api.deepinfra.com/v1/openai/chat/completions");
+      assert.equal(requests[0].options.headers.Authorization, "Bearer deepinfra-secret");
+      assert.equal(body.model, "deepseek-ai/DeepSeek-V3");
+      assert.deepEqual(body.messages, [{ role: "user", content: "Hello!" }]);
+      assert.equal(response.message, "DeepInfra response.");
+    } finally {
+      globalThis.fetch = originalFetch;
+    }
+  });
+
   it("exposes Perplexity Search through Batuk API keys and records search usage", async () => {
     const keyResult = await createUserApiKey({
       userId: "user-d",
