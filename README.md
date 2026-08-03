@@ -9,6 +9,13 @@
 </p>
 
 <p align="center">
+  <a href="./README.md"><strong>English</strong></a> ·
+  <a href="./README-zh.md"><strong>中文</strong></a> ·
+  <a href="./README-de.md"><strong>Deutsch</strong></a> ·
+  <a href="./README-jp.md"><strong>日本語</strong></a>
+</p>
+
+<p align="center">
   <img src="public/homepage.png" alt="Batuk sovereign AI chat workspace and self-hosted AI platform" width="100%" />
 </p>
 
@@ -90,7 +97,9 @@ Batuk turns internal documents into scoped AI context. Personal files stay perso
 
 - Upload PDF, TXT, Markdown, JSON, LOG, CSV, XLS, XLSX, and DOCX files.
 - Extract text, chunk content, generate embeddings, and retrieve relevant context during chat.
-- Use local deterministic embeddings for private offline indexing or hosted embeddings for higher-quality semantic retrieval.
+- Use local deterministic embeddings, direct Ollama `/api/embed` embeddings, LlamaIndex Ollama embeddings, or hosted OpenAI embeddings for semantic retrieval.
+- Ollama RAG supports any pulled embedding model, including `embeddinggemma`, `qwen3-embedding`, `all-minilm`, `nomic-embed-text`, `mxbai-embed-large`, and custom Ollama embedding models.
+- Batuk detects vector dimensions from each embedding response instead of forcing one size; Ollama model dimensions vary, OpenAI `text-embedding-3-small` defaults to 1536, `text-embedding-3-large` can be 3072, and local deterministic embeddings use 384.
 - Store vectors in local JSON, ChromaDB, Pinecone, Qdrant Cloud, or Supabase Postgres/pgvector.
 - Preserve organization, user, and workspace metadata on chunks and vectors.
 - Reindex, download, and delete documents from the Documents workspace.

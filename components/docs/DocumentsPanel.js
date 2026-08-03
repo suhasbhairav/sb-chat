@@ -7,6 +7,7 @@ import { useI18n } from "@/components/i18n/I18nProvider";
 const DEFAULT_DOCUMENT_SETTINGS = {
   embeddingProvider: "local",
   embeddingModel: "local-hash-v1",
+  ollamaBaseUrl: "http://localhost:11434",
   vectorStoreProvider: "json",
   chromaUrl: "http://localhost:8000",
   chromaCollection: "sb_chat_documents",
@@ -33,6 +34,7 @@ const DEFAULT_DOCUMENT_SETTINGS = {
 
 function defaultEmbeddingModel(provider) {
   if (provider === "openai") return "text-embedding-3-small";
+  if (provider === "ollama") return "embeddinggemma";
   if (provider === "llamaindex-openai") return "text-embedding-ada-002";
   if (provider === "llamaindex-ollama") return "nomic-embed-text";
   return "local-hash-v1";
@@ -228,6 +230,7 @@ export function DocumentsPanel({ apiKey, documentChatEnabled, openAIBaseUrl, sel
             >
               <option value="local">{t("documents.localEmbeddings")}</option>
               <option value="openai">{t("documents.openAIEmbeddings")}</option>
+              <option value="ollama">{t("documents.ollamaEmbeddings")}</option>
               <option value="llamaindex-openai">{t("documents.llamaIndexOpenAIEmbeddings")}</option>
               <option value="llamaindex-ollama">{t("documents.llamaIndexOllamaEmbeddings")}</option>
             </select>
@@ -302,6 +305,19 @@ export function DocumentsPanel({ apiKey, documentChatEnabled, openAIBaseUrl, sel
               onChange={(event) => saveSettings({ ...settings, embeddingModel: event.target.value })}
               value={settings.embeddingModel}
             />
+            {["ollama", "llamaindex-ollama"].includes(settings.embeddingProvider) && (
+              <>
+                <label className="field-label" htmlFor="ollamaBaseUrl">{t("documents.ollamaBaseUrl")}</label>
+                <input
+                  id="ollamaBaseUrl"
+                  className="field"
+                  onChange={(event) => saveSettings({ ...settings, ollamaBaseUrl: event.target.value })}
+                  placeholder="http://localhost:11434"
+                  value={settings.ollamaBaseUrl || ""}
+                />
+                <p className="settings-hint">{t("documents.ollamaEmbeddingHint")}</p>
+              </>
+            )}
 
             <div className="setting-title rag-subtitle">
               <h3>{t("documents.vectorStorage")}</h3>

@@ -544,8 +544,8 @@ await requireServerSession();`}</code>
               <span>Document Chat</span>
               <h2>Use scoped JSON, ChromaDB, Pinecone, or Supabase for document vectors.</h2>
               <p>
-                The Documents panel stores uploaded originals locally, then extracts text, chunks content, creates local
-                or OpenAI embeddings, and writes vectors to the selected store. Personal uploads are visible only to the
+                The Documents panel stores uploaded originals locally, then extracts text, chunks content, creates local,
+                Ollama, or OpenAI embeddings, and writes vectors to the selected store. Personal uploads are visible only to the
                 signed-in user. Shared workspace uploads are visible only to admins and workspace members. Pinecone and Supabase can be
                 configured with an API key, index, namespace, cloud, and region while keeping download and delete behavior
                 identical to ChromaDB.
@@ -555,8 +555,9 @@ await requireServerSession();`}</code>
                   "Pinecone can be configured from environment or the Documents panel",
                   "Default Pinecone index and namespace are configurable per deployment",
                   "Personal and workspace RAG stores are separated in local JSON and filtered in ChromaDB/Pinecone/Supabase by scope metadata",
-                  "Local embeddings use 384 dimensions; OpenAI text-embedding-3-small uses 1536",
-                  "If an existing Pinecone index has the wrong dimension, Batuk creates a sibling index such as sb-chat-documents-1536d",
+                  "Ollama embeddings use the model's returned dimensions, so embeddinggemma, qwen3-embedding, all-minilm, nomic-embed-text, and custom Ollama models can all be used for RAG",
+                  "Local embeddings use 384 dimensions; OpenAI text-embedding-3-small defaults to 1536 and text-embedding-3-large can use 3072",
+                  "If an existing Pinecone index has the wrong dimension, Batuk creates a sibling index such as sb-chat-documents-768d",
                   "Delete removes remote vectors and Supabase Storage objects when applicable; download always returns the original file",
                 ].map((item) => (
                   <li key={item}>

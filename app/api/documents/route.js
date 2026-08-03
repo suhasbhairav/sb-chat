@@ -31,6 +31,7 @@ function normalizeSettings(settings = {}) {
   return {
     ...embeddingSettings,
     vectorStoreProvider,
+    ollamaBaseUrl: String(settings.ollamaBaseUrl || process.env.OLLAMA_BASE_URL || process.env.BATUK_OLLAMA_BASE_URL || "http://localhost:11434"),
     chromaUrl: normalizeChromaUrl(settings.chromaUrl),
     chromaCollection: normalizeChromaCollectionName(settings.chromaCollection),
     pineconeApiKey: String(settings.pineconeApiKey || ""),
@@ -104,6 +105,7 @@ export async function POST(request) {
     const settings = normalizeSettings({
       embeddingProvider: formData.get("embeddingProvider"),
       embeddingModel: formData.get("embeddingModel"),
+      ollamaBaseUrl: formData.get("ollamaBaseUrl"),
       chunkSize: formData.get("chunkSize"),
       chunkOverlap: formData.get("chunkOverlap"),
       topK: formData.get("topK"),
@@ -160,6 +162,7 @@ export async function POST(request) {
         chunkCount: 0,
         embeddingProvider: settings.embeddingProvider,
         embeddingModel: settings.embeddingModel,
+        ollamaBaseUrl: ["ollama", "llamaindex-ollama"].includes(settings.embeddingProvider) ? settings.ollamaBaseUrl : null,
         vectorStoreProvider: settings.vectorStoreProvider,
         chromaUrl: settings.vectorStoreProvider === "chroma" ? settings.chromaUrl : null,
         chromaCollection: settings.vectorStoreProvider === "chroma" ? settings.chromaCollection : null,

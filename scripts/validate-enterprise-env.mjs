@@ -175,9 +175,9 @@ function validateModelQueue() {
 
 function validateEmbeddings() {
   const provider = normalizeProvider(process.env.BATUK_EMBEDDING_PROVIDER, "local");
-  const supported = new Set(["local", "openai", "llamaindex-openai", "llamaindex-ollama"]);
+  const supported = new Set(["local", "openai", "ollama", "llamaindex-openai", "llamaindex-ollama"]);
   if (!supported.has(provider)) {
-    throw new Error("BATUK_EMBEDDING_PROVIDER must be one of: local, openai, llamaindex-openai, llamaindex-ollama.");
+    throw new Error("BATUK_EMBEDDING_PROVIDER must be one of: local, openai, ollama, llamaindex-openai, llamaindex-ollama.");
   }
 
   if ((provider === "openai" || provider === "llamaindex-openai") && isBlank(process.env.OPENAI_API_KEY)) {
