@@ -195,6 +195,15 @@ function validateBedrock() {
   requireAny(["AWS_BEDROCK_REGION", "AWS_REGION", "AWS_DEFAULT_REGION"], "AWS Bedrock needs AWS_BEDROCK_REGION or AWS_REGION.");
 }
 
+function validateMicrosoftSSO() {
+  if (normalizeProvider(process.env.BATUK_MICROSOFT_SSO_ENABLED, "false") !== "true") return;
+
+  requireAny(["BATUK_MICROSOFT_TENANT_ID"], "Microsoft SSO needs BATUK_MICROSOFT_TENANT_ID.");
+  requireAny(["BATUK_MICROSOFT_CLIENT_ID"], "Microsoft SSO needs BATUK_MICROSOFT_CLIENT_ID.");
+  requireAny(["BATUK_MICROSOFT_CLIENT_SECRET"], "Microsoft SSO needs BATUK_MICROSOFT_CLIENT_SECRET.");
+  requireAny(["BATUK_MICROSOFT_DOMAIN"], "Microsoft SSO needs BATUK_MICROSOFT_DOMAIN.");
+}
+
 await loadEnvFile(process.env.BATUK_ENV_FILE);
 await loadEnvFile(".env.enterprise");
 await loadEnvFile(".env");
@@ -209,6 +218,7 @@ validateRagStorage();
 validateModelQueue();
 validateEmbeddings();
 validateBedrock();
+validateMicrosoftSSO();
 validateSecurity();
 
 console.log("Enterprise environment configuration is valid.");

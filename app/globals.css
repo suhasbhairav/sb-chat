@@ -289,6 +289,46 @@ body {
   padding: 4px;
 }
 
+.auth-microsoft {
+  display: inline-flex;
+  width: 100%;
+  min-height: 46px;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  border: 1px solid rgb(255 255 255 / 0.16);
+  border-radius: 8px;
+  background: #2f2f2f;
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 780;
+}
+
+.auth-microsoft:disabled,
+.auth-submit:disabled {
+  cursor: not-allowed;
+  opacity: 0.68;
+}
+
+.auth-divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 14px 0;
+  color: #8f8f88;
+  font-size: 11px;
+  font-weight: 820;
+  text-transform: uppercase;
+}
+
+.auth-divider::before,
+.auth-divider::after {
+  height: 1px;
+  flex: 1;
+  background: rgb(255 255 255 / 0.12);
+  content: "";
+}
+
 .auth-mode button {
   min-height: 36px;
   border: 0;

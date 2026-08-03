@@ -30,6 +30,7 @@
 ![Vector Stores](https://img.shields.io/badge/Vector_Stores-ChromaDB_Pinecone_Qdrant_Supabase-0891b2?style=for-the-badge)
 ![Enterprise Identity](https://img.shields.io/badge/Enterprise-Identity-111111?style=for-the-badge)
 ![SSO](https://img.shields.io/badge/SSO-OIDC_SAML_SCIM-334155?style=for-the-badge)
+![Microsoft SSO](https://img.shields.io/badge/Microsoft_Entra_ID-SSO_Ready-0078d4?style=for-the-badge&logo=microsoft&logoColor=white)
 ![API Gateway](https://img.shields.io/badge/API_Gateway-OpenAI_Compatible-059669?style=for-the-badge)
 ![Docker](https://img.shields.io/badge/Docker-Self_Hosted-2496ed?style=for-the-badge&logo=docker&logoColor=white)
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-Ready-4169e1?style=for-the-badge&logo=postgresql&logoColor=white)
@@ -48,7 +49,7 @@
   </a>
 </p>
 
-Batuk is an open-source, enterprise-grade AI workspace for organizations that want control over where AI runs, which models users can access, how documents are retrieved, and how usage is governed. It combines a polished multi-model chat experience with private RAG, team workspaces, SSO-ready identity, audit workflows, token usage reporting, and OpenAI-compatible internal APIs.
+Batuk is an open-source, enterprise-grade AI workspace for organizations that want control over where AI runs, which models users can access, how documents are retrieved, and how usage is governed. It combines a polished multi-model chat experience with private RAG, team workspaces, Microsoft Entra ID / Azure AD SSO-ready identity, audit workflows, token usage reporting, and OpenAI-compatible internal APIs.
 
 Batuk works as a local-first sovereign AI chat workspace for individual teams and as a self-hosted AI platform for larger organizations. Run it on a laptop with local storage, deploy it with Docker, connect it to SQL databases and vector stores, or place it inside a controlled enterprise environment where model credentials, documents, memories, and audit evidence remain under your operating model.
 
@@ -59,7 +60,7 @@ Batuk is built for teams that need more than a chatbot. It gives admins a single
 Batuk is one of the best choices for a private enterprise AI workspace because it treats sovereignty as a product requirement, not a slogan. Local models, hosted frontier models, private model gateways, document RAG, identity, authorization, audit trails, usage visibility, and workspace boundaries are designed to work together from the same interface.
 
 - **Sovereign by design:** run local models, hosted providers, or private OpenAI-compatible endpoints while keeping user data, documents, memories, and API access under admin control.
-- **Enterprise-ready workspace:** users, admins, organizations, teams, shared workspaces, SSO, OAuth/OIDC, SCIM, and protected product APIs are part of the platform.
+- **Enterprise-ready workspace:** users, admins, organizations, teams, shared workspaces, Microsoft Entra ID / Azure AD SSO, OAuth/OIDC, SAML, SCIM, and protected product APIs are part of the platform.
 - **Private document intelligence:** upload documents, extract text, chunk content, embed vectors, retrieve citations, and scope RAG by user, organization, or shared workspace.
 - **Model choice without chaos:** admins decide which providers and models are available, while users get a clean chat UI with provider settings, model selection, voice, web search, and guardrails.
 - **Internal AI API gateway:** expose approved models through Batuk API keys and OpenAI-compatible endpoints for internal tools, agents, and product integrations.
@@ -114,9 +115,43 @@ Batuk includes enterprise identity foundations through Better Auth integrations 
 - Admin management for users, roles, bans, password resets, and admin APIs.
 - Organizations, teams, members, invitations, and organization roles.
 - OAuth 2.1/OIDC provider mode with consent page.
+- One-click Microsoft Entra ID / Azure AD SSO from environment variables for companies, universities, and Microsoft 365-heavy organizations.
 - SSO support for enterprise OIDC/SAML sign-in.
 - SCIM provisioning for identity-provider workflows.
 - Protected APIs for chat, documents, skills, agents, usage, memory, models, attachments, realtime sessions, workflows, and enterprise operations.
+
+### Microsoft Entra ID / Azure AD SSO
+
+Batuk supports Microsoft SSO for organizations that standardize on Microsoft 365, Entra ID, Azure AD, Teams, Outlook, SharePoint, and university Microsoft tenants. Admins can enable a one-click `Continue with Microsoft` login button from `.env` or `.env.enterprise` without writing custom auth code.
+
+Create a Microsoft Entra ID App Registration and add this redirect URI for local development:
+
+```text
+http://localhost:3000/api/auth/sso/callback
+```
+
+For production, replace the host with your deployed `BETTER_AUTH_URL`:
+
+```text
+https://your-batuk-domain.com/api/auth/sso/callback
+```
+
+Then set:
+
+```env
+BATUK_MICROSOFT_SSO_ENABLED=true
+NEXT_PUBLIC_BATUK_MICROSOFT_SSO_ENABLED=true
+BATUK_MICROSOFT_PROVIDER_ID=microsoft-entra
+NEXT_PUBLIC_BATUK_MICROSOFT_PROVIDER_ID=microsoft-entra
+NEXT_PUBLIC_BATUK_MICROSOFT_SSO_LABEL=Continue with Microsoft
+BATUK_MICROSOFT_TENANT_ID=replace_with_directory_tenant_id
+BATUK_MICROSOFT_CLIENT_ID=replace_with_application_client_id
+BATUK_MICROSOFT_CLIENT_SECRET=replace_with_client_secret_value
+BATUK_MICROSOFT_DOMAIN=example.edu,example.com
+BATUK_MICROSOFT_SCOPES=openid,profile,email,offline_access
+```
+
+Use the real Microsoft directory tenant ID for strict OIDC issuer validation. `BATUK_MICROSOFT_DOMAIN` accepts one or more comma-separated email domains, which is useful for universities and multi-domain European organizations.
 
 ### Administration and Governance
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { FileSearch, Globe2, LogOut, MessageCircle, Mic2, ShieldCheck, Sparkles, UserRound } from "lucide-react";
+import { FileSearch, Globe2, LogOut, MessageCircle, Mic2, ShieldCheck, Sparkles, UserRound, WalletCards } from "lucide-react";
 import { useState } from "react";
 import { authClient } from "@/lib/auth-client";
 
@@ -59,8 +59,12 @@ function AuthForm({ onSuccess }) {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isMicrosoftSubmitting, setIsMicrosoftSubmitting] = useState(false);
 
   const isSignUp = mode === "sign-up";
+  const microsoftSSOEnabled = process.env.NEXT_PUBLIC_BATUK_MICROSOFT_SSO_ENABLED === "true";
+  const microsoftProviderId = process.env.NEXT_PUBLIC_BATUK_MICROSOFT_PROVIDER_ID || "microsoft-entra";
+  const microsoftLabel = process.env.NEXT_PUBLIC_BATUK_MICROSOFT_SSO_LABEL || "Continue with Microsoft";
   const capabilities = [
     { icon: MessageCircle, label: "Chat with leading AI models" },
     { icon: FileSearch, label: "Ask questions about your files" },
@@ -88,6 +92,39 @@ function AuthForm({ onSuccess }) {
       setError(authError.message || "Authentication failed.");
     } finally {
       setIsSubmitting(false);
+    }
+  }
+
+  async function signInWithMicrosoft() {
+    setError("");
+    setIsMicrosoftSubmitting(true);
+
+    try {
+      const result = await fetch("/api/auth/sign-in/sso", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          providerId: microsoftProviderId,
+          providerType: "oidc",
+          callbackURL: "/",
+          errorCallbackURL: "/",
+          newUserCallbackURL: "/",
+        }),
+      });
+      const payload = await result.json().catch(() => null);
+
+      if (!result.ok || !payload?.url) {
+        setError(payload?.message || payload?.error || "Microsoft SSO is not configured yet.");
+        return;
+      }
+
+      window.location.href = payload.url;
+    } catch (authError) {
+      setError(authError.message || "Microsoft SSO failed to start.");
+    } finally {
+      setIsMicrosoftSubmitting(false);
     }
   }
 
@@ -138,9 +175,26 @@ function AuthForm({ onSuccess }) {
             <ShieldCheck size={18} />
             <div>
               <h2>{isSignUp ? "Create your workspace" : "Welcome back"}</h2>
-              <p>Your account is protected locally with Better Auth.</p>
+              <p>{microsoftSSOEnabled ? "Use Microsoft SSO or local Better Auth credentials." : "Your account is protected locally with Better Auth."}</p>
             </div>
           </div>
+
+          {microsoftSSOEnabled && (
+            <>
+              <button
+                className="auth-microsoft"
+                type="button"
+                onClick={signInWithMicrosoft}
+                disabled={isMicrosoftSubmitting}
+              >
+                <WalletCards size={18} />
+                <span>{isMicrosoftSubmitting ? "Opening Microsoft..." : microsoftLabel}</span>
+              </button>
+              <div className="auth-divider">
+                <span>or</span>
+              </div>
+            </>
+          )}
 
           <div className="auth-mode" role="tablist" aria-label="Authentication mode">
             <button type="button" className={!isSignUp ? "active" : ""} onClick={() => setMode("sign-in")}>
@@ -176,7 +230,7 @@ function AuthForm({ onSuccess }) {
 
           <div className="auth-footnote">
             <ShieldCheck size={16} />
-            <span>Email/password auth is stored in local SQLite through Better Auth.</span>
+            <span>{microsoftSSOEnabled ? "Microsoft Entra ID SSO is configured from environment variables." : "Email/password auth is stored in local SQLite through Better Auth."}</span>
           </div>
         </section>
 
