@@ -1,6 +1,7 @@
 import { archiveMemory, createMemory, listMemories, updateMemory } from "@/lib/memory-store";
 import { json } from "@/lib/chat-request";
 import { requireServerPermission } from "@/lib/auth-session";
+import { recordRequestAudit, summarizeText } from "@/lib/audit-utils";
 
 export const runtime = "nodejs";
 
@@ -33,6 +34,14 @@ export async function POST(request) {
       tags: body.tags,
     });
     const memories = await listMemories(getUserId(session));
+    await recordRequestAudit({
+      category: "privacy",
+      action: "memory.create",
+      outcome: "success",
+      actor: session.user,
+      target: { type: "memory", id: memory.id },
+      metadata: { content: summarizeText(body.content), sourceChatId: body.sourceChatId || null, tags: body.tags || [] },
+    });
 
     return json({ memory, memories });
   } catch (error) {
@@ -53,6 +62,14 @@ export async function PATCH(request) {
       status: body.status,
     });
     const memories = await listMemories(getUserId(session));
+    await recordRequestAudit({
+      category: "privacy",
+      action: "memory.update",
+      outcome: "success",
+      actor: session.user,
+      target: { type: "memory", id: body.id },
+      metadata: { content: summarizeText(body.content), status: body.status || null },
+    });
 
     return json({ memory, memories });
   } catch (error) {
@@ -69,6 +86,13 @@ export async function DELETE(request) {
     const memoryId = searchParams.get("id");
     const memory = await archiveMemory({ userId: getUserId(session), memoryId });
     const memories = await listMemories(getUserId(session));
+    await recordRequestAudit({
+      category: "privacy",
+      action: "memory.delete",
+      outcome: "success",
+      actor: session.user,
+      target: { type: "memory", id: memoryId },
+    });
 
     return json({ memory, memories });
   } catch (error) {

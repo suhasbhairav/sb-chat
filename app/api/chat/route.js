@@ -11,6 +11,7 @@ import { formatMcpContextForPrompt, getActiveMcpIntegration } from "@/lib/mcp-st
 import { readMcpResource } from "@/lib/mcp-client";
 import { withProductDataScope } from "@/lib/product-data-store";
 import { resolveDocumentProductDataScope } from "@/lib/workspace-access";
+import { recordRequestAudit, summarizeMessages, summarizeText } from "@/lib/audit-utils";
 
 function encodeEvent(event) {
   return new TextEncoder().encode(`${JSON.stringify(event)}\n`);
@@ -82,12 +83,51 @@ export async function POST(request) {
     const validationError = validateChatPayload(payload);
 
     if (validationError) {
+      await recordRequestAudit({
+        category: "model",
+        action: "chat.request.validation_failed",
+        outcome: "failure",
+        actor: session.user,
+        statusCode: 400,
+        metadata: { reason: validationError, payload: { provider: payload?.provider, model: payload?.model, chatId: payload?.chatId } },
+      });
       return json({ error: validationError }, 400);
     }
 
     const chatRequest = prepareChatRequest(payload);
+    await recordRequestAudit({
+      category: "model",
+      action: "chat.prompt.received",
+      outcome: "success",
+      actor: session.user,
+      target: { type: "chat", id: payload.chatId || null },
+      frameworkTags: ["GDPR", "ISO 27001", "SOC 2", "HIPAA"],
+      metadata: {
+        provider: chatRequest.provider,
+        model: chatRequest.model,
+        baseUrl: chatRequest.baseUrl,
+        workspaceId: payload.workspaceId,
+        folderId: payload.folderId,
+        temporary: Boolean(payload.temporary),
+        guardrails: Boolean(payload.guardrails),
+        webSearch: Boolean(chatRequest.webSearch),
+        documentChat: Boolean(chatRequest.documentChat),
+        memoryEnabled: payload.memoryEnabled !== false,
+        messageCount: payload.messages.length,
+        messages: summarizeMessages(payload.messages),
+      },
+    });
 
     if (chatRequest.screened.blocked) {
+      await recordRequestAudit({
+        category: "security",
+        action: "chat.guardrail.blocked",
+        outcome: "denied",
+        actor: session.user,
+        target: { type: "chat", id: payload.chatId || null },
+        statusCode: 200,
+        metadata: { reason: chatRequest.screened.reason, messages: summarizeMessages(payload.messages) },
+      });
       return json(blockedGuardrailResponse(chatRequest.screened));
     }
 
@@ -159,6 +199,18 @@ export async function POST(request) {
         }),
       );
       documentSources = retrieval.sources;
+      await recordRequestAudit({
+        category: "document",
+        action: "document.context.retrieved",
+        outcome: retrieval.context ? "success" : "failure",
+        actor: session.user,
+        target: { type: "workspace", id: payload.workspaceId || null },
+        metadata: {
+          query: summarizeText(latestUserMessage),
+          sourceCount: retrieval.sources.length,
+          context: summarizeText(retrieval.context || ""),
+        },
+      });
 
       if (!retrieval.context) {
         return ndjsonStream((controller) => {
@@ -224,6 +276,25 @@ export async function POST(request) {
                 });
               }
 
+              await recordRequestAudit({
+                category: "model",
+                action: "chat.completion.finished",
+                outcome: "success",
+                actor: session.user,
+                target: { type: "chat", id: payload.chatId || null },
+                metadata: {
+                  provider: modelRequest.provider,
+                  model: modelRequest.model,
+                  workspaceId: payload.workspaceId,
+                  folderId: payload.folderId,
+                  temporary: Boolean(payload.temporary),
+                  documentSourceCount: documentSources.length,
+                  usage,
+                  prompt: { messageCount: modelRequest.messages.length, messages: summarizeMessages(modelRequest.messages) },
+                  result: summarizeText(finalMessage),
+                },
+              });
+
               controller.enqueue(
                 encodeEvent({
                   type: "done",
@@ -243,6 +314,19 @@ export async function POST(request) {
 
           await ticket.promise;
         } catch (error) {
+          await recordRequestAudit({
+            category: "model",
+            action: "chat.completion.failed",
+            outcome: "failure",
+            actor: session.user,
+            target: { type: "chat", id: payload.chatId || null },
+            metadata: {
+              provider: modelRequest.provider,
+              model: modelRequest.model,
+              error: error.message || "Unexpected chat server error.",
+              prompt: { messageCount: modelRequest.messages.length, messages: summarizeMessages(modelRequest.messages) },
+            },
+          });
           controller.enqueue(encodeEvent({ type: "error", error: error.message || "Unexpected chat server error." }));
         } finally {
           controller.close();

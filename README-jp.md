@@ -202,6 +202,8 @@ Batuk はローカル、ホスト型、OpenAI 互換のモデルアクセスを�
 | OpenAI | `https://api.openai.com/v1` | `gpt-5.1-mini` | Chat、Web search、Embeddings、Realtime voice。 |
 | AWS Bedrock | `us-east-1` | `amazon.nova-lite-v1:0` | AWS credentials を使う Bedrock Converse API。 |
 | OpenRouter | `https://openrouter.ai/api/v1` | `openai/gpt-4o-mini` | OpenAI 互換 API による routed access。 |
+| OrcaRouter | `https://api.orcarouter.ai/v1` | `openai/gpt-4o-mini` | モデルプロバイダー横断の OpenAI 互換 routed access。 |
+| Velona | `http://www.velona.in/gateway/v1` | `openai/gpt-4o-mini` | 300+ models への INR 課金 routed inference。 |
 | Claude | `https://api.anthropic.com/v1` | `claude-sonnet-5` | Streaming と usage reporting 対応の Anthropic Messages API。 |
 | Grok | `https://api.x.ai/v1` | `grok-4.5` | xAI text と Grok Voice realtime sessions。 |
 | Sarvam AI | `https://api.sarvam.ai/v1` | `sarvam-105b` | インド言語に最適化された chat models。 |
@@ -223,6 +225,8 @@ Batuk はローカル、ホスト型、OpenAI 互換のモデルアクセスを�
 | `openai` | `OPENAI_API_KEY` | `provider=openai`, `baseUrl=https://api.openai.com/v1`, `model=gpt-5.1-mini` |
 | `bedrock` | AWS credentials と `AWS_BEDROCK_REGION` または `AWS_REGION` | `provider=bedrock`, `baseUrl=us-east-1`, `model=amazon.nova-lite-v1:0` |
 | `openrouter` | `OPENROUTER_API_KEY` | `provider=openrouter`, `baseUrl=https://openrouter.ai/api/v1`, `model=openai/gpt-4o-mini` |
+| `orcarouter` | `ORCAROUTER_API_KEY` | `provider=orcarouter`, `baseUrl=https://api.orcarouter.ai/v1`, `model=openai/gpt-4o-mini` |
+| `velona` | `VELONA_API_KEY` | `provider=velona`, `baseUrl=http://www.velona.in/gateway/v1`, `model=openai/gpt-4o-mini` |
 | `together` | `TOGETHER_API_KEY` | `provider=together`, `baseUrl=https://api.together.ai/v1`, `model=MiniMaxAI/MiniMax-M3` |
 | `mistral` | `MISTRAL_API_KEY` | `provider=mistral`, `baseUrl=https://api.mistral.ai/v1`, `model=mistral-large-latest` |
 | `kimi` | `MOONSHOT_API_KEY` または `KIMI_API_KEY` | `provider=kimi`, `baseUrl=https://api.moonshot.ai/v1`, `model=kimi-k3` |

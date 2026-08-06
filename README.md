@@ -172,10 +172,11 @@ Admins can manage AI access and workspace behavior without editing code.
 - Team creation, invitations, and role management.
 - Shared workspace creation, membership, RAG enablement, renaming, and deletion.
 - Token usage dashboard by source, provider, model, user, chat, API key, day, month, and year.
-- Audit trail for access denials, admin actions, document operations, chat library mutations, privacy requests, and control changes.
-- Hash-chain integrity evidence for audit events.
+- Audit trail for access denials, admin actions, document operations, chat library mutations, privacy requests, model/API calls, prompt/result digests, memory changes, skill and agent changes, MCP tool/resource activity, usage resets, and control changes.
+- Hash-chain integrity evidence for audit events, with actor, target, action, outcome, timestamp, request context, status code, and sanitized metadata.
 - GDPR export, request, and erasure workflows.
-- ISO 27001 and SOC 2 control evidence register.
+- GDPR, ISO 27001, SOC 2, and HIPAA control evidence register.
+- Privacy-safe prompt/output trails store hashes, lengths, roles, attachment metadata, and result digests by default. Set `BATUK_AUDIT_RAW_CONTENT_ENABLED=true` only when your governance policy explicitly permits raw prompt/result previews in audit evidence.
 
 ### Internal AI API Gateway
 
@@ -202,6 +203,8 @@ Batuk supports local, hosted, and OpenAI-compatible model access. Admins choose 
 | OpenAI | `https://api.openai.com/v1` | `gpt-5.1-mini` | Chat, web search, embeddings, and realtime voice. |
 | AWS Bedrock | `us-east-1` | `amazon.nova-lite-v1:0` | Bedrock Converse API with AWS credentials. |
 | OpenRouter | `https://openrouter.ai/api/v1` | `openai/gpt-4o-mini` | Routed access through an OpenAI-compatible API. |
+| OrcaRouter | `https://api.orcarouter.ai/v1` | `openai/gpt-4o-mini` | OpenAI-compatible routed access across model providers. |
+| Velona | `http://www.velona.in/gateway/v1` | `openai/gpt-4o-mini` | INR-billed routed inference across 300+ models. |
 | Claude | `https://api.anthropic.com/v1` | `claude-sonnet-5` | Anthropic Messages API with streaming and usage reporting. |
 | Grok | `https://api.x.ai/v1` | `grok-4.5` | xAI text and Grok Voice realtime sessions. |
 | Sarvam AI | `https://api.sarvam.ai/v1` | `sarvam-105b` | Indian-language optimized chat models. |
@@ -223,6 +226,8 @@ Batuk supports local, hosted, and OpenAI-compatible model access. Admins choose 
 | `openai` | `OPENAI_API_KEY` | `provider=openai`, `baseUrl=https://api.openai.com/v1`, `model=gpt-5.1-mini` |
 | `bedrock` | AWS credentials plus `AWS_BEDROCK_REGION` or `AWS_REGION` | `provider=bedrock`, `baseUrl=us-east-1`, `model=amazon.nova-lite-v1:0` |
 | `openrouter` | `OPENROUTER_API_KEY` | `provider=openrouter`, `baseUrl=https://openrouter.ai/api/v1`, `model=openai/gpt-4o-mini` |
+| `orcarouter` | `ORCAROUTER_API_KEY` | `provider=orcarouter`, `baseUrl=https://api.orcarouter.ai/v1`, `model=openai/gpt-4o-mini` |
+| `velona` | `VELONA_API_KEY` | `provider=velona`, `baseUrl=http://www.velona.in/gateway/v1`, `model=openai/gpt-4o-mini` |
 | `together` | `TOGETHER_API_KEY` | `provider=together`, `baseUrl=https://api.together.ai/v1`, `model=MiniMaxAI/MiniMax-M3` |
 | `mistral` | `MISTRAL_API_KEY` | `provider=mistral`, `baseUrl=https://api.mistral.ai/v1`, `model=mistral-large-latest` |
 | `kimi` | `MOONSHOT_API_KEY` or `KIMI_API_KEY` | `provider=kimi`, `baseUrl=https://api.moonshot.ai/v1`, `model=kimi-k3` |

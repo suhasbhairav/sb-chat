@@ -1,6 +1,6 @@
 import { json } from "@/lib/chat-request";
 import { requireServerPermission } from "@/lib/auth-session";
-import { getBedrockModels, getClaudeModels, getDeepInfraModels, getDeepSeekModels, getEdenAIModels, getKimiModels, getMistralModels, getOllamaModels, getOpenAIModels, getOpenRouterModels, getPerplexityModels, getQwenModels, getSarvamModels, getTogetherModels, getXAIModels } from "@/lib/model-catalog";
+import { getBedrockModels, getClaudeModels, getDeepInfraModels, getDeepSeekModels, getEdenAIModels, getKimiModels, getMistralModels, getOllamaModels, getOpenAIModels, getOrcaRouterModels, getOpenRouterModels, getPerplexityModels, getQwenModels, getSarvamModels, getTogetherModels, getVelonaModels, getXAIModels } from "@/lib/model-catalog";
 
 export async function GET(request) {
   const { response } = await requireServerPermission({ model: ["read"] });
@@ -17,6 +17,14 @@ export async function GET(request) {
 
     if (provider === "openrouter") {
       return json(await getOpenRouterModels());
+    }
+
+    if (provider === "orcarouter") {
+      return json(await getOrcaRouterModels(baseUrl));
+    }
+
+    if (provider === "velona") {
+      return json(await getVelonaModels(baseUrl));
     }
 
     if (provider === "together") {

@@ -202,6 +202,8 @@ Batuk unterstützt lokalen, gehosteten und OpenAI-kompatiblen Modellzugriff. Adm
 | OpenAI | `https://api.openai.com/v1` | `gpt-5.1-mini` | Chat, Websuche, Embeddings und Realtime Voice. |
 | AWS Bedrock | `us-east-1` | `amazon.nova-lite-v1:0` | Bedrock Converse API mit AWS Credentials. |
 | OpenRouter | `https://openrouter.ai/api/v1` | `openai/gpt-4o-mini` | Gerouteter Zugriff über eine OpenAI-kompatible API. |
+| OrcaRouter | `https://api.orcarouter.ai/v1` | `openai/gpt-4o-mini` | OpenAI-kompatibler gerouteter Zugriff über Modellanbieter hinweg. |
+| Velona | `http://www.velona.in/gateway/v1` | `openai/gpt-4o-mini` | INR-abgerechnete geroutete Inferenz über 300+ Modelle. |
 | Claude | `https://api.anthropic.com/v1` | `claude-sonnet-5` | Anthropic Messages API mit Streaming und Nutzungsbericht. |
 | Grok | `https://api.x.ai/v1` | `grok-4.5` | xAI Text und Grok Voice Realtime Sessions. |
 | Sarvam AI | `https://api.sarvam.ai/v1` | `sarvam-105b` | Chatmodelle optimiert für indische Sprachen. |
@@ -223,6 +225,8 @@ Batuk unterstützt lokalen, gehosteten und OpenAI-kompatiblen Modellzugriff. Adm
 | `openai` | `OPENAI_API_KEY` | `provider=openai`, `baseUrl=https://api.openai.com/v1`, `model=gpt-5.1-mini` |
 | `bedrock` | AWS Credentials plus `AWS_BEDROCK_REGION` oder `AWS_REGION` | `provider=bedrock`, `baseUrl=us-east-1`, `model=amazon.nova-lite-v1:0` |
 | `openrouter` | `OPENROUTER_API_KEY` | `provider=openrouter`, `baseUrl=https://openrouter.ai/api/v1`, `model=openai/gpt-4o-mini` |
+| `orcarouter` | `ORCAROUTER_API_KEY` | `provider=orcarouter`, `baseUrl=https://api.orcarouter.ai/v1`, `model=openai/gpt-4o-mini` |
+| `velona` | `VELONA_API_KEY` | `provider=velona`, `baseUrl=http://www.velona.in/gateway/v1`, `model=openai/gpt-4o-mini` |
 | `together` | `TOGETHER_API_KEY` | `provider=together`, `baseUrl=https://api.together.ai/v1`, `model=MiniMaxAI/MiniMax-M3` |
 | `mistral` | `MISTRAL_API_KEY` | `provider=mistral`, `baseUrl=https://api.mistral.ai/v1`, `model=mistral-large-latest` |
 | `kimi` | `MOONSHOT_API_KEY` oder `KIMI_API_KEY` | `provider=kimi`, `baseUrl=https://api.moonshot.ai/v1`, `model=kimi-k3` |

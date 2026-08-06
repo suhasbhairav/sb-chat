@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { ArrowLeft, ClipboardCheck, Database, Download, FileClock, RefreshCw, ShieldCheck, X } from "lucide-react";
+import { ArrowLeft, Activity, ClipboardCheck, Database, Download, FileClock, Filter, RefreshCw, Search, ShieldCheck, X } from "lucide-react";
 
 async function complianceRequest(action, payload = {}) {
   const response = await fetch("/api/compliance", {
@@ -40,6 +40,10 @@ export function AuditPanel({ onBackToMenu, onClose }) {
   const [status, setStatus] = useState("loading");
   const [error, setError] = useState("");
   const [busyAction, setBusyAction] = useState("");
+  const [activeView, setActiveView] = useState("evidence");
+  const [eventQuery, setEventQuery] = useState("");
+  const [eventCategory, setEventCategory] = useState("all");
+  const [eventOutcome, setEventOutcome] = useState("all");
 
   async function load() {
     setStatus("loading");
@@ -88,6 +92,27 @@ export function AuditPanel({ onBackToMenu, onClose }) {
 
   const totals = compliance?.summary?.totals || {};
   const frameworkCounts = compliance?.summary?.byFramework || {};
+  const categories = compliance?.summary?.byCategory || {};
+  const outcomes = compliance?.summary?.byOutcome || {};
+  const integrity = compliance?.summary?.integrity || {};
+  const trailCoverage = compliance?.summary?.trailCoverage || [];
+  const controls = compliance?.controls || [];
+  const events = compliance?.auditEvents || [];
+  const filteredEvents = events.filter((event) => {
+    const query = eventQuery.trim().toLowerCase();
+    const matchesQuery = !query || [event.action, event.category, event.outcome, event.target?.type, event.target?.id, event.actor?.role]
+      .filter(Boolean)
+      .join(" ")
+      .toLowerCase()
+      .includes(query);
+    const matchesCategory = eventCategory === "all" || event.category === eventCategory;
+    const matchesOutcome = eventOutcome === "all" || event.outcome === eventOutcome;
+    return matchesQuery && matchesCategory && matchesOutcome;
+  });
+  const frameworkReadiness = Object.entries(frameworkCounts).map(([framework, count]) => {
+    const implemented = controls.filter((control) => control.framework === framework && control.status === "implemented").length;
+    return { framework, count, implemented, percent: count ? Math.round((implemented / count) * 100) : 0 };
+  });
 
   return (
     <section className="audit-panel">
@@ -122,8 +147,8 @@ export function AuditPanel({ onBackToMenu, onClose }) {
           <section className="audit-card audit-overview">
             <div className="audit-card-heading">
               <div>
-                <span>Compliance dashboard</span>
-                <h3>GDPR, ISO 27001, and SOC 2 evidence</h3>
+                <span>Compliance evidence dashboard</span>
+                <h3>GDPR, ISO 27001, SOC 2, and HIPAA data trails</h3>
               </div>
               <ShieldCheck size={24} />
             </div>
@@ -138,12 +163,12 @@ export function AuditPanel({ onBackToMenu, onClose }) {
                 <span>audit events</span>
               </div>
               <div className="audit-metric">
-                <strong>{totals.openDataRequests || 0}</strong>
-                <span>open GDPR requests</span>
+                <strong>{totals.coverageCount || 0}/{totals.coverageTotal || 0}</strong>
+                <span>trail categories active</span>
               </div>
               <div className="audit-metric">
-                <strong>{totals.failedOrDeniedEvents || 0}</strong>
-                <span>denied or failed events</span>
+                <strong>{integrity.verified ? "Verified" : "Review"}</strong>
+                <span>hash-chain integrity</span>
               </div>
             </div>
 
@@ -152,8 +177,9 @@ export function AuditPanel({ onBackToMenu, onClose }) {
                 <span className="audit-chip" key={framework}>{framework}: {count} controls</span>
               ))}
               <span className="audit-chip">Retention: {compliance.settings?.retentionDays} days</span>
-              <span className="audit-chip">Hash chain: enabled</span>
+              <span className={`audit-chip ${integrity.verified ? "positive" : "danger"}`}>Hash chain: {integrity.verified ? "verified" : "needs review"}</span>
               <span className="audit-chip">PII hashing: {compliance.settings?.hashPersonalIdentifiers ? "enabled" : "disabled"}</span>
+              <span className="audit-chip">Raw prompt previews: {compliance.settings?.rawContentEnabled ? "enabled" : "off by default"}</span>
             </div>
 
             <div className="audit-actions">
@@ -172,17 +198,117 @@ export function AuditPanel({ onBackToMenu, onClose }) {
             </div>
           </section>
 
+          <nav className="audit-view-tabs" aria-label="Compliance evidence views">
+            {[
+              ["evidence", "Evidence"],
+              ["trail", "Event trail"],
+              ["controls", "Controls"],
+              ["data", "Data map"],
+            ].map(([id, label]) => (
+              <button className={activeView === id ? "active" : ""} key={id} onClick={() => setActiveView(id)} type="button">
+                {label}
+              </button>
+            ))}
+          </nav>
+
+          {activeView === "evidence" && (
+            <>
+              <section className="audit-card">
+                <div className="audit-section-title">
+                  <ShieldCheck size={17} />
+                  <h3>Framework readiness</h3>
+                </div>
+                <div className="audit-readiness-grid">
+                  {frameworkReadiness.map((item) => (
+                    <div className="audit-readiness-row" key={item.framework}>
+                      <div>
+                        <strong>{item.framework}</strong>
+                        <small>{item.implemented}/{item.count} controls implemented</small>
+                      </div>
+                      <span>{item.percent}%</span>
+                    </div>
+                  ))}
+                </div>
+              </section>
+
+              <section className="audit-card">
+                <div className="audit-section-title">
+                  <Activity size={17} />
+                  <h3>Data-trail coverage</h3>
+                </div>
+                <div className="audit-coverage-list">
+                  {trailCoverage.map((item) => (
+                    <div className="audit-coverage-row" key={item.id}>
+                      <span className={`audit-dot ${item.covered ? "success" : ""}`} />
+                      <div>
+                        <strong>{item.label}</strong>
+                        <small>{item.covered ? `${categories[item.category]} events captured` : "No events yet; trail is enabled when activity occurs"}</small>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </section>
+
+              <section className="audit-card">
+                <div className="audit-section-title">
+                  <FileClock size={17} />
+                  <h3>Review queue</h3>
+                </div>
+                <div className="audit-metrics compact">
+                  <div className="audit-metric">
+                    <strong>{totals.failedOrDeniedEvents || 0}</strong>
+                    <span>failed or denied</span>
+                  </div>
+                  <div className="audit-metric">
+                    <strong>{totals.openDataRequests || 0}</strong>
+                    <span>open privacy requests</span>
+                  </div>
+                  <div className="audit-metric">
+                    <strong>{totals.recentEvents7d || 0}</strong>
+                    <span>events in 7 days</span>
+                  </div>
+                </div>
+                <div className="audit-chip-list">
+                  {Object.entries(outcomes).map(([outcome, count]) => (
+                    <span className={`audit-chip ${outcome === "success" ? "positive" : "danger"}`} key={outcome}>{outcome}: {count}</span>
+                  ))}
+                </div>
+              </section>
+            </>
+          )}
+
+          {activeView === "trail" && (
           <section className="audit-card audit-trail">
             <div className="audit-section-title">
               <FileClock size={17} />
               <h3>Audit trail</h3>
             </div>
+            <div className="audit-filters">
+              <label>
+                <Search size={15} />
+                <input value={eventQuery} onChange={(event) => setEventQuery(event.target.value)} placeholder="Search actions, targets, roles" />
+              </label>
+              <label>
+                <Filter size={15} />
+                <select value={eventCategory} onChange={(event) => setEventCategory(event.target.value)}>
+                  <option value="all">All categories</option>
+                  {Object.keys(categories).sort().map((category) => <option key={category} value={category}>{category}</option>)}
+                </select>
+              </label>
+              <label>
+                <Filter size={15} />
+                <select value={eventOutcome} onChange={(event) => setEventOutcome(event.target.value)}>
+                  <option value="all">All outcomes</option>
+                  {Object.keys(outcomes).sort().map((outcome) => <option key={outcome} value={outcome}>{outcome}</option>)}
+                </select>
+              </label>
+            </div>
             <div className="audit-event-scroll" tabIndex={0}>
-              {(compliance.auditEvents || []).map((event) => (
+              {filteredEvents.map((event) => (
                 <div className="audit-event-row" key={event.id}>
                   <div>
                     <strong>{event.action}</strong>
-                    <small>{event.actor?.role || "system"} · {event.actor?.emailHash ? "hashed actor" : "recorded actor"}</small>
+                    <small>{event.actor?.role || "system"} · {event.target?.type || "event"} {event.target?.id ? `· ${event.target.id}` : ""}</small>
                   </div>
                   <span className={`audit-status ${event.outcome === "success" ? "success" : event.outcome === "denied" ? "denied" : "failure"}`}>
                     {event.category} · {event.outcome}
@@ -190,10 +316,12 @@ export function AuditPanel({ onBackToMenu, onClose }) {
                   <time>{formatDate(event.createdAt)}</time>
                 </div>
               ))}
-              {!compliance.auditEvents?.length && <p className="audit-muted">Audit events will appear as users perform protected actions.</p>}
+              {!filteredEvents.length && <p className="audit-muted">No audit events match the current filters.</p>}
             </div>
           </section>
+          )}
 
+          {activeView === "data" && (
           <section className="audit-card audit-inventory">
             <div className="audit-section-title">
               <Database size={17} />
@@ -209,7 +337,9 @@ export function AuditPanel({ onBackToMenu, onClose }) {
               ))}
             </div>
           </section>
+          )}
 
+          {activeView === "data" && (
           <section className="audit-card audit-requests">
             <div className="audit-section-title">
               <ClipboardCheck size={17} />
@@ -224,9 +354,28 @@ export function AuditPanel({ onBackToMenu, onClose }) {
               {!compliance.dataRequests?.length && <p className="audit-muted">No GDPR requests have been logged yet.</p>}
             </div>
           </section>
+          )}
+
+          {activeView === "controls" && (
+            <section className="audit-card audit-controls">
+              <div className="audit-section-title">
+                <ClipboardCheck size={17} />
+                <h3>Control evidence register</h3>
+              </div>
+              <div className="audit-table">
+                {controls.map((control) => (
+                  <div className="audit-table-row control" key={control.id}>
+                    <strong>{control.framework}</strong>
+                    <span>{control.title}</span>
+                    <small>{control.status} · {control.owner}</small>
+                  </div>
+                ))}
+              </div>
+            </section>
+          )}
 
           <p className="audit-footnote">
-            Implemented control evidence: GDPR records of processing, data subject access and erasure, security of processing; ISO 27001 security policies and logging/monitoring; SOC 2 logical access, system operations monitoring, and privacy commitments.
+            Evidence posture: audit logs are hash chained, actor identifiers can be hashed, raw prompt/result previews are disabled by default, and prompt/output accountability is preserved through digests, role-level message summaries, sizes, timestamps, and result metadata.
           </p>
         </div>
       )}
